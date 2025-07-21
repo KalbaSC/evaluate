@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <title>نادي كلباء الرياضي الثقافي - التقييمات</title>
+  <style>
+    
+    @font-face {
+      font-family: 'NotoKufiArabic';
+      src: url('NotoKufiArabic.ttf') format('truetype');
+    }
+    html {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    body {
+      font-family: 'NotoKufiArabic', sans-serif;
+      background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+     flex-direction: column;
+    }
+    body > .footer-container {
+      margin-top: auto;
+    }
+    .container, #mainView, #activityView, #statsView {
+      flex: 1 0 auto;
+    }
+    main {
+     flex: 1;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+    }
+    .header-container {
+      width: 100%;
+      background: #111;
+      border-bottom: 2px solid #f4e733;
+    }
+    .header-right {
+      width: 100%;
+      max-width: 1170px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 42px;
+      background-color: #111;
+      color: white;
+      box-sizing: border-box;
+    }
+    .header-right img.logo {
+      height: 70px;
+    }
+    .divider {
+      width: 1.5px;
+      height: 65px;
+      background-color: #f4e733;
+    }
+    .header-info {
+      text-align: center;
+    }
+    .arabic-name {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .english-name {
+      font-size: 14px;
+      color: #f4e733;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(0,0,0,0.7);
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+  margin: 100px auto; 
+}
+    .popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .popup-content {
+      background: #222;
+      border: 2px solid #f4e733;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 300px;
+    }
+    .popup-content button {
+      background: #f4e733;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #f4e733;
+      padding: 10px;
+      text-align: center; 
+      vertical-align: middle;
+    }
+    th {
+      background: #333;
+    }
+    button {
+      background: #f4e733;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    footer {
+      background-color: #111;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      border-top: 3px solid #f4e733;
+      font-size: 14px;
+    }
+    .social-icons a {
+      color: white;
+      margin: 0 8px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-container">
+    <div class="header-right">
+      <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+      <div class="divider"></div>
+      <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+      <div class="header-info">
+        <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+        <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+      </div>
+    </div>
+  </header>
+
+<div id="rolePopup" class="popup">
+  <div class="popup-content">
+    <h2>اختر نوع الدخول:</h2>
+    <button onclick="enterCoach()">مدرب</button>
+    <button onclick="enterViewer()">مشاهد</button>
+  </div>
+</div>
+
+<main style="flex: 1;">
+    <div class="container"> 
+      
+<div id="content"></div>
+
+       </div>
+
+<script>
+const evaluationsURL = 'https://script.google.com/macros/s/AKfycbzpbUmXmD3ik-2Cgc64UZeWBL6hLSc_LDDwg0YoSCR_4bOKy4YUj8PrVczBfTi-Rj6a/exec';
+const attendanceURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
+const evaluationCriteria = {
+  "كرة يد": ["التصويب", "اللياقة", "التعاون", "الدفاع", "التركيز"],
+  "كرة طائرة": ["الارسال", "الاستقبال", "القفز", "اللياقة", "التعاون"],
+  "كرة سلة": ["التصويب", "المراوغة", "التمرير", "الدفاع", "الارتداد"],
+  "شطرنج": ["التخطيط", "التركيز", "التكتيك", "الصبر", "الابداع"]
+};
+
+const coaches = {
+  "handball1": { password: "pass1", activity: "كرة يد" },
+  "volley2": { password: "pass2", activity: "كرة طائرة" },
+  "basket3": { password: "pass3", activity: "كرة سلة" },
+  "chess4": { password: "pass4", activity: "شطرنج" }
+};
+
+let currentCoach = '';
+
+function enterCoach() {
+  document.getElementById('rolePopup').style.display = 'none';
+  loadCoachLogin();
+}
+
+function enterViewer() {
+  document.getElementById('rolePopup').style.display = 'none';
+  loadViewer();
+}
+
+function loadCoachLogin() {
+  document.getElementById('content').innerHTML = `
+    <div class="login-container">
+      <h2>تسجيل دخول المدرب</h2>
+      <input type='text' id='username' placeholder='اسم المستخدم'><br>
+      <input type='password' id='password' placeholder='كلمة المرور'><br>
+      <button onclick='authenticateCoach()'>دخول</button>
+    </div>
+  `;
+}
+
+function authenticateCoach() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  if (coaches[username] && coaches[username].password === password) {
+    currentCoach = username;
+    loadPlayers();
+  } else {
+    alert('بيانات الدخول غير صحيحة');
+  }
+}
+
+async function loadPlayers() {
+  const response = await fetch(attendanceURL);
+  const data = await response.json();
+  const coachActivity = coaches[currentCoach].activity;
+
+  let table = `
+    <h2>تقييم لاعبين الـ${coachActivity}</h2>
+    <div class="controls">
+      <div class="filter-bar">
+        <input type="text" id="filter-name" placeholder="🔍 الاسم..." onkeyup="filterTable()" autocomplete="off">
+        <input type="text" id="filter-id" placeholder="🔍 المعرّف..." onkeyup="filterTable()">
+        <input type="date" id="datePicker" onchange="filterTable()">
+        <button onclick="clearFilters()">مسح الفلاتر</button>
+        <button onclick="toggleEvaluation()" style="background: #f4e733;">🔄 بدء التقييم</button>
+      </div>
+    </div>
+    <table id="playersTable">
+      <thead>
+        <tr><th>المعرّف</th><th>اسم اللاعب وولي الأمر</th><th>تاريخ الحضور</th><th class="eval-col hidden">التقييم</th><th class="eval-col hidden">ملاحظات</th></tr>
+      </thead><tbody>`;
+
+  data.filter(p => p.Activity === coachActivity).forEach(player => {
+    const parent = player['Parent'] || '';
+    const date = player['Timestamp'] ? new Date(player['Timestamp']).toLocaleDateString('ar-EG') : '';
+    const fullName = `${player['Child Name']} ${parent}`;
+
+    table += `
+      <tr>
+        <td>${player.ID}</td>
+        <td>${fullName}</td>
+        <td>${date}</td>
+        <td class="eval-col hidden">
+          ${renderCriteriaInputs(player.ID, player.Activity)}
+          <div id="total-${player.ID}">الإجمالي: 0</div>
+          <button onclick="submitEvaluation('${player['Child Name']}', '${player.Activity}', '${player.ID}')">حفظ التقييم</button>
+        </td>
+        <td class="eval-col hidden">
+          <input type="text" id="notes-${player.ID}" placeholder="ملاحظة...">
+        </td>
+      </tr>`;
+  });
+
+  table += '</tbody></table>';
+  document.getElementById('content').innerHTML = table;
+}
+  
+function renderCriteriaInputs(playerId, activity) {
+  const criteria = evaluationCriteria[activity] || [];
+  return criteria.map((criterion, index) => `
+    <label>${criterion}</label>
+    <input type="number" id="${playerId}-c${index}" min="1" max="5" value="3" onchange="calculateTotal('${playerId}', '${activity}')"><br>
+  `).join('');
+}
+  
+function calculateTotal(playerId, activity) {
+  const criteria = evaluationCriteria[activity] || [];
+  let total = 0;
+
+  criteria.forEach((_, index) => {
+    const val = parseInt(document.getElementById(`${playerId}-c${index}`).value) || 0;
+    total += val;
+  });
+
+  document.getElementById(`total-${playerId}`).textContent = `الإجمالي: ${total}`;
+}
+
+function submitEvaluation(playerName, activity, playerId) {
+  const criteria = evaluationCriteria[activity] || [];
+  const scores = {};
+  let total = 0;
+
+  criteria.forEach((criterion, index) => {
+    const score = parseInt(document.getElementById(`${playerId}-c${index}`).value) || 0;
+    scores[criterion] = score;
+    total += score;
+  });
+
+  const maxScore = criteria.length * 5;
+  const percentage = Math.round((total / maxScore) * 100);
+
+  const payload = {
+    playerName,
+    activity,
+    scores,
+    total,
+    maxScore,
+    percentage,
+    note: document.getElementById(`notes-${playerId}`).value,
+    coach: currentCoach,
+    date: new Date().toISOString().split('T')[0]
+  };
+
+  console.log(payload); 
+}
+
+async function loadEvaluations() {
+  const res = await fetch(evaluationsURL);
+  const data = await res.json();
+
+  let content = `
+    <h2>قائمة التقييمات</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>اسم اللاعب وولي الأمر</th>
+          <th>المعرّف</th>
+          <th>النشاط</th>
+          <th>التقييم</th>
+          <th>الملاحظات</th>
+          <th>المدرب</th>
+          <th>التاريخ</th>
+        </tr>
+      </thead>
+      <tbody id="evaluationsTable"></tbody>
+    </table>`;
+
+  document.getElementById('content').innerHTML = content;
+
+  const tbody = document.getElementById('evaluationsTable');
+  data.forEach(ev => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${ev.playerName || ''} ${ev.parentName || ''}</td>
+      <td>${ev.playerId || ''}</td>
+      <td>${ev.activity || ''}</td>
+      <td>${ev.evaluation || ''}</td>
+      <td>${ev.note || ''}</td>
+      <td>${ev.coach || ''}</td>
+      <td>${ev.date || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleEvaluation() {
+  document.querySelectorAll('.eval-col').forEach(col => {
+    col.classList.toggle('hidden');
+  });
+}
+
+function filterTable() {
+  const name = document.getElementById('filter-name').value.toLowerCase();
+  const id = document.getElementById('filter-id').value.toLowerCase();
+  const date = document.getElementById('datePicker').value;
+
+  const rows = document.querySelectorAll('#playersTable tbody tr');
+  rows.forEach(row => {
+    const rowId = row.cells[0].textContent.toLowerCase();
+    const rowName = row.cells[1].textContent.toLowerCase();
+    const rowDate = row.cells[2].textContent;
+
+    const show = (!name || rowName.includes(name)) &&
+                 (!id || rowId.includes(id)) &&
+                 (!date || rowDate === date);
+
+    row.style.display = show ? '' : 'none';
+  });
+}
+
+function clearFilters() {
+  document.getElementById('filter-name').value = '';
+  document.getElementById('filter-id').value = '';
+  document.getElementById('datePicker').value = '';
+  filterTable();
+}
+  
+function loadViewer() {
+  const callbackName = 'handleEvaluations_' + Date.now();
+  const script = document.createElement('script');
+  
+  window[callbackName] = function(data) {
+    delete window[callbackName];
+    document.body.removeChild(script);
+    renderEvaluations(data);
+  };
+
+  script.src = `${evaluationsURL}?callback=${callbackName}`;
+  document.body.appendChild(script);
+}
+
+function renderEvaluations(data) {
+  try {
+    if (!Array.isArray(data)) throw new Error('Invalid data format');
+    
+    let html = `
+      <h2 style="text-align: right;">قائمة التقييمات</h2>
+      <table dir="rtl" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f4e733; color: black;">
+            <th>اسم اللاعب</th>
+            <th>النشاط</th>
+            <th>التقييم</th>
+            <th>المدرب</th>
+            <th>التاريخ</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    const startRow = data[0][0] === 'Timestamp' ? 1 : 0;
+    data.slice(startRow).forEach(row => {
+      html += `
+        <tr>
+          <td>${row[1] || '---'}</td>
+          <td>${row[2] || '---'}</td>
+          <td>${row[3] || '---'}</td>
+          <td>${row[5] || '---'}</td>
+          <td>${row[6] || '---'}</td>
+        </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    document.getElementById('content').innerHTML = html;
+
+  } catch (error) {
+    document.getElementById('content').innerHTML = `
+      <div style="color: red; text-align: center; padding: 20px; border: 1px solid red;">
+        ❌ فشل تحميل البيانات: ${error.message}
+      </div>`;
+  }
+}
+  
+</script>
+  </main>
+  
+  <div class="footer-container">
+  <footer>
+    <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
+    <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
+    <div class="social-icons">
+      <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
+      <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
+    </div>
+  </footer>
+</div>  
+  
+</body>
+</html>
