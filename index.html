@@ -3,42 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نادي كلباء - تقييم اللاعبين</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <title>نادي كلباء الرياضي الثقافي - التقييمات</title>
   <style>
-
     @font-face {
       font-family: 'NotoKufiArabic';
       src: url('NotoKufiArabic.ttf') format('truetype');
-    }
-    html {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
     }
     body {
       font-family: 'NotoKufiArabic', sans-serif;
       background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
       background-size: cover;
       color: white;
-      height: 100%;
       margin: 0;
       padding: 0;
-      display: flex;
-     flex-direction: column;
-    }
-    body > .footer-container {
-      margin-top: auto;
-    }
-    .container, #mainView, #activityView, #statsView {
-      flex: 1 0 auto;
-    }
-    main {
-     flex: 1;
-     display: flex;
-     align-items: center;
-     justify-content: center;
     }
     .header-container {
       width: 100%;
@@ -87,81 +67,209 @@
       background: rgba(0, 0, 0, 0.9);
       border-radius: 10px;
       margin-top: 30px;
+      margin-bottom: 30px;
     }
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: rgba(0,0,0,0.7);
-  padding: 30px;
-  border-radius: 10px;
-  width: 300px;
-  margin: 100px auto; 
-}
-    .popup {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .popup-content {
-      background: #222;
-      border: 2px solid #f4e733;
+    .login-container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.9);
       border-radius: 10px;
-      padding: 20px;
-      max-width: 300px;
+      text-align: center;
     }
-    .popup-content button {
+    .login-container h2 {
+      color: #f4e733;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #f4e733;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #f4e733;
+      background: #222;
+      color: white;
+    }
+    .btn {
       background: #f4e733;
+      color: black;
       border: none;
       padding: 10px 20px;
-      margin: 10px;
+      border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      margin: 5px;
+    }
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #f4e733;
+    }
+    .nav-tabs button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .nav-tabs button.active {
+      background: #f4e733;
+      color: black;
+      border-radius: 5px 5px 0 0;
     }
     table {
-      width: 90%;
-      margin: 20px auto;
+      width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
     }
     th, td {
       border: 1px solid #f4e733;
       padding: 10px;
-      text-align: center; 
-      vertical-align: middle;
+      text-align: center;
     }
     th {
+      background-color: #333;
+      color: #f4e733;
+    }
+    .evaluation-form {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .evaluation-criteria {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .criteria-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .criteria-item label {
+      color: #f4e733;
+    }
+    .criteria-item select {
+      width: 100px;
+      padding: 5px;
+      border-radius: 5px;
       background: #333;
+      color: white;
+      border: 1px solid #f4e733;
     }
-    button {
+    .hidden {
+      display: none;
+    }
+    .player-card {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border-left: 4px solid #f4e733;
+    }
+    .player-card h3 {
+      margin-top: 0;
+      color: #f4e733;
+    }
+    .progress-container {
+      margin-top: 20px;
+    }
+    .progress-bar {
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
       background: #f4e733;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      cursor: pointer;
+      width: 0%;
+      transition: width 0.5s;
     }
-    footer {
+    .rankings {
+      margin-top: 30px;
+    }
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: #222;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .rank-badge {
+      background: #f4e733;
+      color: black;
+      padding: 5px 10px;
+      border-radius: 50%;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .footer-container {
+      width: 100%;
       background-color: #111;
       color: white;
       text-align: center;
       padding: 20px;
       border-top: 3px solid #f4e733;
-      font-size: 14px;
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     .social-icons a {
       color: white;
-      margin: 0 8px;
+      margin: 0 10px;
       font-size: 20px;
+      transition: color 0.3s;
+    }
+    .social-icons a:hover {
+      color: #f4e733;
+    }
+    @media (max-width: 768px) {
+      .header-right {
+        padding: 10px;
+        flex-direction: row;
+        gap: 10px;
+      }
+      .header-right img.logo {
+        height: 50px;
+      }
+      .arabic-name {
+        font-size: 16px;
+      }
+      .english-name {
+        font-size: 12px;
+      }
+      .container {
+        padding: 15px;
+        margin: 15px auto;
+      }
+      .evaluation-criteria {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-
   <header class="header-container">
     <div class="header-right">
       <img src="Picture3.png" alt="شعار الشارقة" class="logo">
@@ -174,30 +282,78 @@
     </div>
   </header>
 
-<div id="rolePopup" class="popup">
-  <div class="popup-content">
-    <h2>اختر نوع الدخول:</h2>
-    <button onclick="enterCoach()">مدرب</button>
-    <button onclick="enterViewer()">مشاهد</button>
+  <div id="loginView" class="login-container">
+    <h2>تسجيل دخول المدربين</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">اسم المستخدم</label>
+        <input type="text" id="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" required>
+      </div>
+      <button type="submit" class="btn btn-block">دخول</button>
+    </form>
   </div>
-</div>
 
-<main style="flex: 1;">
-    <div class="container"> 
+  <div id="coachPortal" class="container hidden">
+    <div class="nav-tabs">
+      <button class="active" onclick="showTab('evaluation')">تقييم اللاعبين</button>
+      <button onclick="showTab('rankings')">التصنيفات</button>
+      <button onclick="showTab('progress')">تطور الأداء</button>
+      <button onclick="logout()">خروج</button>
+    </div>
 
-<div id="content"></div>
+    <div id="evaluationTab">
+      <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
+      <div class="form-group">
+        <label for="sessionDate">تاريخ الجلسة</label>
+        <input type="date" id="sessionDate" required>
+      </div>
+      
+      <div id="playersList"></div>
+    </div>
 
-       </div>
+    <div id="rankingsTab" class="hidden">
+      <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
+      <div id="rankingsContainer" class="rankings"></div>
+      <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
+    </div>
 
-<script>
-const evaluationsURL = 'https://script.google.com/macros/s/AKfycbzpbUmXmD3ik-2Cgc64UZeWBL6hLSc_LDDwg0YoSCR_4bOKy4YUj8PrVczBfTi-Rj6a/exec';
-const attendanceURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
-const evaluationCriteria = {
-  "كرة يد": ["التصويب", "اللياقة", "التعاون", "الدفاع", "التركيز"],
-  "كرة طائرة": ["الارسال", "الاستقبال", "القفز", "اللياقة", "التعاون"],
-  "كرة سلة": ["التصويب", "المراوغة", "التمرير", "الدفاع", "الارتداد"],
-  "شطرنج": ["التخطيط", "التركيز", "التكتيك", "الصبر", "الابداع"]
-};
+    <div id="progressTab" class="hidden">
+      <h2 style="color:#f4e733; text-align:center">تطور الأداء</h2>
+      <div class="form-group">
+        <label for="playerSelect">اختر اللاعب</label>
+        <select id="playerSelect" onchange="showPlayerProgress()"></select>
+      </div>
+      <div id="progressChartContainer">
+        <canvas id="progressChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-container">
+    <div class="footer-content">
+      <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
+      <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
+      <div class="social-icons">
+        <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxkLlvTJzXk0qcjJvKiwJqlNzUVBTGZVkoZRPDQzJvuFVOT8StXy5ta_CuU4rp8Xg7_oQ/exec',
+      ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec',
+      USE_CORS_PROXY: true,
+      CORS_PROXY_URL: 'https://cors-anywhere.herokuapp.com/'
+    };
 
 const coaches = {
   "handball1": { password: "pass1", activity: "كرة يد" },
@@ -206,277 +362,448 @@ const coaches = {
   "chess4": { password: "pass4", activity: "شطرنج" }
 };
 
-let currentCoach = '';
+const evaluationCriteria = {
+  "كرة يد": [
+    "قوة التصويب",
+    "دقة التمرير",
+    "التمركز الدفاعي",
+    "الانسجام مع الفريق",
+    "اللياقة البدنية"
+  ],
+  "كرة طائرة": [
+    "الإرسال القوي",
+    "الاستقبال تحت الضغط",
+    "الضرب الساحق",
+    "التمركز في الملعب",
+    "سرعة رد الفعل"
+  ],
+  "كرة سلة": [
+    "التصويب من المسافات المختلفة",
+    "المراوغة بالكرة",
+    "التمرير الحاسم",
+    "التحرك بدون كرة",
+    "القوة البدنية"
+  ],
+  "شطرنج": [
+    "الافتتاحيات",
+    "التكتيكات",
+    "التخطيط طويل المدى",
+    "إدارة الوقت",
+    "التركيز الذهني"
+  ]
+};
 
-function enterCoach() {
-  document.getElementById('rolePopup').style.display = 'none';
-  loadCoachLogin();
-}
+    let currentCoach = null;
+    let playersData = [];
+    let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
-function enterViewer() {
-  document.getElementById('rolePopup').style.display = 'none';
-  loadViewer();
-}
-
-function loadCoachLogin() {
-  document.getElementById('content').innerHTML = `
-    <div class="login-container">
-      <h2>تسجيل دخول المدرب</h2>
-      <input type='text' id='username' placeholder='اسم المستخدم'><br>
-      <input type='password' id='password' placeholder='كلمة المرور'><br>
-      <button onclick='authenticateCoach()'>دخول</button>
-    </div>
-  `;
-}
-
-function authenticateCoach() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  if (coaches[username] && coaches[username].password === password) {
-    currentCoach = username;
-    loadPlayers();
-  } else {
-    alert('بيانات الدخول غير صحيحة');
-  }
-}
-
-async function loadPlayers() {
-  const response = await fetch(attendanceURL);
-  const data = await response.json();
-  const coachActivity = coaches[currentCoach].activity;
-
-  let table = `
-    <h2>تقييم لاعبين الـ${coachActivity}</h2>
-    <div class="controls">
-      <div class="filter-bar">
-        <input type="text" id="filter-name" placeholder="🔍 الاسم..." onkeyup="filterTable()" autocomplete="off">
-        <input type="text" id="filter-id" placeholder="🔍 المعرّف..." onkeyup="filterTable()">
-        <input type="date" id="datePicker" onchange="filterTable()">
-        <button onclick="clearFilters()">مسح الفلاتر</button>
-        <button onclick="toggleEvaluation()" style="background: #f4e733;">🔄 بدء التقييم</button>
-      </div>
-    </div>
-    <table id="playersTable">
-      <thead>
-        <tr><th>المعرّف</th><th>اسم اللاعب وولي الأمر</th><th>تاريخ الحضور</th><th class="eval-col hidden">التقييم</th><th class="eval-col hidden">ملاحظات</th></tr>
-      </thead><tbody>`;
-
-  data.filter(p => p.Activity === coachActivity).forEach(player => {
-    const parent = player['Parent'] || '';
-    const date = player['Timestamp'] ? new Date(player['Timestamp']).toLocaleDateString('ar-EG') : '';
-    const fullName = `${player['Child Name']} ${parent}`;
-
-    table += `
-      <tr>
-        <td>${player.ID}</td>
-        <td>${fullName}</td>
-        <td>${date}</td>
-        <td class="eval-col hidden">
-          ${renderCriteriaInputs(player.ID, player.Activity)}
-          <div id="total-${player.ID}">الإجمالي: 0</div>
-          <button onclick="submitEvaluation('${player['Child Name']}', '${player.Activity}', '${player.ID}')">حفظ التقييم</button>
-        </td>
-        <td class="eval-col hidden">
-          <input type="text" id="notes-${player.ID}" placeholder="ملاحظة...">
-        </td>
-      </tr>`;
-  });
-
-  table += '</tbody></table>';
-  document.getElementById('content').innerHTML = table;
-}
-
-function renderCriteriaInputs(playerId, activity) {
-  const criteria = evaluationCriteria[activity] || [];
-  return criteria.map((criterion, index) => `
-    <label>${criterion}</label>
-    <input type="number" id="${playerId}-c${index}" min="1" max="5" value="3" onchange="calculateTotal('${playerId}', '${activity}')"><br>
-  `).join('');
-}
-
-function calculateTotal(playerId, activity) {
-  const criteria = evaluationCriteria[activity] || [];
-  let total = 0;
-
-  criteria.forEach((_, index) => {
-    const val = parseInt(document.getElementById(`${playerId}-c${index}`).value) || 0;
-    total += val;
-  });
-
-  document.getElementById(`total-${playerId}`).textContent = `الإجمالي: ${total}`;
-}
-
-function submitEvaluation(playerName, activity, playerId) {
-  const criteria = evaluationCriteria[activity] || [];
-  const scores = {};
-  let total = 0;
-
-  criteria.forEach((criterion, index) => {
-    const score = parseInt(document.getElementById(`${playerId}-c${index}`).value) || 0;
-    scores[criterion] = score;
-    total += score;
-  });
-
-  const maxScore = criteria.length * 5;
-  const percentage = Math.round((total / maxScore) * 100);
-
-  const payload = {
-    playerName,
-    activity,
-    scores,
-    total,
-    maxScore,
-    percentage,
-    note: document.getElementById(`notes-${playerId}`).value,
-    coach: currentCoach,
-    date: new Date().toISOString().split('T')[0]
-  };
-
-  console.log(payload); 
-}
-
-async function loadEvaluations() {
-  const res = await fetch(evaluationsURL);
-  const data = await res.json();
-
-  let content = `
-    <h2>قائمة التقييمات</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>اسم اللاعب وولي الأمر</th>
-          <th>المعرّف</th>
-          <th>النشاط</th>
-          <th>التقييم</th>
-          <th>الملاحظات</th>
-          <th>المدرب</th>
-          <th>التاريخ</th>
-        </tr>
-      </thead>
-      <tbody id="evaluationsTable"></tbody>
-    </table>`;
-
-  document.getElementById('content').innerHTML = content;
-
-  const tbody = document.getElementById('evaluationsTable');
-  data.forEach(ev => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${ev.playerName || ''} ${ev.parentName || ''}</td>
-      <td>${ev.playerId || ''}</td>
-      <td>${ev.activity || ''}</td>
-      <td>${ev.evaluation || ''}</td>
-      <td>${ev.note || ''}</td>
-      <td>${ev.coach || ''}</td>
-      <td>${ev.date || ''}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function toggleEvaluation() {
-  document.querySelectorAll('.eval-col').forEach(col => {
-    col.classList.toggle('hidden');
-  });
-}
-
-function filterTable() {
-  const name = document.getElementById('filter-name').value.toLowerCase();
-  const id = document.getElementById('filter-id').value.toLowerCase();
-  const date = document.getElementById('datePicker').value;
-
-  const rows = document.querySelectorAll('#playersTable tbody tr');
-  rows.forEach(row => {
-    const rowId = row.cells[0].textContent.toLowerCase();
-    const rowName = row.cells[1].textContent.toLowerCase();
-    const rowDate = row.cells[2].textContent;
-
-    const show = (!name || rowName.includes(name)) &&
-                 (!id || rowId.includes(id)) &&
-                 (!date || rowDate === date);
-
-    row.style.display = show ? '' : 'none';
-  });
-}
-
-function clearFilters() {
-  document.getElementById('filter-name').value = '';
-  document.getElementById('filter-id').value = '';
-  document.getElementById('datePicker').value = '';
-  filterTable();
-}
-
-function loadViewer() {
-  const callbackName = 'handleEvaluations_' + Date.now();
-  const script = document.createElement('script');
-
-  window[callbackName] = function(data) {
-    delete window[callbackName];
-    document.body.removeChild(script);
-    renderEvaluations(data);
-  };
-
-  script.src = `${evaluationsURL}?callback=${callbackName}`;
-  document.body.appendChild(script);
-}
-
-function renderEvaluations(data) {
-  try {
-    if (!Array.isArray(data)) throw new Error('Invalid data format');
-
-    let html = `
-      <h2 style="text-align: right;">قائمة التقييمات</h2>
-      <table dir="rtl" style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background-color: #f4e733; color: black;">
-            <th>اسم اللاعب</th>
-            <th>النشاط</th>
-            <th>التقييم</th>
-            <th>المدرب</th>
-            <th>التاريخ</th>
-          </tr>
-        </thead>
-        <tbody>`;
-
-    const startRow = data[0][0] === 'Timestamp' ? 1 : 0;
-    data.slice(startRow).forEach(row => {
-      html += `
-        <tr>
-          <td>${row[1] || '---'}</td>
-          <td>${row[2] || '---'}</td>
-          <td>${row[3] || '---'}</td>
-          <td>${row[5] || '---'}</td>
-          <td>${row[6] || '---'}</td>
-        </tr>`;
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('sessionDate').valueAsDate = new Date();
+      setupEventListeners();
     });
 
-    html += `</tbody></table>`;
-    document.getElementById('content').innerHTML = html;
+    function setupEventListeners() {
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('sessionDate').addEventListener('change', handleDateChange);
+    }
 
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if (coaches[username] && coaches[username].password === password) {
+        currentCoach = {
+          username: username,
+          activity: coaches[username].activity
+        };
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('coachPortal').classList.remove('hidden');
+        await loadPlayersData();
+      } else {
+        alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+      }
+    }
+
+    async function loadPlayersData() {
+      try {
+        let url = CONFIG.ATTENDANCE_SCRIPT_URL;
+        if (CONFIG.USE_CORS_PROXY) {
+          url = CONFIG.CORS_PROXY_URL + url;
+        }
+        
+        url += `?activity=${encodeURIComponent(currentCoach.activity)}&random=${Math.random()}`;
+        
+        const response = await fetch(url, {
+          redirect: 'follow',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        
+        playersData = data
+          .filter(player => player.Activity === currentCoach.activity && player["Child Name"])
+          .map(player => ({
+            id: player.ID || `${player["Child Name"]}-${Math.random().toString(36).substr(2, 9)}`,
+            name: player["Child Name"],
+            parent: player.Parent || "",
+            date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+          }));
+        
+        renderPlayersList();
+        updatePlayerSelect();
+      } catch (error) {
+        console.error("Error loading players data:", error);
+        alert("حدث خطأ أثناء تحميل بيانات اللاعبين. الرجاء المحاولة لاحقًا");
+        
+        playersData = [
+          { 
+            id: "KalbaSC-1751407184003", 
+            name: "محمد أحمد", 
+            parent: "أحمد محمد",
+            date: new Date().toISOString().split('T')[0]
+          },
+          { 
+            id: "KalbaSC-1751982403874", 
+            name: "علي محمود", 
+            parent: "محمود علي",
+            date: new Date().toISOString().split('T')[0]
+          }
+        ];
+        renderPlayersList();
+        updatePlayerSelect();
+      }
+    }
+
+    function handleDateChange() {
+      const selectedDate = document.getElementById('sessionDate').value;
+      const filteredPlayers = playersData.filter(player => player.date === selectedDate);
+      
+      if (filteredPlayers.length === 0) {
+        alert('لا يوجد لاعبون مسجلون في هذا التاريخ');
+        renderPlayersList(playersData);
+      } else {
+        renderPlayersList(filteredPlayers);
+      }
+    }
+
+    function renderPlayersList(players = playersData) {
+      const container = document.getElementById('playersList');
+      container.innerHTML = '';
+      
+      if (players.length === 0) {
+        container.innerHTML = '<p>لا يوجد لاعبون متاحون للتقييم</p>';
+        return;
+      }
+      
+      players.forEach(player => {
+        const playerCard = document.createElement('div');
+        playerCard.className = 'player-card';
+        playerCard.innerHTML = `
+          <h3>${player.name} <small>(${player.id})</small></h3>
+          <p>ولي الأمر: ${player.parent || "غير معروف"}</p>
+          <div class="evaluation-form">
+            <h4>تقييم الأداء:</h4>
+            <div class="evaluation-criteria" id="criteria-${player.id}"></div>
+            <textarea id="notes-${player.id}" placeholder="ملاحظات إضافية..."></textarea>
+            <button class="btn" onclick="saveEvaluation('${player.id}')">حفظ التقييم</button>
+          </div>
+        `;
+        
+        const criteriaContainer = playerCard.querySelector(`#criteria-${player.id}`);
+        evaluationCriteria[currentCoach.activity].forEach((criteria, index) => {
+          criteriaContainer.innerHTML += `
+            <div class="criteria-item">
+              <label>${criteria}</label>
+              <select id="${player.id}-skill${index + 1}">
+                <option value="5">ممتاز (5)</option>
+                <option value="4">جيد جداً (4)</option>
+                <option value="3">جيد (3)</option>
+                <option value="2">مقبول (2)</option>
+                <option value="1">ضعيف (1)</option>
+              </select>
+            </div>
+          `;
+        });
+        
+        container.appendChild(playerCard);
+      });
+    }
+
+async function saveEvaluation(playerId) {
+  const sessionDate = document.getElementById('sessionDate').value;
+  if (!sessionDate) {
+    alert('الرجاء إدخال تاريخ الجلسة');
+    return;
+  }
+  
+  const player = playersData.find(p => p.id === playerId);
+  if (!player) {
+    alert('لاعب غير موجود');
+    return;
+  }
+
+  const criteriaCount = evaluationCriteria[currentCoach.activity].length;
+  let totalScore = 0;
+  const scores = {};
+
+  for (let i = 0; i < criteriaCount; i++) {
+    const skillValue = parseInt(document.getElementById(`${playerId}-skill${i + 1}`).value);
+    scores[`skill${i + 1}`] = skillValue;
+    totalScore += skillValue;
+  }
+
+  const maxScore = criteriaCount * 5;
+  const percentage = Math.round((totalScore / maxScore) * 100);
+
+  const evaluationData = {
+    Timestamp: new Date().toISOString(),
+    Coach: currentCoach.username,
+    Activity: currentCoach.activity,
+    "Player ID": playerId,
+    "Player Name": player.name,
+    Notes: document.getElementById(`notes-${playerId}`).value,
+    Total: totalScore
+  };
+
+  for (let i = 0; i < criteriaCount; i++) {
+    evaluationData[`Skill ${i + 1}`] = scores[`skill${i + 1}`];
+  }
+
+  try {
+    let url = CONFIG.EVALUATION_SCRIPT_URL;
+    if (CONFIG.USE_CORS_PROXY) {
+      url = CONFIG.CORS_PROXY_URL + url;
+    }
+
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(evaluationData));
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    });
+
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    const result = await response.json();
+
+    if (result.success) {
+      const evaluation = {
+        playerId,
+        playerName: player.name,
+        coach: currentCoach.username,
+        activity: currentCoach.activity,
+        date: sessionDate,
+        notes: evaluationData.Notes,
+        scores: scores,
+        totalScore: totalScore,
+        maxScore: maxScore,
+        percentage: percentage
+      };
+
+      evaluations.push(evaluation);
+      localStorage.setItem('playerEvaluations', JSON.stringify(evaluations));
+
+      alert('تم حفظ التقييم بنجاح');
+      updateRankings();
+    } else {
+      alert('حدث خطأ أثناء حفظ التقييم: ' + (result.message || ''));
+    }
   } catch (error) {
-    document.getElementById('content').innerHTML = `
-      <div style="color: red; text-align: center; padding: 20px; border: 1px solid red;">
-        ❌ فشل تحميل البيانات: ${error.message}
-      </div>`;
+    console.error('Error saving evaluation:', error);
+    alert('حدث خطأ أثناء حفظ التقييم. الرجاء المحاولة لاحقًا');
   }
 }
+    
+    function updateRankings() {
 
-</script>
-  </main>
+      const playerStats = {};
+      
+      evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
+        if (!playerStats[eval.playerId]) {
+          playerStats[eval.playerId] = {
+            name: eval.playerName,
+            total: 0,
+            count: 0,
+            evaluations: []
+          };
+        }
+        playerStats[eval.playerId].total += eval.percentage;
+        playerStats[eval.playerId].count++;
+        playerStats[eval.playerId].evaluations.push(eval);
+      });
+      
+      const rankings = Object.values(playerStats).map(player => {
+        return {
+          id: player.id,
+          name: player.name,
+          average: Math.round(player.total / player.count),
+          evaluations: player.evaluations
+        };
+      });
+      
+      rankings.sort((a, b) => b.average - a.average);
+      
+      rankingsContainer.innerHTML = '';
+      rankings.forEach((player, index) => {
+        const rankItem = document.createElement('div');
+        rankItem.className = 'ranking-item';
+        rankItem.innerHTML = `
+          <div>
+            <span class="rank-badge">${index + 1}</span>
+            <span>${player.name}</span>
+          </div>
+          <div>
+            <span>المعدل: ${player.average}%</span>
+          </div>
+        `;
+        rankingsContainer.appendChild(rankItem);
+      });
+    }
 
-  <div class="footer-container">
-  <footer>
-    <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
-    <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
-    <div class="social-icons">
-      <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
-      <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
-      <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
-      <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
-    </div>
-  </footer>
-</div>  
+    function updatePlayerSelect() {
+      playerSelect.innerHTML = '';
+      playersData.forEach(player => {
+        const option = document.createElement('option');
+        option.value = player.id;
+        option.textContent = player.name;
+        playerSelect.appendChild(option);
+      });
+      
+      if (playersData.length > 0) {
+        showPlayerProgress();
+      }
+    }
 
+    function showPlayerProgress() {
+      const playerId = playerSelect.value;
+      const playerName = playersData.find(p => p.id === playerId).name;
+      const playerEvals = evaluations.filter(e => e.playerId === playerId && e.activity === currentCoach.activity);
+      
+      if (playerEvals.length === 0) {
+        progressChartContainer.innerHTML = '<p>لا توجد بيانات تطور لهذا اللاعب بعد</p>';
+        if (progressChart) progressChart.destroy();
+        return;
+      }
+      
+      playerEvals.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      const dates = playerEvals.map(e => e.date);
+      const percentages = playerEvals.map(e => e.percentage);
+      
+      if (progressChart) progressChart.destroy();
+      
+      const ctx = progressChartCanvas.getContext('2d');
+      progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: `تطور أداء ${playerName}`,
+            data: percentages,
+            borderColor: '#f4e733',
+            backgroundColor: 'rgba(244, 231, 51, 0.1)',
+            fill: true,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 0,
+              max: 100,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: `تطور أداء ${playerName}`,
+              color: '#f4e733'
+            },
+            legend: {
+              labels: {
+                color: 'white'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function exportRankings() {
+      const playerStats = {};
+      
+      evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
+        if (!playerStats[eval.playerId]) {
+          playerStats[eval.playerId] = {
+            name: eval.playerName,
+            total: 0,
+            count: 0,
+            evaluations: []
+          };
+        }
+        playerStats[eval.playerId].total += eval.percentage;
+        playerStats[eval.playerId].count++;
+        playerStats[eval.playerId].evaluations.push(eval);
+      });
+      
+      const rankings = Object.values(playerStats).map(player => {
+        return {
+          name: player.name,
+          average: Math.round(player.total / player.count),
+          evaluations: player.evaluations.length
+        };
+      });
+      
+      rankings.sort((a, b) => b.average - a.average);
+      
+      const wsData = [
+        ['الترتيب', 'اسم اللاعب', 'المعدل', 'عدد التقييمات'],
+        ...rankings.map((player, index) => [index + 1, player.name, player.average + '%', player.evaluations])
+      ];
+      
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "التصنيفات");
+      XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
+    }
+
+    function showTab(tabName) {
+      document.getElementById('evaluationTab').classList.add('hidden');
+      document.getElementById('rankingsTab').classList.add('hidden');
+      document.getElementById('progressTab').classList.add('hidden');
+      
+      document.querySelector('.nav-tabs button.active').classList.remove('active');
+      event.target.classList.add('active');
+      
+      document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+      
+      if (tabName === 'rankings') {
+        updateRankings();
+      }
+    }
+
+    function logout() {
+      currentCoach = null;
+      coachPortal.classList.add('hidden');
+      loginView.classList.remove('hidden');
+      loginForm.reset();
+    }
+
+    document.getElementById('sessionDate').valueAsDate = new Date();
+  </script>
 </body>
 </html>
