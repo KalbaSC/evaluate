@@ -1,3 +1,5 @@
+[media pointer="file-service://file-J5MM7982jGYudMbiniwNQx"]
+[media pointer="file-service://file-7KP1Um4fRxyJytZfRYGbhN"]
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -406,13 +408,50 @@ const evaluationCriteria = {
       document.getElementById('sessionDate').valueAsDate = new Date();
       setupEventListeners();
     });
+async function loadPlayersData() {
+  try {
+    let url = CONFIG.ATTENDANCE_SCRIPT_URL;
+    if (CONFIG.USE_CORS_PROXY) {
+      url = CONFIG.CORS_PROXY_URL + url;
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not ok');
+
+    const result = await response.json();
+
+    // Flatten data from all staff sheets into a single array
+    playersData = [];
+    Object.keys(result).forEach(sheetName => {
+      const sheetData = result[sheetName];
+      sheetData.forEach(row => {
+        if (row.ID && row['Child Name']) {
+          playersData.push({
+            id: row.ID.trim(),
+            name: row['Child Name'].trim(),
+            parent: row['Parent']?.trim() || "",
+            date: row.Timestamp?.split("T")[0] || "", // Keep date only
+            scannedBy: row['Scanned By'] || sheetName // fallback to sheet name
+          });
+        }
+      });
+    });
+
+    renderPlayersList(playersData);
+    updatePlayerSelect();
+
+  } catch (error) {
+    console.error('Error fetching attendance data:', error);
+    alert('فشل تحميل بيانات الحضور، يرجى المحاولة لاحقًا');
+  }
+}
 
     function setupEventListeners() {
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
       document.getElementById('sessionDate').addEventListener('change', handleDateChange);
     }
 
- async function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
@@ -424,87 +463,38 @@ const evaluationCriteria = {
         };
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('coachPortal').classList.remove('hidden');
-        await fetchAttendanceData(); // Changed from loadPlayersData to fetchAttendanceData
+        await loadPlayersData();
       } else {
         alert('اسم المستخدم أو كلمة المرور غير صحيحة');
       }
     }
-
-    // Add this function to load players data
-    async function loadPlayersData() {
-      try {
-        // First try to load from localStorage
-        const savedData = localStorage.getItem('playersData');
-        if (savedData) {
-          playersData = JSON.parse(savedData);
-          renderPlayersList();
-          updatePlayerSelect();
-        }
-        
-        // Then fetch fresh data
-        await fetchAttendanceData();
-      } catch (error) {
-        console.error('Error loading players data:', error);
-        alert('حدث خطأ أثناء تحميل بيانات اللاعبين');
-      }
-    }
-        
-        // Since we're using no-cors, we can't read the response directly
-        // This is a workaround to handle the redirect
-        const text = await response.text();
-        
-        // If we get HTML back, it's likely the Google auth page
-        if (text.includes('<html') || text.includes('Google')) {
-          alert('حدث خطأ في جلب البيانات. الرجاء التأكد من صلاحيات الوصول.');
-          return;
-        }
-        
-        // Try to parse the response as JSON
-        try {
-          const data = JSON.parse(text);
-          processAttendanceData(data);
-        } catch (e) {
-          // If parsing fails, try to extract JSON from the response
-          const jsonMatch = text.match(/{.*}/);
-          if (jsonMatch) {
-            const data = JSON.parse(jsonMatch[0]);
-            processAttendanceData(data);
-          } else {
-            alert('تنسيق البيانات غير متوقع. الرجاء التحقق من المصدر.');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching attendance data:', error);
-        alert('حدث خطأ أثناء جلب بيانات الحضور: ' + error.message);
-      }
-    }
-
-    function processAttendanceData(data) {
-      if (!data || !Array.isArray(data)) {
-        alert('بيانات الحضور غير صالحة أو فارغة');
-        return;
-      }
-      
-      // Process the data and update playersData
-      playersData = data.map(item => ({
-        id: item['رقم اللاعب'] || item['Player ID'] || '',
-        name: item['اسم اللاعب'] || item['Player Name'] || '',
-        parent: item['ولي الأمر'] || item['Parent Name'] || '',
-        date: item['التاريخ'] || item['Date'] || '',
-        activity: item['النشاط'] || item['Activity'] || ''
-      }));
-      
-      // Filter players by current coach's activity
-      playersData = playersData.filter(player => player.activity === currentCoach.activity);
-      
-      if (playersData.length === 0) {
-        alert('لا يوجد لاعبون مسجلون في هذا النشاط');
-      } else {
-        renderPlayersList();
-        updatePlayerSelect();
-      }
-    }
-    
+function loadPlayersTable() {
+  const container = document.getElementById('playersList');
+  container.innerHTML = `
+    <h3>قائمة اللاعبين</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>المعرف</th>
+          <th>اسم اللاعب</th>
+          <th>اسم ولي الأمر</th>
+          <th>تاريخ الحضور</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${playersData.map(player => `
+          <tr>
+            <td>${player.id}</td>
+            <td>${player.name}</td>
+            <td>${player.parent}</td>
+            <td>${player.date}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+   
 function filterByDate() {
   const selectedDate = document.getElementById('filterDate').value;
   const filteredPlayers = playersData.filter(player => player.date === selectedDate);
