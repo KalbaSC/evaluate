@@ -412,7 +412,7 @@ const evaluationCriteria = {
       document.getElementById('sessionDate').addEventListener('change', handleDateChange);
     }
 
-    async function handleLogin(e) {
+ async function handleLogin(e) {
       e.preventDefault();
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
@@ -424,44 +424,30 @@ const evaluationCriteria = {
         };
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('coachPortal').classList.remove('hidden');
-        await loadPlayersData();
+        await fetchAttendanceData(); // Changed from loadPlayersData to fetchAttendanceData
       } else {
         alert('اسم المستخدم أو كلمة المرور غير صحيحة');
       }
     }
-function loadPlayersTable() {
-  const container = document.getElementById('playersList');
-  container.innerHTML = `
-    <h3>قائمة اللاعبين</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>المعرف</th>
-          <th>اسم اللاعب</th>
-          <th>اسم ولي الأمر</th>
-          <th>تاريخ الحضور</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${playersData.map(player => `
-          <tr>
-            <td>${player.id}</td>
-            <td>${player.name}</td>
-            <td>${player.parent}</td>
-            <td>${player.date}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-       async function fetchAttendanceData() {
+
+    // Add this function to load players data
+    async function loadPlayersData() {
       try {
-        const response = await fetch(CONFIG.ATTENDANCE_SCRIPT_URL, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-cache'
-        });
+        // First try to load from localStorage
+        const savedData = localStorage.getItem('playersData');
+        if (savedData) {
+          playersData = JSON.parse(savedData);
+          renderPlayersList();
+          updatePlayerSelect();
+        }
+        
+        // Then fetch fresh data
+        await fetchAttendanceData();
+      } catch (error) {
+        console.error('Error loading players data:', error);
+        alert('حدث خطأ أثناء تحميل بيانات اللاعبين');
+      }
+    }
         
         // Since we're using no-cors, we can't read the response directly
         // This is a workaround to handle the redirect
