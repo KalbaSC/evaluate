@@ -407,21 +407,34 @@ const evaluationCriteria = {
       setupEventListeners();
     });
 
-async function loadPlayers() {
-  try {
-    const response = await fetch(attendanceURL, {
-      method: 'GET',
-      mode: 'no-cors' 
-    });
+async function loadPlayersData() {
+  return new Promise((resolve) => {
+    const callbackName = 'handlePlayers_' + Date.now();
+    const script = document.createElement('script');
 
-    const data = await response.json(); 
-    console.log(data);
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      document.body.removeChild(script);
 
-  } catch (error) {
-    console.error("❌ Error loading players:", error);
-    alert("⚠️ فشل تحميل بيانات الحضور");
-  }
-}
+      const coachActivity = currentCoach.activity;
+      playersData = data
+        .filter(p => p.Activity === coachActivity)
+        .map(player => ({
+          id: player.ID,
+          name: player["Child Name"],
+          parent: player.Parent,
+          date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
+        }));
+
+      renderPlayersList(); // show the UI
+      updatePlayerSelect(); // for progress
+      resolve();
+    };
+
+    script.src = `${CONFIG.ATTENDANCE_SCRIPT_URL}?callback=${callbackName}`;
+    document.body.appendChild(script);
+  });
+}    
 
     function setupEventListeners() {
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
