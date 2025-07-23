@@ -557,7 +557,7 @@ async function saveEvaluation(playerId) {
     alert('الرجاء إدخال تاريخ الجلسة');
     return;
   }
-  
+
   const player = playersData.find(p => p.id === playerId);
   if (!player) {
     alert('لاعب غير موجود');
@@ -592,13 +592,21 @@ async function saveEvaluation(playerId) {
   }
 
   try {
-    let url = CONFIG.EVALUATION_SCRIPT_URL;
-    if (CONFIG.USE_CORS_PROXY) {
-      url = CONFIG.CORS_PROXY_URL + url;
-    }
+    await sendEvaluationJSONP(evaluationData);
 
-await sendEvaluationJSONP(evaluationData);
-alert('تم حفظ التقييم بنجاح');
+    // Save locally for rankings & progress
+    evaluations.push({
+      ...evaluationData,
+      percentage
+    });
+
+    localStorage.setItem('playerEvaluations', JSON.stringify(evaluations));
+    alert('✅ تم حفظ التقييم بنجاح');
+  } catch (err) {
+    console.error("Evaluation submission failed:", err);
+    alert("❌ فشل في إرسال التقييم. حاول مرة أخرى.");
+  }
+}
 
 function sendEvaluationJSONP(evaluationData) {
   return new Promise((resolve, reject) => {
