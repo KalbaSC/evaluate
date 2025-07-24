@@ -243,6 +243,21 @@
             loadActivities();
         });
 
+        function loadActivities() {
+    const script = document.createElement('script');
+    script.src = `${APPS_SCRIPT_URL}?action=getActivities&callback=handleActivities`;
+    document.body.appendChild(script);
+}
+
+function handleActivities(response) {
+    console.log("Activities:", response);
+    // Process your activities here
+    document.getElementById('activity').innerHTML = `
+        <option value="عام">📋 الحضور العام</option>
+        ${response.data.map(a => `<option value="${a}">${a}</option>`).join('')}
+    `;
+}
+        
         // Load available activities from Google Sheets
 async function loadActivities() {
     try {
