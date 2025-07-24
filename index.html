@@ -328,7 +328,6 @@
             }
         }
 
-        // Render the attendance table
         function renderAttendanceTable() {
             const tbody = document.querySelector('#attendanceTable tbody');
             tbody.innerHTML = '';
@@ -359,33 +358,29 @@
             });
         }
 
-        // Show evaluation form for a student
-        function showEvaluationForm(studentId) {
-            const student = attendanceData.find(s => s.ID === studentId);
-            if (!student) return;
-            
-            currentStudent = student;
-            
-            document.getElementById('evalStudentName').textContent = student['Child Name'] || '-';
-            document.getElementById('evalStudentParent').textContent = student.Parent || '-';
-            document.getElementById('evalStudentId').textContent = student.ID || '-';
-            
-            // Reset form
-            document.querySelector('input[name="evaluation"]:checked')?.checked = false;
-            document.getElementById('evalNotes').value = student.Notes || '';
-            
-            // Set current evaluation if exists
-            if (student.Evaluation) {
-                document.querySelector(`input[name="evaluation"][value="${student.Evaluation}"]`).checked = true;
-            }
-            
-            document.getElementById('evaluationForm').classList.remove('hidden');
-            
-            // Scroll to form
-            document.getElementById('evaluationForm').scrollIntoView({ behavior: 'smooth' });
-        }
+function showEvaluationForm(studentId) {
+    const student = attendanceData.find(s => s.ID === studentId);
+    if (!student) return;
+    
+    currentStudent = student;
+    
+    document.getElementById('evalStudentName').textContent = student['Child Name'] || '-';
+    document.getElementById('evalStudentParent').textContent = student.Parent || '-';
+    document.getElementById('evalStudentId').textContent = student.ID || '-';
+    
+    // Reset form - CORRECTED VERSION
+    document.querySelector('input[name="evaluation"]:checked').checked = false;
+    document.getElementById('evalNotes').value = student.Notes || '';
+    
+    // Set current evaluation if exists
+    if (student.Evaluation) {
+        document.querySelector(`input[name="evaluation"][value="${student.Evaluation}"]`).checked = true;
+    }
+    
+    document.getElementById('evaluationForm').classList.remove('hidden');
+    document.getElementById('evaluationForm').scrollIntoView({ behavior: 'smooth' });
+}
 
-        // Save evaluation to Google Sheets
         async function saveEvaluation() {
             const evaluation = document.querySelector('input[name="evaluation"]:checked')?.value;
             const notes = document.getElementById('evalNotes').value;
