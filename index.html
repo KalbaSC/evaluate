@@ -239,27 +239,46 @@
         });
 
         // Load available activities from Google Sheets
-        async function loadActivities() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const activitySelect = document.getElementById('activity');
-                    result.data.forEach(activity => {
-                        const option = document.createElement('option');
-                        option.value = activity;
-                        option.textContent = activity;
-                        activitySelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Error loading activities:', result.message);
-                }
-            } catch (error) {
-                console.error('Error loading activities:', error);
-            }
+async function loadActivities() {
+    try {
+        console.log("Fetching activities from:", APPS_SCRIPT_URL);
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+        
+        const result = await response.json();
+        console.log("Received activities data:", result);
+        
+        if (!result.success) {
+            throw new Error(result.message || "Failed to load activities");
+        }
+        
+        const activitySelect = document.getElementById('activity');
+        activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
+        
+        if (result.data && result.data.length > 0) {
+            result.data.forEach(activity => {
+                const option = document.createElement('option');
+                option.value = activity;
+                option.textContent = activity;
+                activitySelect.appendChild(option);
+            });
+        } else {
+            console.warn("No activities found in response");
+            activitySelect.appendChild(new Option("لا توجد أنشطة متاحة", ""));
+        }
+        
+    } catch (error) {
+        console.error("Error loading activities:", error);
+        document.getElementById('activity').innerHTML = `
+            <option value="">خطأ في تحميل الأنشطة</option>
+        `;
+        // Show error to user
+        alert("حدث خطأ أثناء تحميل قائمة الأنشطة. يرجى المحاولة لاحقًا.");
+    }
+}
         // Coach login
         async function login() {
             const username = document.getElementById('username').value;
