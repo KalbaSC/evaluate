@@ -244,56 +244,75 @@
         });
 
         // Load available activities from Google Sheets
-        async function loadActivities() {
-            try {
-                console.log("Fetching activities from:", APPS_SCRIPT_URL);
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
-                
-                // First check response status
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                // Store response text for debugging
-                const responseText = await response.text();
-                console.log("Raw response:", responseText);
-                
-                // Parse JSON
-                const result = JSON.parse(responseText);
-                console.log("Parsed data:", result);
-                
-                if (!result.success) {
-                    throw new Error(result.message || "Failed to load activities");
-                }
-                
-                const activitySelect = document.getElementById('activity');
-                activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
-                
-                if (result.data && result.data.length > 0) {
-                    result.data.forEach(activity => {
-                        const option = new Option(activity, activity);
-                        activitySelect.add(option);
-                    });
-                } else {
-                    console.warn("No activities found");
-                    activitySelect.add(new Option("لا توجد أنشطة متاحة", ""));
-                }
-                
-            } catch (error) {
-                console.error("Error loading activities:", error);
-                document.getElementById('activity').innerHTML = `
-                    <option value="">خطأ في تحميل الأنشطة</option>
-                `;
-                alert("حدث خطأ أثناء تحميل قائمة الأنشطة. يرجى المحاولة لاحقًا.");
-            }
+async function loadActivities() {
+    try {
+        console.log("Fetching activities from:", APPS_SCRIPT_URL);
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        console.log("Parsed response:", result);
+
+        // If response is already an array of activities (your case)
+        let activities = [];
+        if (Array.isArray(result)) {
+            // Extract unique activities from records
+            activities = [...new Set(result.map(item => item.Activity).filter(Boolean))];
+        } 
+        // If response is in {success, data} format
+        else if (result.success) {
+            activities = result.data;
+        } else {
+            throw new Error(result.message || "Invalid data format");
+        }
+
+        const activitySelect = document.getElementById('activity');
+        activitySelect.innerHTML = `
+            <option value="عام">📋 الحضور العام</option>
+            ${activities.map(activity => 
+                `<option value="${activity}">${activity}</option>`
+            ).join('')}
+        `;
+
+    } catch (error) {
+        console.error("Error loading activities:", error);
+        // Fallback to hardcoded activities if API fails
+        document.getElementById('activity').innerHTML = `
+            <option value="عام">📋 الحضور العام</option>
+            <option value="ورش">ورش</option>
+            <option value="زيارات خارجية">زيارات خارجية</option>
+            <option value="شطرنج">شطرنج</option>
+            <option value="كرة قدم">كرة قدم</option>
+            <option value="كرة سلة">كرة سلة</option>
+            <option value="كرة طائرة">كرة طائرة</option>
+            <option value="كرة يد">كرة يد</option>
+            <option value="العاب ثقافية">العاب ثقافية</option>
+            <option value="خماسي حديث">خماسي حديث</option>
+            <option value="لياقة بدنية">لياقة بدنية</option>
+        `;
+        alert("تم تحميل الأنشطة الأساسية بسبب مشكلة في الاتصال");
+    }
+}
 
         
 function getActivities() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheets = ss.getSheets();
-  const activities = new Set(['عام']); // Start with "General"
+  const activities = new Set();
   
+  // Add your default activities
+  const defaultActivities = [
+    " ", "ورش", "زيارات خارجية", "شطرنج", 
+    "كرة قدم", "كرة سلة", "كرة طائرة", "كرة يد",
+    "العاب ثقافية", "خماسي حديث", "لياقة بدنية"
+  ];
+  
+  defaultActivities.forEach(activity => activities.add(activity));
+
+  // Get activities from attendance sheets
   sheets.forEach(sheet => {
     if (sheet.getName().startsWith("attendance-")) {
       const data = sheet.getDataRange().getValues();
