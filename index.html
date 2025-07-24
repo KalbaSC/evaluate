@@ -3,71 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة المدربين - نادي كلباء</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>بوابة المدربين</title>
     <style>
-        @font-face {
-            font-family: 'NotoKufiArabic';
-            src: url('https://kalbasc.github.io/reports/NotoKufiArabic.ttf') format('truetype');
-        }
         body {
-            font-family: 'NotoKufiArabic', sans-serif;
-            background: #111;
-            color: white;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-        }
-        .header-container {
-            background: #111;
-            border-bottom: 2px solid #f4e733;
-            padding: 15px 0;
-        }
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-        .logo {
-            height: 60px;
-        }
-        .divider {
-            width: 1.5px;
-            height: 45px;
-            background-color: #f4e733;
-        }
-        .header-info {
-            text-align: center;
-        }
-        .arabic-name {
-            font-weight: bold;
-            font-size: 18px;
-        }
-        .english-name {
-            font-size: 12px;
-            color: #f4e733;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
         }
         .container {
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 0 auto;
+            background: white;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-        }
-        h1 {
-            color: #f4e733;
-            text-align: center;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .login-form {
             max-width: 400px;
-            margin: 0 auto;
+            margin: 50px auto;
             padding: 20px;
-            background: #222;
-            border-radius: 10px;
-            border: 1px solid #f4e733;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .form-group {
             margin-bottom: 15px;
@@ -75,25 +34,30 @@
         label {
             display: block;
             margin-bottom: 5px;
-            color: #f4e733;
+            font-weight: bold;
         }
         input, select {
             width: 100%;
             padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #f4e733;
-            background: #111;
-            color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
         button {
-            background: #f4e733;
-            color: black;
-            border: none;
+            background-color: #4CAF50;
+            color: white;
             padding: 10px 15px;
-            border-radius: 5px;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
-            font-weight: bold;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
         }
         table {
             width: 100%;
@@ -101,439 +65,369 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #f4e733;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
         }
         th {
-            background-color: #333;
-            color: #f4e733;
+            background-color: #f2f2f2;
         }
         .evaluation-form {
-            display: none;
-            margin-top: 20px;
+            background: #f9f9f9;
             padding: 15px;
-            background: #222;
-            border-radius: 10px;
-            border: 1px solid #f4e733;
-        }
-        .evaluation-options {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .evaluation-options label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
         }
         textarea {
             width: 100%;
             padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #f4e733;
-            background: #111;
-            color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             resize: vertical;
             min-height: 100px;
         }
-        .hidden {
-            display: none;
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+            flex-wrap: wrap;
         }
-        .coach-dashboard {
-            display: none;
+        .radio-option {
+            display: flex;
+            align-items: center;
         }
-        .activity-selector {
-            margin-bottom: 20px;
+        .error {
+            color: red;
+            margin-top: 5px;
         }
-        .summary-card {
-            background: #222;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #f4e733;
-            margin-bottom: 20px;
-        }
-        .empty-state {
+        .loading {
             text-align: center;
             padding: 20px;
-            color: #aaa;
-        }
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .divider {
-                width: 80%;
-                height: 1.5px;
-            }
-            .logo {
-                height: 50px;
-            }
-            th, td {
-                padding: 5px;
-                font-size: 12px;
-            }
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <header class="header-container">
-        <div class="header-content">
-            <img src="Picture3.png" alt="شعار الشارقة" class="logo">
-            <div class="divider"></div>
-            <img src="logo.png" alt="شعار نادي كلباء" class="logo">
-            <div class="header-info">
-                <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
-                <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
-            </div>
-        </div>
-    </header>
-
     <div class="container">
         <!-- Login Section -->
         <div id="loginSection">
-            <h1>تسجيل دخول المدربين</h1>
             <div class="login-form">
+                <h2 style="text-align: center;">تسجيل دخول المدربين</h2>
                 <div class="form-group">
-                    <label for="coachName">اسم المدرب:</label>
-                    <input type="text" id="coachName" placeholder="أدخل اسمك">
-                </div>
-                <div class="form-group">
-                    <label for="activity">النشاط:</label>
-                    <select id="activity">
-                        <option value="">اختر النشاط</option>
-                        <!-- Activities will be populated by JavaScript -->
-                    </select>
+                    <label for="username">اسم المستخدم:</label>
+                    <input type="text" id="username" required>
                 </div>
                 <div class="form-group">
                     <label for="password">كلمة المرور:</label>
-                    <input type="password" id="password" placeholder="أدخل كلمة المرور">
+                    <input type="password" id="password" required>
                 </div>
-                <button onclick="loginCoach()">تسجيل الدخول</button>
+                <div class="form-group">
+                    <label for="activity">النشاط:</label>
+                    <select id="activity" required>
+                        <option value="">اختر النشاط</option>
+                    </select>
+                </div>
+                <div id="loginError" class="error"></div>
+                <button onclick="login()">تسجيل الدخول</button>
             </div>
         </div>
 
-        <!-- Coach Dashboard -->
-        <div id="coachDashboard" class="coach-dashboard">
-            <h1>مرحبا بك، <span id="welcomeCoach"></span></h1>
-            <div class="summary-card">
-                <h2 id="activityTitle"></h2>
-                <p>عدد المشاركين: <span id="participantCount">0</span></p>
-                <p>آخر تحديث: <span id="lastUpdate"></span></p>
-            </div>
-
-            <div class="activity-selector">
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="hidden">
+            <h1>مرحبا بك، <span id="coachName"></span></h1>
+            <h2>نشاط: <span id="activityName"></span></h2>
+            
+            <div class="form-group">
                 <label for="attendanceDate">اختر تاريخ:</label>
-                <input type="date" id="attendanceDate">
+                <input type="date" id="attendanceDate" onchange="loadAttendanceData()">
             </div>
-
-            <table id="attendanceTable">
+            
+            <div id="loading" class="loading hidden">جاري تحميل البيانات...</div>
+            
+            <table id="attendanceTable" class="hidden">
                 <thead>
                     <tr>
-                        <th>التاريخ</th>
                         <th>الاسم</th>
+                        <th>الوالد</th>
                         <th>المعرف</th>
                         <th>الحضور</th>
                         <th>التقييم</th>
+                        <th>ملاحظات</th>
                         <th>إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td colspan="6" class="empty-state">اختر تاريخًا لعرض البيانات</td>
-                    </tr>
+                    <!-- Will be populated by JavaScript -->
                 </tbody>
             </table>
-
-            <div id="evaluationForm" class="evaluation-form">
+            
+            <!-- Evaluation Form (hidden by default) -->
+            <div id="evaluationForm" class="evaluation-form hidden">
                 <h3>تقييم المشارك</h3>
                 <div class="form-group">
-                    <label for="participantName">اسم المشارك:</label>
-                    <input type="text" id="participantName" readonly>
+                    <label>الاسم: <span id="evalStudentName"></span></label>
                 </div>
                 <div class="form-group">
-                    <label for="participantId">المعرف:</label>
-                    <input type="text" id="participantId" readonly>
+                    <label>الوالد: <span id="evalStudentParent"></span></label>
+                </div>
+                <div class="form-group">
+                    <label>المعرف: <span id="evalStudentId"></span></label>
                 </div>
                 <div class="form-group">
                     <label>التقييم:</label>
-                    <div class="evaluation-options">
-                        <label><input type="radio" name="evaluation" value="ممتاز"> ممتاز</label>
-                        <label><input type="radio" name="evaluation" value="جيد جدا"> جيد جداً</label>
-                        <label><input type="radio" name="evaluation" value="جيد"> جيد</label>
-                        <label><input type="radio" name="evaluation" value="مقبول"> مقبول</label>
-                        <label><input type="radio" name="evaluation" value="ضعيف"> ضعيف</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="evalExcellent" name="evaluation" value="ممتاز">
+                            <label for="evalExcellent">ممتاز</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="evalVeryGood" name="evaluation" value="جيد جدا">
+                            <label for="evalVeryGood">جيد جداً</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="evalGood" name="evaluation" value="جيد">
+                            <label for="evalGood">جيد</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="evalAverage" name="evaluation" value="مقبول">
+                            <label for="evalAverage">مقبول</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="evalPoor" name="evaluation" value="ضعيف">
+                            <label for="evalPoor">ضعيف</label>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="evaluationNotes">ملاحظات:</label>
-                    <textarea id="evaluationNotes" placeholder="أدخل ملاحظاتك عن المشارك"></textarea>
+                    <label for="evalNotes">ملاحظات:</label>
+                    <textarea id="evalNotes"></textarea>
                 </div>
                 <button onclick="saveEvaluation()">حفظ التقييم</button>
-                <button onclick="cancelEvaluation()" style="background: #555; margin-top: 10px;">إلغاء</button>
+                <button onclick="cancelEvaluation()" style="background-color: #f44336; margin-top: 10px;">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Sample data - in a real app, this would come from your database
-        const coaches = [
-            { name: "مدرب كرة القدم", activity: "كرة القدم", password: "football123" },
-            { name: "مدرب السباحة", activity: "السباحة", password: "swimming123" },
-            { name: "مدرب الرسم", activity: "الرسم", password: "art123" }
-        ];
-
-        const activities = ["كرة القدم", "السباحة", "الرسم", "الكاراتيه", "الجمباز"];
-        
-        // Sample attendance data - in a real app, this would come from your main system
-        let attendanceData = [];
-        
-        // Current coach info
+        // Configuration - Replace with your Apps Script Web App URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
         let currentCoach = null;
-        let currentActivityData = [];
+        let currentStudent = null;
+        let attendanceData = [];
 
         // Initialize the page
-        $(document).ready(function() {
-            // Populate activities dropdown
-            const activitySelect = $('#activity');
-            activities.forEach(activity => {
-                activitySelect.append(`<option value="${activity}">${activity}</option>`);
-            });
-            
+        document.addEventListener('DOMContentLoaded', function() {
             // Set default date to today
             const today = new Date().toISOString().split('T')[0];
-            $('#attendanceDate').val(today);
+            document.getElementById('attendanceDate').value = today;
             
-            // Load sample data (in a real app, you would fetch this from your API)
-            loadSampleData();
+            // Load available activities
+            loadActivities();
         });
 
-        function loadSampleData() {
-            // This is just sample data - replace with actual data from your system
-            attendanceData = [
-                {
-                    id: "1001",
-                    name: "محمد أحمد",
-                    activity: "كرة القدم",
-                    date: "2025-07-20",
-                    timestamp: "2025-07-20T10:15:00",
-                    attendance: "حاضر",
-                    evaluation: "",
-                    notes: ""
-                },
-                {
-                    id: "1002",
-                    name: "علي خالد",
-                    activity: "كرة القدم",
-                    date: "2025-07-20",
-                    timestamp: "2025-07-20T10:20:00",
-                    attendance: "حاضر",
-                    evaluation: "جيد",
-                    notes: "أداء جيد ولكن يحتاج لتحسين التمريرات"
-                },
-                {
-                    id: "1003",
-                    name: "سارة محمد",
-                    activity: "السباحة",
-                    date: "2025-07-20",
-                    timestamp: "2025-07-20T11:00:00",
-                    attendance: "حاضر",
-                    evaluation: "ممتاز",
-                    notes: "أداء رائع في تعلم السباحة الحرة"
-                },
-                {
-                    id: "1004",
-                    name: "يوسف عمر",
-                    activity: "الرسم",
-                    date: "2025-07-21",
-                    timestamp: "2025-07-21T09:30:00",
-                    attendance: "حاضر",
-                    evaluation: "",
-                    notes: ""
+        // Load available activities from Google Sheets
+        async function loadActivities() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const activitySelect = document.getElementById('activity');
+                    result.data.forEach(activity => {
+                        const option = document.createElement('option');
+                        option.value = activity;
+                        option.textContent = activity;
+                        activitySelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Error loading activities:', result.message);
                 }
-            ];
+            } catch (error) {
+                console.error('Error loading activities:', error);
+            }
         }
 
-        function loginCoach() {
-            const coachName = $('#coachName').val().trim();
-            const activity = $('#activity').val();
-            const password = $('#password').val();
+        // Coach login
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const activity = document.getElementById('activity').value;
             
-            if (!coachName || !activity || !password) {
-                alert("الرجاء إدخال جميع البيانات المطلوبة");
+            document.getElementById('loginError').textContent = '';
+            
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username, 
+                        password, 
+                        activity 
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentCoach = result.coach;
+                    
+                    document.getElementById('coachName').textContent = currentCoach.name;
+                    document.getElementById('activityName').textContent = currentCoach.activity;
+                    
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    
+                    loadAttendanceData();
+                } else {
+                    document.getElementById('loginError').textContent = result.message || 'بيانات الدخول غير صحيحة';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginError').textContent = 'حدث خطأ أثناء محاولة الدخول';
+            }
+        }
+
+        // Load attendance data for selected date
+        async function loadAttendanceData() {
+            const date = document.getElementById('attendanceDate').value;
+            
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('attendanceTable').classList.add('hidden');
+            
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getAttendance&activity=${encodeURIComponent(currentCoach.activity)}&date=${date}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    attendanceData = result.data;
+                    renderAttendanceTable();
+                } else {
+                    alert(result.message || 'حدث خطأ أثناء تحميل البيانات');
+                }
+            } catch (error) {
+                console.error('Error loading attendance data:', error);
+                alert('حدث خطأ أثناء تحميل البيانات');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('attendanceTable').classList.remove('hidden');
+            }
+        }
+
+        // Render the attendance table
+        function renderAttendanceTable() {
+            const tbody = document.querySelector('#attendanceTable tbody');
+            tbody.innerHTML = '';
+            
+            if (attendanceData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">لا يوجد بيانات لهذا التاريخ</td></tr>';
                 return;
             }
             
-            // Check if coach exists (in a real app, this would be a server-side check)
-            const coach = coaches.find(c => 
-                c.name === coachName && 
-                c.activity === activity && 
-                c.password === password
-            );
-            
-            if (!coach) {
-                alert("بيانات الدخول غير صحيحة");
-                return;
-            }
-            
-            currentCoach = coach;
-            
-            // Show coach dashboard
-            $('#loginSection').addClass('hidden');
-            $('#coachDashboard').removeClass('hidden');
-            
-            // Update welcome message
-            $('#welcomeCoach').text(coachName);
-            $('#activityTitle').text(`نشاط: ${activity}`);
-            
-            // Load data for this coach's activity
-            loadActivityData(activity);
-        }
-
-        function loadActivityData(activity) {
-            // Filter attendance data for this activity
-            currentActivityData = attendanceData.filter(item => item.activity === activity);
-            
-            // Update participant count
-            const uniqueParticipants = [...new Set(currentActivityData.map(item => item.id))];
-            $('#participantCount').text(uniqueParticipants.length);
-            
-            // Set last update time
-            const now = new Date();
-            $('#lastUpdate').text(now.toLocaleString('ar-EG'));
-            
-            // Load data for today by default
-            filterAttendanceByDate();
-        }
-
-        function filterAttendanceByDate() {
-            const selectedDate = $('#attendanceDate').val();
-            if (!selectedDate) return;
-            
-            const filteredData = currentActivityData.filter(item => item.date === selectedDate);
-            
-            const tbody = $('#attendanceTable tbody');
-            tbody.empty();
-            
-            if (filteredData.length === 0) {
-                tbody.append('<tr><td colspan="6" class="empty-state">لا يوجد بيانات لهذا التاريخ</td></tr>');
-                return;
-            }
-            
-            filteredData.forEach(item => {
-                const row = `
-                    <tr>
-                        <td>${formatDate(item.timestamp)}</td>
-                        <td>${item.name}</td>
-                        <td>${item.id}</td>
-                        <td>${item.attendance}</td>
-                        <td>${item.evaluation || "-"}</td>
-                        <td>
-                            <button onclick="openEvaluation('${item.id}', '${item.name}')" style="padding: 5px 10px; font-size: 12px;">
-                                ${item.evaluation ? "تعديل التقييم" : "إضافة تقييم"}
-                            </button>
-                        </td>
-                    </tr>
+            attendanceData.forEach(student => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${student['Child Name'] || '-'}</td>
+                    <td>${student.Parent || '-'}</td>
+                    <td>${student.ID || '-'}</td>
+                    <td>${student.General || student.Activity ? 'حاضر' : '-'}</td>
+                    <td>${student.Evaluation || '-'}</td>
+                    <td>${student.Notes || '-'}</td>
+                    <td>
+                        <button onclick="showEvaluationForm('${student.ID}')" style="padding: 5px 10px; font-size: 14px;">
+                            ${student.Evaluation ? 'تعديل التقييم' : 'إضافة تقييم'}
+                        </button>
+                    </td>
                 `;
-                tbody.append(row);
+                
+                tbody.appendChild(row);
             });
         }
 
-        function openEvaluation(participantId, participantName) {
-            // Find participant data
-            const participantData = currentActivityData.find(item => 
-                item.id === participantId && 
-                item.date === $('#attendanceDate').val()
-            );
+        // Show evaluation form for a student
+        function showEvaluationForm(studentId) {
+            const student = attendanceData.find(s => s.ID === studentId);
+            if (!student) return;
             
-            // Fill evaluation form
-            $('#participantName').val(participantName);
-            $('#participantId').val(participantId);
+            currentStudent = student;
             
-            if (participantData.evaluation) {
-                $(`input[name="evaluation"][value="${participantData.evaluation}"]`).prop('checked', true);
-            } else {
-                $('input[name="evaluation"]').prop('checked', false);
+            document.getElementById('evalStudentName').textContent = student['Child Name'] || '-';
+            document.getElementById('evalStudentParent').textContent = student.Parent || '-';
+            document.getElementById('evalStudentId').textContent = student.ID || '-';
+            
+            // Reset form
+            document.querySelector('input[name="evaluation"]:checked')?.checked = false;
+            document.getElementById('evalNotes').value = student.Notes || '';
+            
+            // Set current evaluation if exists
+            if (student.Evaluation) {
+                document.querySelector(`input[name="evaluation"][value="${student.Evaluation}"]`).checked = true;
             }
             
-            $('#evaluationNotes').val(participantData.notes || '');
+            document.getElementById('evaluationForm').classList.remove('hidden');
             
-            // Show evaluation form
-            $('#evaluationForm').show();
-            $('html, body').animate({
-                scrollTop: $('#evaluationForm').offset().top
-            }, 500);
+            // Scroll to form
+            document.getElementById('evaluationForm').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function saveEvaluation() {
-            const participantId = $('#participantId').val();
-            const evaluation = $('input[name="evaluation"]:checked').val();
-            const notes = $('#evaluationNotes').val();
+        // Save evaluation to Google Sheets
+        async function saveEvaluation() {
+            const evaluation = document.querySelector('input[name="evaluation"]:checked')?.value;
+            const notes = document.getElementById('evalNotes').value;
             
             if (!evaluation) {
-                alert("الرجاء اختيار تقييم");
+                alert('الرجاء اختيار تقييم');
                 return;
             }
             
-            // Update the data (in a real app, this would save to your database)
-            const selectedDate = $('#attendanceDate').val();
-            
-            const index = currentActivityData.findIndex(item => 
-                item.id === participantId && 
-                item.date === selectedDate
-            );
-            
-            if (index !== -1) {
-                currentActivityData[index].evaluation = evaluation;
-                currentActivityData[index].notes = notes;
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=saveEvaluation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        studentId: currentStudent.ID,
+                        activity: currentCoach.activity,
+                        date: document.getElementById('attendanceDate').value,
+                        evaluation,
+                        notes,
+                        studentName: currentStudent['Child Name'],
+                        parentName: currentStudent.Parent
+                    })
+                });
                 
-                // Also update the main attendance data (for demo purposes)
-                const mainIndex = attendanceData.findIndex(item => 
-                    item.id === participantId && 
-                    item.date === selectedDate
-                );
+                const result = await response.json();
                 
-                if (mainIndex !== -1) {
-                    attendanceData[mainIndex].evaluation = evaluation;
-                    attendanceData[mainIndex].notes = notes;
+                if (result.success) {
+                    // Update local data
+                    currentStudent.Evaluation = evaluation;
+                    currentStudent.Notes = notes;
+                    
+                    // Update the table
+                    renderAttendanceTable();
+                    
+                    // Hide the form
+                    cancelEvaluation();
+                    
+                    alert('تم حفظ التقييم بنجاح');
+                } else {
+                    alert(result.message || 'حدث خطأ أثناء حفظ التقييم');
                 }
+            } catch (error) {
+                console.error('Error saving evaluation:', error);
+                alert('حدث خطأ أثناء حفظ التقييم');
             }
-            
-            // Refresh the table
-            filterAttendanceByDate();
-            
-            // Hide the evaluation form
-            $('#evaluationForm').hide();
-            
-            alert("تم حفظ التقييم بنجاح");
         }
 
+        // Cancel evaluation
         function cancelEvaluation() {
-            $('#evaluationForm').hide();
+            document.getElementById('evaluationForm').classList.add('hidden');
+            currentStudent = null;
         }
-
-        function formatDate(isoString) {
-            const date = new Date(isoString);
-            const options = {
-                year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit',
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true
-            };
-            let formatted = date.toLocaleString('ar-EG', options);
-            formatted = formatted.replace("AM", "ص").replace("PM", "م");
-            return formatted;
-        }
-
-        // Event listeners
-        $('#attendanceDate').change(function() {
-            filterAttendanceByDate();
-        });
     </script>
 </body>
 </html>
