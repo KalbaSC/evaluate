@@ -1,823 +1,539 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نادي كلباء - تقييم اللاعبين</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    @font-face {
-      font-family: 'NotoKufiArabic';
-      src: url('NotoKufiArabic.ttf') format('truetype');
-    }
-    body {
-      font-family: 'NotoKufiArabic', sans-serif;
-      background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      margin: 0;
-      padding: 0;
-    }
-    .header-container {
-      width: 100%;
-      background: #111;
-      border-bottom: 2px solid #f4e733;
-    }
-    .header-right {
-      width: 100%;
-      max-width: 1170px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px 42px;
-      background-color: #111;
-      color: white;
-      box-sizing: border-box;
-    }
-    .header-right img.logo {
-      height: 70px;
-    }
-    .divider {
-      width: 1.5px;
-      height: 65px;
-      background-color: #f4e733;
-    }
-    .header-info {
-      text-align: center;
-    }
-    .arabic-name {
-      font-weight: bold;
-      font-size: 20px;
-    }
-    .english-name {
-      font-size: 14px;
-      color: #f4e733;
-    }
-    .container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.9);
-      border-radius: 10px;
-      margin-top: 30px;
-      margin-bottom: 30px;
-    }
-    .login-container {
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 30px;
-      background: rgba(0, 0, 0, 0.9);
-      border-radius: 10px;
-      text-align: center;
-    }
-    .login-container h2 {
-      color: #f4e733;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-      text-align: right;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: #f4e733;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #f4e733;
-      background: #222;
-      color: white;
-    }
-    .btn {
-      background: #f4e733;
-      color: black;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      margin: 5px;
-    }
-    .btn-block {
-      display: block;
-      width: 100%;
-    }
-    .nav-tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #f4e733;
-    }
-    .nav-tabs button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .nav-tabs button.active {
-      background: #f4e733;
-      color: black;
-      border-radius: 5px 5px 0 0;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #f4e733;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #333;
-      color: #f4e733;
-    }
-    .evaluation-form {
-      background: #222;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-    .evaluation-criteria {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    .criteria-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .criteria-item label {
-      color: #f4e733;
-    }
-    .criteria-item select {
-      width: 100px;
-      padding: 5px;
-      border-radius: 5px;
-      background: #333;
-      color: white;
-      border: 1px solid #f4e733;
-    }
-    .hidden {
-      display: none;
-    }
-    .player-card {
-      background: #222;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      border-left: 4px solid #f4e733;
-    }
-    .player-card h3 {
-      margin-top: 0;
-      color: #f4e733;
-    }
-    .progress-container {
-      margin-top: 20px;
-    }
-    .progress-bar {
-      height: 20px;
-      background: #333;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: #f4e733;
-      width: 0%;
-      transition: width 0.5s;
-    }
-    .rankings {
-      margin-top: 30px;
-    }
-    .ranking-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background: #222;
-      margin-bottom: 10px;
-      border-radius: 5px;
-    }
-    .rank-badge {
-      background: #f4e733;
-      color: black;
-      padding: 5px 10px;
-      border-radius: 50%;
-      font-weight: bold;
-      margin-left: 10px;
-    }
-    .footer-container {
-      width: 100%;
-      background-color: #111;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      border-top: 3px solid #f4e733;
-    }
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .social-icons a {
-      color: white;
-      margin: 0 10px;
-      font-size: 20px;
-      transition: color 0.3s;
-    }
-    .social-icons a:hover {
-      color: #f4e733;
-    }
-    @media (max-width: 768px) {
-      .header-right {
-        padding: 10px;
-        flex-direction: row;
-        gap: 10px;
-      }
-      .header-right img.logo {
-        height: 50px;
-      }
-      .arabic-name {
-        font-size: 16px;
-      }
-      .english-name {
-        font-size: 12px;
-      }
-      .container {
-        padding: 15px;
-        margin: 15px auto;
-      }
-      .evaluation-criteria {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة المدربين - نادي كلباء</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'NotoKufiArabic';
+            src: url('https://kalbasc.github.io/reports/NotoKufiArabic.ttf') format('truetype');
+        }
+        body {
+            font-family: 'NotoKufiArabic', sans-serif;
+            background: #111;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            background: #111;
+            border-bottom: 2px solid #f4e733;
+            padding: 15px 0;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .logo {
+            height: 60px;
+        }
+        .divider {
+            width: 1.5px;
+            height: 45px;
+            background-color: #f4e733;
+        }
+        .header-info {
+            text-align: center;
+        }
+        .arabic-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .english-name {
+            font-size: 12px;
+            color: #f4e733;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #f4e733;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #222;
+            border-radius: 10px;
+            border: 1px solid #f4e733;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #f4e733;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f4e733;
+            background: #111;
+            color: white;
+        }
+        button {
+            background: #f4e733;
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #f4e733;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: #f4e733;
+        }
+        .evaluation-form {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #222;
+            border-radius: 10px;
+            border: 1px solid #f4e733;
+        }
+        .evaluation-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .evaluation-options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f4e733;
+            background: #111;
+            color: white;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .hidden {
+            display: none;
+        }
+        .coach-dashboard {
+            display: none;
+        }
+        .activity-selector {
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: #222;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f4e733;
+            margin-bottom: 20px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+        }
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .divider {
+                width: 80%;
+                height: 1.5px;
+            }
+            .logo {
+                height: 50px;
+            }
+            th, td {
+                padding: 5px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="header-container">
-    <div class="header-right">
-      <img src="Picture3.png" alt="شعار الشارقة" class="logo">
-      <div class="divider"></div>
-      <img src="logo.png" alt="شعار نادي كلباء" class="logo">
-      <div class="header-info">
-        <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
-        <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
-      </div>
-    </div>
-  </header>
-
-  <div id="loginView" class="login-container">
-    <h2>تسجيل دخول المدربين</h2>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username">اسم المستخدم</label>
-        <input type="text" id="username" required>
-      </div>
-      <div class="form-group">
-        <label for="password">كلمة المرور</label>
-        <input type="password" id="password" required>
-      </div>
-      <button type="submit" class="btn btn-block">دخول</button>
-    </form>
-  </div>
-
-  <div id="coachPortal" class="container hidden">
-    <div class="nav-tabs">
-      <button class="active" onclick="showTab('evaluation')">تقييم اللاعبين</button>
-      <button onclick="showTab('rankings')">التصنيفات</button>
-      <button onclick="showTab('progress')">تطور الأداء</button>
-      <button onclick="loadPlayersTable()">عرض اللاعبين</button> 
-      <button onclick="logout()">خروج</button>
-    </div>
-
-    <div id="evaluationTab">
-      <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
-      <div class="form-group">
-        <label for="sessionDate">تاريخ الجلسة</label>
-     <div class="form-group">
-        <label for="filterDate">تصفية اللاعبين حسب التاريخ</label>
-       <input type="date" id="filterDate" onchange="filterByDate()">
-   </div>
-      </div>
-      
-      <div id="playersList"></div>
-    </div>
-
-    <div id="rankingsTab" class="hidden">
-      <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
-      <div id="rankingsContainer" class="rankings"></div>
-      <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
-    </div>
-
-    <div id="progressTab" class="hidden">
-      <h2 style="color:#f4e733; text-align:center">تطور الأداء</h2>
-      <div class="form-group">
-        <label for="playerSelect">اختر اللاعب</label>
-        <select id="playerSelect" onchange="showPlayerProgress()"></select>
-      </div>
-      <div id="progressChartContainer">
-        <canvas id="progressChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer-container">
-    <div class="footer-content">
-      <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
-      <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
-      <div class="social-icons">
-        <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
-        <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
-        <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const CONFIG = {
-      EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
-      ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec',
-      USE_CORS_PROXY: true,
-      CORS_PROXY_URL: 'https://cors-anywhere.herokuapp.com/'
-    };
-
-const coaches = {
-  "handball1": { password: "pass1", activity: "كرة يد" },
-  "volley2": { password: "pass2", activity: "كرة طائرة" },
-  "basket3": { password: "pass3", activity: "كرة سلة" },
-  "chess4": { password: "pass4", activity: "شطرنج" }
-};
-
-const evaluationCriteria = {
-  "كرة يد": [
-    "قوة التصويب",
-    "دقة التمرير",
-    "التمركز الدفاعي",
-    "الانسجام مع الفريق",
-    "اللياقة البدنية"
-  ],
-  "كرة طائرة": [
-    "الإرسال القوي",
-    "الاستقبال تحت الضغط",
-    "الضرب الساحق",
-    "التمركز في الملعب",
-    "سرعة رد الفعل"
-  ],
-  "كرة سلة": [
-    "التصويب من المسافات المختلفة",
-    "المراوغة بالكرة",
-    "التمرير الحاسم",
-    "التحرك بدون كرة",
-    "القوة البدنية"
-  ],
-  "شطرنج": [
-    "الافتتاحيات",
-    "التكتيكات",
-    "التخطيط طويل المدى",
-    "إدارة الوقت",
-    "التركيز الذهني"
-  ]
-};
-
-    let currentCoach = null;
-    let playersData = [];
-    let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
-
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('sessionDate').valueAsDate = new Date();
-      setupEventListeners();
-    });
-
-async function loadPlayersData() {
-  return new Promise((resolve) => {
-    const callbackName = 'handlePlayers_' + Date.now();
-    const script = document.createElement('script');
-
-    window[callbackName] = function(data) {
-      delete window[callbackName];
-      document.body.removeChild(script);
-
-      const coachActivity = currentCoach.activity;
-      playersData = data
-        .filter(p => p.Activity === coachActivity)
-        .map(player => ({
-          id: player.ID,
-          name: player["Child Name"],
-          parent: player.Parent,
-          date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
-        }));
-
-      renderPlayersList(); // show the UI
-      updatePlayerSelect(); // for progress
-      resolve();
-    };
-
-    script.src = `${CONFIG.ATTENDANCE_SCRIPT_URL}?callback=${callbackName}`;
-    document.body.appendChild(script);
-  });
-}    
-
-    function setupEventListeners() {
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      document.getElementById('sessionDate').addEventListener('change', handleDateChange);
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      
-      if (coaches[username] && coaches[username].password === password) {
-        currentCoach = {
-          username: username,
-          activity: coaches[username].activity
-        };
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('coachPortal').classList.remove('hidden');
-        await loadPlayersData();
-      } else {
-        alert('اسم المستخدم أو كلمة المرور غير صحيحة');
-      }
-    }
-function loadPlayersTable() {
-  const container = document.getElementById('playersList');
-  container.innerHTML = `
-    <h3>قائمة اللاعبين</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>المعرف</th>
-          <th>اسم اللاعب</th>
-          <th>اسم ولي الأمر</th>
-          <th>تاريخ الحضور</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${playersData.map(player => `
-          <tr>
-            <td>${player.id}</td>
-            <td>${player.name}</td>
-            <td>${player.parent}</td>
-            <td>${player.date}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-   
-function filterByDate() {
-  const selectedDate = document.getElementById('filterDate').value;
-  const filteredPlayers = playersData.filter(player => player.date === selectedDate);
-  
-  if (filteredPlayers.length === 0) {
-    alert('لا يوجد لاعبون في هذا التاريخ');
-    renderPlayersList(); 
-  } else {
-    renderPlayersList(filteredPlayers);
-  }
-}
-    function handleDateChange() {
-      const selectedDate = document.getElementById('sessionDate').value;
-      const filteredPlayers = playersData.filter(player => player.date === selectedDate);
-      
-      if (filteredPlayers.length === 0) {
-        alert('لا يوجد لاعبون مسجلون في هذا التاريخ');
-        renderPlayersList(playersData);
-      } else {
-        renderPlayersList(filteredPlayers);
-      }
-    }
-
-    function renderPlayersList(players = playersData) {
-      const container = document.getElementById('playersList');
-      container.innerHTML = '';
-      
-      if (players.length === 0) {
-        container.innerHTML = '<p>لا يوجد لاعبون متاحون للتقييم</p>';
-        return;
-      }
-      
-      players.forEach(player => {
-        const playerCard = document.createElement('div');
-        playerCard.className = 'player-card';
-        playerCard.innerHTML = `
-          <h3>${player.name} <small>(${player.id})</small></h3>
-          <p>ولي الأمر: ${player.parent || "غير معروف"}</p>
-          <div class="evaluation-form">
-            <h4>تقييم الأداء:</h4>
-            <div class="evaluation-criteria" id="criteria-${player.id}"></div>
-            <textarea id="notes-${player.id}" placeholder="ملاحظات إضافية..."></textarea>
-            <button class="btn" onclick="saveEvaluation('${player.id}')">حفظ التقييم</button>
-          </div>
-        `;
-        
-        const criteriaContainer = playerCard.querySelector(`#criteria-${player.id}`);
-        evaluationCriteria[currentCoach.activity].forEach((criteria, index) => {
-          criteriaContainer.innerHTML += `
-            <div class="criteria-item">
-              <label>${criteria}</label>
-              <select id="${player.id}-skill${index + 1}">
-                <option value="5">ممتاز (5)</option>
-                <option value="4">جيد جداً (4)</option>
-                <option value="3">جيد (3)</option>
-                <option value="2">مقبول (2)</option>
-                <option value="1">ضعيف (1)</option>
-              </select>
+    <header class="header-container">
+        <div class="header-content">
+            <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+            <div class="divider"></div>
+            <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+            <div class="header-info">
+                <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+                <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
             </div>
-          `;
-        });
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection">
+            <h1>تسجيل دخول المدربين</h1>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="coachName">اسم المدرب:</label>
+                    <input type="text" id="coachName" placeholder="أدخل اسمك">
+                </div>
+                <div class="form-group">
+                    <label for="activity">النشاط:</label>
+                    <select id="activity">
+                        <option value="">اختر النشاط</option>
+                        <!-- Activities will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="password">كلمة المرور:</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور">
+                </div>
+                <button onclick="loginCoach()">تسجيل الدخول</button>
+            </div>
+        </div>
+
+        <!-- Coach Dashboard -->
+        <div id="coachDashboard" class="coach-dashboard">
+            <h1>مرحبا بك، <span id="welcomeCoach"></span></h1>
+            <div class="summary-card">
+                <h2 id="activityTitle"></h2>
+                <p>عدد المشاركين: <span id="participantCount">0</span></p>
+                <p>آخر تحديث: <span id="lastUpdate"></span></p>
+            </div>
+
+            <div class="activity-selector">
+                <label for="attendanceDate">اختر تاريخ:</label>
+                <input type="date" id="attendanceDate">
+            </div>
+
+            <table id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الاسم</th>
+                        <th>المعرف</th>
+                        <th>الحضور</th>
+                        <th>التقييم</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="empty-state">اختر تاريخًا لعرض البيانات</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div id="evaluationForm" class="evaluation-form">
+                <h3>تقييم المشارك</h3>
+                <div class="form-group">
+                    <label for="participantName">اسم المشارك:</label>
+                    <input type="text" id="participantName" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="participantId">المعرف:</label>
+                    <input type="text" id="participantId" readonly>
+                </div>
+                <div class="form-group">
+                    <label>التقييم:</label>
+                    <div class="evaluation-options">
+                        <label><input type="radio" name="evaluation" value="ممتاز"> ممتاز</label>
+                        <label><input type="radio" name="evaluation" value="جيد جدا"> جيد جداً</label>
+                        <label><input type="radio" name="evaluation" value="جيد"> جيد</label>
+                        <label><input type="radio" name="evaluation" value="مقبول"> مقبول</label>
+                        <label><input type="radio" name="evaluation" value="ضعيف"> ضعيف</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="evaluationNotes">ملاحظات:</label>
+                    <textarea id="evaluationNotes" placeholder="أدخل ملاحظاتك عن المشارك"></textarea>
+                </div>
+                <button onclick="saveEvaluation()">حفظ التقييم</button>
+                <button onclick="cancelEvaluation()" style="background: #555; margin-top: 10px;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Sample data - in a real app, this would come from your database
+        const coaches = [
+            { name: "مدرب كرة القدم", activity: "كرة القدم", password: "football123" },
+            { name: "مدرب السباحة", activity: "السباحة", password: "swimming123" },
+            { name: "مدرب الرسم", activity: "الرسم", password: "art123" }
+        ];
+
+        const activities = ["كرة القدم", "السباحة", "الرسم", "الكاراتيه", "الجمباز"];
         
-        container.appendChild(playerCard);
-      });
-    }
+        // Sample attendance data - in a real app, this would come from your main system
+        let attendanceData = [];
+        
+        // Current coach info
+        let currentCoach = null;
+        let currentActivityData = [];
 
-async function saveEvaluation(playerId) {
-  const sessionDate = document.getElementById('sessionDate').value;
-  if (!sessionDate) {
-    alert('الرجاء إدخال تاريخ الجلسة');
-    return;
-  }
+        // Initialize the page
+        $(document).ready(function() {
+            // Populate activities dropdown
+            const activitySelect = $('#activity');
+            activities.forEach(activity => {
+                activitySelect.append(`<option value="${activity}">${activity}</option>`);
+            });
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            $('#attendanceDate').val(today);
+            
+            // Load sample data (in a real app, you would fetch this from your API)
+            loadSampleData();
+        });
 
-  const player = playersData.find(p => p.id === playerId);
-  if (!player) {
-    alert('لاعب غير موجود');
-    return;
-  }
-
-  const criteriaCount = evaluationCriteria[currentCoach.activity].length;
-  let totalScore = 0;
-  const scores = {};
-
-  for (let i = 0; i < criteriaCount; i++) {
-    const skillValue = parseInt(document.getElementById(`${playerId}-skill${i + 1}`).value);
-    scores[`skill${i + 1}`] = skillValue;
-    totalScore += skillValue;
-  }
-
-  const maxScore = criteriaCount * 5;
-  const percentage = Math.round((totalScore / maxScore) * 100);
-
-  const evaluationData = {
-    Timestamp: new Date().toISOString(),
-    Coach: currentCoach.username,
-    Activity: currentCoach.activity,
-    "Player ID": playerId,
-    "Player Name": player.name,
-    Notes: document.getElementById(`notes-${playerId}`).value,
-    Total: totalScore
-  };
-
-  for (let i = 0; i < criteriaCount; i++) {
-    evaluationData[`Skill ${i + 1}`] = scores[`skill${i + 1}`];
-  }
-
-  try {
-    await sendEvaluationJSONP(evaluationData);
-
-    // Save locally for rankings & progress
-    evaluations.push({
-      ...evaluationData,
-      percentage
-    });
-
-    localStorage.setItem('playerEvaluations', JSON.stringify(evaluations));
-    alert('✅ تم حفظ التقييم بنجاح');
-  } catch (err) {
-    console.error("Evaluation submission failed:", err);
-    alert("❌ فشل في إرسال التقييم. حاول مرة أخرى.");
-  }
-}
-
-function sendEvaluationJSONP(evaluationData) {
-  return new Promise((resolve, reject) => {
-    const callbackName = "handleEval_" + Date.now();
-    const script = document.createElement("script");
-
-    window[callbackName] = function(result) {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      resolve(result);
-    };
-
-    const encodedData = encodeURIComponent(JSON.stringify(evaluationData));
-    let url = `${CONFIG.EVALUATION_SCRIPT_URL}?data=${encodedData}&callback=${callbackName}`;
-
-    if (CONFIG.USE_CORS_PROXY) {
-      url = CONFIG.CORS_PROXY_URL + url;
-    }
-
-    script.src = url;
-    script.onerror = () => {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      reject("Script load error");
-    };
-
-    document.body.appendChild(script);
-  });
-}
- 
-    function updateRankings() {
-
-      const playerStats = {};
-      
-      evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
-        if (!playerStats[eval.playerId]) {
-          playerStats[eval.playerId] = {
-            name: eval.playerName,
-            total: 0,
-            count: 0,
-            evaluations: []
-          };
-        }
-        playerStats[eval.playerId].total += eval.percentage;
-        playerStats[eval.playerId].count++;
-        playerStats[eval.playerId].evaluations.push(eval);
-      });
-      
-      const rankings = Object.values(playerStats).map(player => {
-        return {
-          id: player.id,
-          name: player.name,
-          average: Math.round(player.total / player.count),
-          evaluations: player.evaluations
-        };
-      });
-      
-      rankings.sort((a, b) => b.average - a.average);
-      
-      rankingsContainer.innerHTML = '';
-      rankings.forEach((player, index) => {
-        const rankItem = document.createElement('div');
-        rankItem.className = 'ranking-item';
-        rankItem.innerHTML = `
-          <div>
-            <span class="rank-badge">${index + 1}</span>
-            <span>${player.name}</span>
-          </div>
-          <div>
-            <span>المعدل: ${player.average}%</span>
-          </div>
-        `;
-        rankingsContainer.appendChild(rankItem);
-      });
-    }
-
-    function updatePlayerSelect() {
-      playerSelect.innerHTML = '';
-      playersData.forEach(player => {
-        const option = document.createElement('option');
-        option.value = player.id;
-        option.textContent = player.name;
-        playerSelect.appendChild(option);
-      });
-      
-      if (playersData.length > 0) {
-        showPlayerProgress();
-      }
-    }
-
-    function showPlayerProgress() {
-      const playerId = playerSelect.value;
-      const playerName = playersData.find(p => p.id === playerId).name;
-      const playerEvals = evaluations.filter(e => e.playerId === playerId && e.activity === currentCoach.activity);
-      
-      if (playerEvals.length === 0) {
-        progressChartContainer.innerHTML = '<p>لا توجد بيانات تطور لهذا اللاعب بعد</p>';
-        if (progressChart) progressChart.destroy();
-        return;
-      }
-      
-      playerEvals.sort((a, b) => new Date(a.date) - new Date(b.date));
-      
-      const dates = playerEvals.map(e => e.date);
-      const percentages = playerEvals.map(e => e.percentage);
-      
-      if (progressChart) progressChart.destroy();
-      
-      const ctx = progressChartCanvas.getContext('2d');
-      progressChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: dates,
-          datasets: [{
-            label: `تطور أداء ${playerName}`,
-            data: percentages,
-            borderColor: '#f4e733',
-            backgroundColor: 'rgba(244, 231, 51, 0.1)',
-            fill: true,
-            tension: 0.1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: false,
-              min: 0,
-              max: 100,
-              ticks: {
-                callback: function(value) {
-                  return value + '%';
+        function loadSampleData() {
+            // This is just sample data - replace with actual data from your system
+            attendanceData = [
+                {
+                    id: "1001",
+                    name: "محمد أحمد",
+                    activity: "كرة القدم",
+                    date: "2025-07-20",
+                    timestamp: "2025-07-20T10:15:00",
+                    attendance: "حاضر",
+                    evaluation: "",
+                    notes: ""
+                },
+                {
+                    id: "1002",
+                    name: "علي خالد",
+                    activity: "كرة القدم",
+                    date: "2025-07-20",
+                    timestamp: "2025-07-20T10:20:00",
+                    attendance: "حاضر",
+                    evaluation: "جيد",
+                    notes: "أداء جيد ولكن يحتاج لتحسين التمريرات"
+                },
+                {
+                    id: "1003",
+                    name: "سارة محمد",
+                    activity: "السباحة",
+                    date: "2025-07-20",
+                    timestamp: "2025-07-20T11:00:00",
+                    attendance: "حاضر",
+                    evaluation: "ممتاز",
+                    notes: "أداء رائع في تعلم السباحة الحرة"
+                },
+                {
+                    id: "1004",
+                    name: "يوسف عمر",
+                    activity: "الرسم",
+                    date: "2025-07-21",
+                    timestamp: "2025-07-21T09:30:00",
+                    attendance: "حاضر",
+                    evaluation: "",
+                    notes: ""
                 }
-              }
-            }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: `تطور أداء ${playerName}`,
-              color: '#f4e733'
-            },
-            legend: {
-              labels: {
-                color: 'white'
-              }
-            }
-          }
+            ];
         }
-      });
-    }
 
-    function exportRankings() {
-      const playerStats = {};
-      
-      evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
-        if (!playerStats[eval.playerId]) {
-          playerStats[eval.playerId] = {
-            name: eval.playerName,
-            total: 0,
-            count: 0,
-            evaluations: []
-          };
+        function loginCoach() {
+            const coachName = $('#coachName').val().trim();
+            const activity = $('#activity').val();
+            const password = $('#password').val();
+            
+            if (!coachName || !activity || !password) {
+                alert("الرجاء إدخال جميع البيانات المطلوبة");
+                return;
+            }
+            
+            // Check if coach exists (in a real app, this would be a server-side check)
+            const coach = coaches.find(c => 
+                c.name === coachName && 
+                c.activity === activity && 
+                c.password === password
+            );
+            
+            if (!coach) {
+                alert("بيانات الدخول غير صحيحة");
+                return;
+            }
+            
+            currentCoach = coach;
+            
+            // Show coach dashboard
+            $('#loginSection').addClass('hidden');
+            $('#coachDashboard').removeClass('hidden');
+            
+            // Update welcome message
+            $('#welcomeCoach').text(coachName);
+            $('#activityTitle').text(`نشاط: ${activity}`);
+            
+            // Load data for this coach's activity
+            loadActivityData(activity);
         }
-        playerStats[eval.playerId].total += eval.percentage;
-        playerStats[eval.playerId].count++;
-        playerStats[eval.playerId].evaluations.push(eval);
-      });
-      
-      const rankings = Object.values(playerStats).map(player => {
-        return {
-          name: player.name,
-          average: Math.round(player.total / player.count),
-          evaluations: player.evaluations.length
-        };
-      });
-      
-      rankings.sort((a, b) => b.average - a.average);
-      
-      const wsData = [
-        ['الترتيب', 'اسم اللاعب', 'المعدل', 'عدد التقييمات'],
-        ...rankings.map((player, index) => [index + 1, player.name, player.average + '%', player.evaluations])
-      ];
-      
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "التصنيفات");
-      XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
-    }
 
-    function showTab(tabName) {
-      document.getElementById('evaluationTab').classList.add('hidden');
-      document.getElementById('rankingsTab').classList.add('hidden');
-      document.getElementById('progressTab').classList.add('hidden');
-      
-      document.querySelector('.nav-tabs button.active').classList.remove('active');
-      event.target.classList.add('active');
-      
-      document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-      
-      if (tabName === 'rankings') {
-        updateRankings();
-      }
-    }
+        function loadActivityData(activity) {
+            // Filter attendance data for this activity
+            currentActivityData = attendanceData.filter(item => item.activity === activity);
+            
+            // Update participant count
+            const uniqueParticipants = [...new Set(currentActivityData.map(item => item.id))];
+            $('#participantCount').text(uniqueParticipants.length);
+            
+            // Set last update time
+            const now = new Date();
+            $('#lastUpdate').text(now.toLocaleString('ar-EG'));
+            
+            // Load data for today by default
+            filterAttendanceByDate();
+        }
 
-    function logout() {
-      currentCoach = null;
-      coachPortal.classList.add('hidden');
-      loginView.classList.remove('hidden');
-      loginForm.reset();
-    }
+        function filterAttendanceByDate() {
+            const selectedDate = $('#attendanceDate').val();
+            if (!selectedDate) return;
+            
+            const filteredData = currentActivityData.filter(item => item.date === selectedDate);
+            
+            const tbody = $('#attendanceTable tbody');
+            tbody.empty();
+            
+            if (filteredData.length === 0) {
+                tbody.append('<tr><td colspan="6" class="empty-state">لا يوجد بيانات لهذا التاريخ</td></tr>');
+                return;
+            }
+            
+            filteredData.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${formatDate(item.timestamp)}</td>
+                        <td>${item.name}</td>
+                        <td>${item.id}</td>
+                        <td>${item.attendance}</td>
+                        <td>${item.evaluation || "-"}</td>
+                        <td>
+                            <button onclick="openEvaluation('${item.id}', '${item.name}')" style="padding: 5px 10px; font-size: 12px;">
+                                ${item.evaluation ? "تعديل التقييم" : "إضافة تقييم"}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
 
+        function openEvaluation(participantId, participantName) {
+            // Find participant data
+            const participantData = currentActivityData.find(item => 
+                item.id === participantId && 
+                item.date === $('#attendanceDate').val()
+            );
+            
+            // Fill evaluation form
+            $('#participantName').val(participantName);
+            $('#participantId').val(participantId);
+            
+            if (participantData.evaluation) {
+                $(`input[name="evaluation"][value="${participantData.evaluation}"]`).prop('checked', true);
+            } else {
+                $('input[name="evaluation"]').prop('checked', false);
+            }
+            
+            $('#evaluationNotes').val(participantData.notes || '');
+            
+            // Show evaluation form
+            $('#evaluationForm').show();
+            $('html, body').animate({
+                scrollTop: $('#evaluationForm').offset().top
+            }, 500);
+        }
+
+        function saveEvaluation() {
+            const participantId = $('#participantId').val();
+            const evaluation = $('input[name="evaluation"]:checked').val();
+            const notes = $('#evaluationNotes').val();
+            
+            if (!evaluation) {
+                alert("الرجاء اختيار تقييم");
+                return;
+            }
+            
+            // Update the data (in a real app, this would save to your database)
+            const selectedDate = $('#attendanceDate').val();
+            
+            const index = currentActivityData.findIndex(item => 
+                item.id === participantId && 
+                item.date === selectedDate
+            );
+            
+            if (index !== -1) {
+                currentActivityData[index].evaluation = evaluation;
+                currentActivityData[index].notes = notes;
+                
+                // Also update the main attendance data (for demo purposes)
+                const mainIndex = attendanceData.findIndex(item => 
+                    item.id === participantId && 
+                    item.date === selectedDate
+                );
+                
+                if (mainIndex !== -1) {
+                    attendanceData[mainIndex].evaluation = evaluation;
+                    attendanceData[mainIndex].notes = notes;
+                }
+            }
+            
+            // Refresh the table
+            filterAttendanceByDate();
+            
+            // Hide the evaluation form
+            $('#evaluationForm').hide();
+            
+            alert("تم حفظ التقييم بنجاح");
+        }
+
+        function cancelEvaluation() {
+            $('#evaluationForm').hide();
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            const options = {
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true
+            };
+            let formatted = date.toLocaleString('ar-EG', options);
+            formatted = formatted.replace("AM", "ص").replace("PM", "م");
+            return formatted;
+        }
+
+        // Event listeners
+        $('#attendanceDate').change(function() {
+            filterAttendanceByDate();
+        });
     </script>
-  </body>
+</body>
 </html>
