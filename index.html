@@ -184,30 +184,38 @@
                 </div>
                 <div class="form-group">
                     <label>التقييم:</label>
-                    <div class="radio-group">
-<div class="radio-option">
-    <label>
-        <input type="radio" name="evaluation" value="ممتاز">
-        ممتاز
-    </label>
-</div>
-                        <div class="radio-option">
-                            <input type="radio" id="evalVeryGood" name="evaluation" value="جيد جدا">
-                            <label for="evalVeryGood">جيد جداً</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="evalGood" name="evaluation" value="جيد">
-                            <label for="evalGood">جيد</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="evalAverage" name="evaluation" value="مقبول">
-                            <label for="evalAverage">مقبول</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="evalPoor" name="evaluation" value="ضعيف">
-                            <label for="evalPoor">ضعيف</label>
-                        </div>
-                    </div>
+            <div class="radio-group">
+                <div class="radio-option">
+                    <label>
+                        <input type="radio" name="evaluation" value="ممتاز">
+                        ممتاز
+                    </label>
+                </div>
+                <div class="radio-option">
+                    <label>
+                        <input type="radio" name="evaluation" value="جيد جدا">
+                        جيد جداً
+                    </label>
+                </div>
+                <div class="radio-option">
+                    <label>
+                        <input type="radio" name="evaluation" value="جيد">
+                        جيد
+                    </label>
+                </div>
+                <div class="radio-option">
+                    <label>
+                        <input type="radio" name="evaluation" value="مقبول">
+                        مقبول
+                    </label>
+                </div>
+                <div class="radio-option">
+                    <label>
+                        <input type="radio" name="evaluation" value="ضعيف">
+                        ضعيف
+                    </label>
+                </div>
+            </div>
                 </div>
 <div class="form-group">
     <label>
@@ -222,7 +230,7 @@
     </div>
 
     <script>
-        // Configuration - Replace with your Apps Script Web App URL
+        // Configuration
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
         let currentCoach = null;
         let currentStudent = null;
@@ -230,55 +238,84 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            // Set default date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('attendanceDate').value = today;
-            
-            // Load available activities
             loadActivities();
         });
 
         // Load available activities from Google Sheets
-async function loadActivities() {
-    try {
-        console.log("Fetching activities from:", APPS_SCRIPT_URL);
-        const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        async function loadActivities() {
+            try {
+                console.log("Fetching activities from:", APPS_SCRIPT_URL);
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getActivities`);
+                
+                // First check response status
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Store response text for debugging
+                const responseText = await response.text();
+                console.log("Raw response:", responseText);
+                
+                // Parse JSON
+                const result = JSON.parse(responseText);
+                console.log("Parsed data:", result);
+                
+                if (!result.success) {
+                    throw new Error(result.message || "Failed to load activities");
+                }
+                
+                const activitySelect = document.getElementById('activity');
+                activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
+                
+                if (result.data && result.data.length > 0) {
+                    result.data.forEach(activity => {
+                        const option = new Option(activity, activity);
+                        activitySelect.add(option);
+                    });
+                } else {
+                    console.warn("No activities found");
+                    activitySelect.add(new Option("لا توجد أنشطة متاحة", ""));
+                }
+                
+            } catch (error) {
+                console.error("Error loading activities:", error);
+                document.getElementById('activity').innerHTML = `
+                    <option value="">خطأ في تحميل الأنشطة</option>
+                `;
+                alert("حدث خطأ أثناء تحميل قائمة الأنشطة. يرجى المحاولة لاحقًا.");
+            }
         }
+
         
-        const result = await response.json();
-        console.log("Received activities data:", result);
-        
-        if (!result.success) {
-            throw new Error(result.message || "Failed to load activities");
+function getActivities() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets();
+  const activities = new Set(['عام']); // Start with "General"
+  
+  sheets.forEach(sheet => {
+    if (sheet.getName().startsWith("attendance-")) {
+      const data = sheet.getDataRange().getValues();
+      const headers = data[0];
+      const activityCol = headers.indexOf("Activity");
+      
+      if (activityCol !== -1) {
+        for (let i = 1; i < data.length; i++) {
+          if (data[i][activityCol]) {
+            activities.add(data[i][activityCol]);
+          }
         }
-        
-        const activitySelect = document.getElementById('activity');
-        activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
-        
-        if (result.data && result.data.length > 0) {
-            result.data.forEach(activity => {
-                const option = document.createElement('option');
-                option.value = activity;
-                option.textContent = activity;
-                activitySelect.appendChild(option);
-            });
-        } else {
-            console.warn("No activities found in response");
-            activitySelect.appendChild(new Option("لا توجد أنشطة متاحة", ""));
-        }
-        
-    } catch (error) {
-        console.error("Error loading activities:", error);
-        document.getElementById('activity').innerHTML = `
-            <option value="">خطأ في تحميل الأنشطة</option>
-        `;
-        // Show error to user
-        alert("حدث خطأ أثناء تحميل قائمة الأنشطة. يرجى المحاولة لاحقًا.");
+      }
     }
+  });
+  
+  return ContentService.createTextOutput(JSON.stringify({
+    success: true,
+    data: Array.from(activities)
+  })).setMimeType(ContentService.MimeType.JSON);
 }
+        
         // Coach login
         async function login() {
             const username = document.getElementById('username').value;
@@ -318,32 +355,6 @@ async function loadActivities() {
             } catch (error) {
                 console.error('Login error:', error);
                 document.getElementById('loginError').textContent = 'حدث خطأ أثناء محاولة الدخول';
-            }
-        }
-
-        // Load attendance data for selected date
-        async function loadAttendanceData() {
-            const date = document.getElementById('attendanceDate').value;
-            
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('attendanceTable').classList.add('hidden');
-            
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=getAttendance&activity=${encodeURIComponent(currentCoach.activity)}&date=${date}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    attendanceData = result.data;
-                    renderAttendanceTable();
-                } else {
-                    alert(result.message || 'حدث خطأ أثناء تحميل البيانات');
-                }
-            } catch (error) {
-                console.error('Error loading attendance data:', error);
-                alert('حدث خطأ أثناء تحميل البيانات');
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('attendanceTable').classList.remove('hidden');
             }
         }
 
