@@ -487,52 +487,6 @@ function showEvaluationForm(studentId) {
             form.submit();
         }
         
-        async function saveEvaluation() {
-            const evaluation = document.querySelector('input[name="evaluation"]:checked')?.value;
-            const notes = document.getElementById('evalNotes').value;
-            
-            if (!evaluation) {
-                alert('الرجاء اختيار تقييم');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=saveEvaluation`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        studentId: currentStudent.ID,
-                        activity: currentCoach.activity,
-                        date: document.getElementById('attendanceDate').value,
-                        evaluation,
-                        notes,
-                        studentName: currentStudent['Child Name'],
-                        parentName: currentStudent.Parent
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    currentStudent.Evaluation = evaluation;
-                    currentStudent.Notes = notes;
-                    
-                    renderAttendanceTable();
-                    
-                    cancelEvaluation();
-                    
-                    alert('تم حفظ التقييم بنجاح');
-                } else {
-                    alert(result.message || 'حدث خطأ أثناء حفظ التقييم');
-                }
-            } catch (error) {
-                console.error('Error saving evaluation:', error);
-                alert('حدث خطأ أثناء حفظ التقييم');
-            }
-        }
-
         function cancelEvaluation() {
             document.getElementById('evaluationForm').classList.add('hidden');
             currentStudent = null;
