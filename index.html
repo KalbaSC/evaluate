@@ -306,18 +306,20 @@
       <button onclick="logout()">خروج</button>
     </div>
 
-    <div id="evaluationTab">
-      <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
-      <div class="form-group">
-        <label for="sessionDate">تاريخ الجلسة</label>
-     <div class="form-group">
-        <label for="filterDate">تصفية اللاعبين حسب التاريخ</label>
-       <input type="date" id="filterDate" onchange="filterByDate()">
-   </div>
-      </div>
-      
-      <div id="playersList"></div>
-    </div>
+<div id="evaluationTab">
+  <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
+  <div class="form-group">
+    <label for="sessionDate">تاريخ الجلسة</label>
+    <input type="date" id="sessionDate"> 
+  </div>
+  
+  <div class="form-group">
+    <label for="filterDate">تصفية اللاعبين حسب التاريخ</label>
+    <input type="date" id="filterDate" onchange="filterByDate()">
+  </div>
+  
+  <div id="playersList"></div>
+</div>
 
     <div id="rankingsTab" class="hidden">
       <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
@@ -396,15 +398,19 @@ const evaluationCriteria = {
     "التركيز الذهني"
   ]
 };
-
+    let progressChart = null;
+    const progressChartCanvas = document.getElementById('progressChart');
     let currentCoach = null;
     let playersData = [];
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('sessionDate').valueAsDate = new Date();
-      setupEventListeners();
-    });
+document.addEventListener('DOMContentLoaded', function() {
+  const sessionDateInput = document.getElementById('sessionDate');
+  if (sessionDateInput) {
+    sessionDateInput.valueAsDate = new Date();
+  }
+  setupEventListeners();
+});
 
 async function loadPlayersData() {
   return new Promise((resolve) => {
