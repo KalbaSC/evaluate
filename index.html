@@ -354,12 +354,12 @@
   </div>
 
   <script>
-    const CONFIG = {
-      EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
-      ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzJwZ7Ulx_pfSOsnpQ-fEicYnXPWsGB7b0k_pTrpglnkFXBPQpU-WEXV7VXYyIQkHh2nw/exec',
-      USE_CORS_PROXY: true,
-      CORS_PROXY_URL: 'https://cors-anywhere.herokuapp.com/'
-    };
+const CONFIG = {
+  EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
+  ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzJwZ7Ulx_pfSOsnpQ-fEicYnXPWsGB7b0k_pTrpglnkFXBPQpU-WEXV7VXYyIQkHh2nw/exec',
+  USE_CORS_PROXY: true,
+  CORS_PROXY_URL: 'https://cors-anywhere.herokuapp.com/'
+};
 
 const coaches = {
   "handball1": { password: "pass1", activity: "كرة يد" },
@@ -414,13 +414,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadPlayersData() {
   try {
-    // Use a free CORS proxy (or deploy your own)
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const targetUrl = CONFIG.ATTENDANCE_SCRIPT_URL;
-    
-    const response = await fetch(proxyUrl + targetUrl);
-    
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.ATTENDANCE_SCRIPT_URL 
+      : CONFIG.ATTENDANCE_SCRIPT_URL;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch players");
     
     const data = await response.json();
     
@@ -434,15 +433,16 @@ async function loadPlayersData() {
         parent: player.Parent,
         date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
       }));
-    
+
     renderPlayersList();
+    updatePlayerSelect();
   } catch (error) {
-    console.error("Failed to load players:", error);
+    console.error("Error loading players:", error);
     // Fallback to localStorage if available
     const cachedData = localStorage.getItem('playersData');
     if (cachedData) playersData = JSON.parse(cachedData);
   }
-}   
+}  
 
     function setupEventListeners() {
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -559,6 +559,28 @@ function filterByDate() {
       });
     }
 
+async function sendEvaluation(evaluationData) {
+  try {
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      : CONFIG.EVALUATION_SCRIPT_URL;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(evaluationData)
+    });
+
+    if (!response.ok) throw new Error("Evaluation submission failed");
+    return await response.json();
+  } catch (error) {
+    console.error("Error submitting evaluation:", error);
+    throw error;
+  }
+}
+    
 async function saveEvaluation(playerId) {
   const sessionDate = document.getElementById('sessionDate').value;
   if (!sessionDate) {
@@ -582,9 +604,6 @@ async function saveEvaluation(playerId) {
     totalScore += skillValue;
   }
 
-  const maxScore = criteriaCount * 5;
-  const percentage = Math.round((totalScore / maxScore) * 100);
-
   const evaluationData = {
     Timestamp: new Date().toISOString(),
     Coach: currentCoach.username,
@@ -592,63 +611,22 @@ async function saveEvaluation(playerId) {
     "Player ID": playerId,
     "Player Name": player.name,
     Notes: document.getElementById(`notes-${playerId}`).value,
+    Scores: scores,
     Total: totalScore
   };
 
-  for (let i = 0; i < criteriaCount; i++) {
-    evaluationData[`Skill ${i + 1}`] = scores[`skill${i + 1}`];
-  }
-
   try {
-    await sendEvaluationJSONP(evaluationData);
-
-    // Save locally for rankings & progress
-    evaluations.push({
-      ...evaluationData,
-      percentage
-    });
-
+    await sendEvaluation(evaluationData);
+    evaluations.push(evaluationData);
     localStorage.setItem('playerEvaluations', JSON.stringify(evaluations));
-    alert('✅ تم حفظ التقييم بنجاح');
+    showToast('✅ تم حفظ التقييم بنجاح', true);
   } catch (err) {
-    console.error("Evaluation submission failed:", err);
-    alert("❌ فشل في إرسال التقييم. حاول مرة أخرى.");
+    showToast('❌ فشل في إرسال التقييم', false);
   }
 }
-
-function sendEvaluationJSONP(evaluationData) {
-  return new Promise((resolve, reject) => {
-    const callbackName = "handleEval_" + Date.now();
-    const script = document.createElement("script");
-
-    window[callbackName] = function(result) {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      resolve(result);
-    };
-
-    const encodedData = encodeURIComponent(JSON.stringify(evaluationData));
-    let url = `${CONFIG.EVALUATION_SCRIPT_URL}?data=${encodedData}&callback=${callbackName}`;
-
-    if (CONFIG.USE_CORS_PROXY) {
-      url = CONFIG.CORS_PROXY_URL + url;
-    }
-
-    script.src = url;
-    script.onerror = () => {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      reject("Script load error");
-    };
-
-    document.body.appendChild(script);
-  });
-}
- 
-    function updateRankings() {
-
+    
+function updateRankings() {
       const playerStats = {};
-      
       evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
         if (!playerStats[eval.playerId]) {
           playerStats[eval.playerId] = {
