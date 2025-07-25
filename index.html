@@ -413,33 +413,36 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function loadPlayersData() {
-  return new Promise((resolve) => {
-    const callbackName = 'handlePlayers_' + Date.now();
-    const script = document.createElement('script');
-
-    window[callbackName] = function(data) {
-      delete window[callbackName];
-      document.body.removeChild(script);
-
-      const coachActivity = currentCoach.activity;
-      playersData = data
-        .filter(p => p.Activity === coachActivity)
-        .map(player => ({
-          id: player.ID,
-          name: player["Child Name"],
-          parent: player.Parent,
-          date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
-        }));
-
-      renderPlayersList(); // show the UI
-      updatePlayerSelect(); // for progress
-      resolve();
-    };
-
-    script.src = `${CONFIG.ATTENDANCE_SCRIPT_URL}?callback=${callbackName}`;
-    document.body.appendChild(script);
-  });
-}    
+  try {
+    // Use a free CORS proxy (or deploy your own)
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const targetUrl = CONFIG.ATTENDANCE_SCRIPT_URL;
+    
+    const response = await fetch(proxyUrl + targetUrl);
+    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    const data = await response.json();
+    
+    // Process data as before
+    const coachActivity = currentCoach.activity;
+    playersData = data
+      .filter(p => p.Activity === coachActivity)
+      .map(player => ({
+        id: player.ID,
+        name: player["Child Name"],
+        parent: player.Parent,
+        date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
+      }));
+    
+    renderPlayersList();
+  } catch (error) {
+    console.error("Failed to load players:", error);
+    // Fallback to localStorage if available
+    const cachedData = localStorage.getItem('playersData');
+    if (cachedData) playersData = JSON.parse(cachedData);
+  }
+}   
 
     function setupEventListeners() {
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
