@@ -358,7 +358,7 @@ const CONFIG = {
   EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
   ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzJwZ7Ulx_pfSOsnpQ-fEicYnXPWsGB7b0k_pTrpglnkFXBPQpU-WEXV7VXYyIQkHh2nw/exec',
   CORS_PROXY_URL: 'https://corsproxy.io/?',
-  USE_CORS_PROXY: true
+  USE_CORS_PROXY: false
 };
 
 const coaches = {
@@ -584,35 +584,36 @@ async function sendEvaluation(evaluationData) {
 async function saveEvaluation(playerId) {
   const sessionDate = document.getElementById('sessionDate').value;
   if (!sessionDate) {
-    alert('الرجاء إدخال تاريخ الجلسة');
+    showToast('الرجاء إدخال تاريخ الجلسة', false);
     return;
   }
 
   const player = playersData.find(p => p.id === playerId);
   if (!player) {
-    alert('لاعب غير موجود');
+    showToast('لاعب غير موجود', false);
     return;
   }
 
-  const criteriaCount = evaluationCriteria[currentCoach.activity].length;
-  let totalScore = 0;
+  // Prepare scores object with criteria names
   const scores = {};
+  const criteria = evaluationCriteria[currentCoach.activity];
+  let totalScore = 0;
 
-  for (let i = 0; i < criteriaCount; i++) {
-    const skillValue = parseInt(document.getElementById(`${playerId}-skill${i + 1}`).value);
-    scores[`skill${i + 1}`] = skillValue;
-    totalScore += skillValue;
-  }
+  criteria.forEach((criterion, index) => {
+    const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
+    scores[criterion] = score;
+    totalScore += score;
+  });
 
   const evaluationData = {
     Timestamp: new Date().toISOString(),
     Coach: currentCoach.username,
     Activity: currentCoach.activity,
-    "Player ID": playerId,
     "Player Name": player.name,
-    Notes: document.getElementById(`notes-${playerId}`).value,
+    "Player ID": playerId,
     Scores: scores,
-    Total: totalScore
+    Total: totalScore,
+    Notes: document.getElementById(`notes-${playerId}`).value
   };
 
   try {
@@ -621,7 +622,7 @@ async function saveEvaluation(playerId) {
     localStorage.setItem('playerEvaluations', JSON.stringify(evaluations));
     showToast('✅ تم حفظ التقييم بنجاح', true);
   } catch (err) {
-    showToast('❌ فشل في إرسال التقييم', false);
+    showToast('❌ فشل في إرسال التقييم: ' + err.message, false);
   }
 }
     
