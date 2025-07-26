@@ -565,12 +565,24 @@ async function sendEvaluation(evaluationData) {
       ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
       : CONFIG.EVALUATION_SCRIPT_URL;
 
+    const formData = new URLSearchParams();
+
+    for (const key in evaluationData) {
+      if (typeof evaluationData[key] === 'object' && evaluationData[key] !== null) {
+        for (const subKey in evaluationData[key]) {
+          formData.append(subKey, evaluationData[key][subKey]);
+        }
+      } else {
+        formData.append(key, evaluationData[key]);
+      }
+    }
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(evaluationData)
+      body: formData.toString()
     });
 
     if (!response.ok) throw new Error("Evaluation submission failed");
