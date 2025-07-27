@@ -361,17 +361,18 @@
   </div>
 
   <div id="coachPortal" class="container hidden">
-    <div class="nav-tabs">
-      <button class="active" onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
-      <button onclick="showTab('rankings', event)">التصنيفات</button>
-      <button onclick="showTab('progress', event)">تطور الأداء</button>
-      <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
-      <button onclick="logout()">خروج</button>
-      <div id="playersListTab" class="hidden">
-        <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
-        <div id="playersTableContainer"></div>
-      </div>
-    </div>
+<div class="nav-tabs">
+  <button class="active" onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+  <button onclick="showTab('rankings', event)">التصنيفات</button>
+  <button onclick="showTab('progress', event)">تطور الأداء</button>
+  <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
+  <button onclick="logout()">خروج</button>
+</div>
+
+<div id="playersListTab" class="hidden">
+  <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
+  <div id="playersTableContainer"></div>
+</div>
 
     <div id="evaluationTab">
       <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
@@ -547,14 +548,13 @@ async function loadPlayersData() {
     
 function loadPlayersTable() {
   const container = document.getElementById('playersTableContainer');
-  
   container.innerHTML = `
     <div class="table-responsive">
       <table class="players-table">
         <thead>
           <tr>
             <th>تاريخ الحضور</th>
-            <th>اسم اللاعب</th>
+            <th>اسم اللاع </th>
             <th>المعرف</th>
           </tr>
         </thead>
@@ -878,16 +878,17 @@ function updateRankings() {
     }
 
 function showTab(tabName, event) {
-  document.querySelectorAll('[id$="Tab"]').forEach(tab => {
-    tab.classList.add('hidden');
+  const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersListTab"];
+  allTabs.forEach(tab => {
+    document.getElementById(tab).classList.add('hidden');
   });
-  
+
   document.querySelectorAll('.nav-tabs button').forEach(btn => {
     btn.classList.remove('active');
   });
-  
-  document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+
   event.target.classList.add('active');
+  document.getElementById(`${tabName}Tab`).classList.remove('hidden');
   
   if (tabName === 'playersList') {
     loadPlayersTable();
