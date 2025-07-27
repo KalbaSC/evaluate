@@ -907,7 +907,7 @@ orderedTop3.forEach((player, index) => {
   const badges = ['🥈', '👑', '🥉'];
   card.innerHTML = `
     <div class="player-badge">${badges[index]}</div>
-    <img src="img/arab-boy.png" class="player-avatar" />
+    <img src="user-icon.png" class="player-avatar" />
     <h3>${player.name}</h3>
     <p>ID: ${player.id}</p>
     <p>المعدل: ${player.average}%</p>
@@ -921,7 +921,7 @@ others.forEach((player, index) => {
   card.className = 'ranking-card';
   card.innerHTML = `
     <div class="player-badge">${index + 4}</div>
-    <img src="img/arab-boy.png" class="player-avatar" />
+    <img src="user-icon.png" class="player-avatar" />
     <h3>${player.name}</h3>
     <p>ID: ${player.id}</p>
     <p>المعدل: ${player.average}%</p>
