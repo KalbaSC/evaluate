@@ -404,8 +404,10 @@
 
   <div id="playersListTab">
     <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
-    <div id="playersTableContainer"></div>
-    <div id="playersCount" style="color: #f4e733; text-align: center; font-weight: bold; margin-top: 10px;"></div>
+<div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
+  <div id="playersCount" style="color: #f4e733; font-weight: bold;"></div>
+</div>
+<div id="playersTableContainer"></div>
   </div>
 
     <div id="evaluationTab" class="hidden">
@@ -588,7 +590,7 @@ function hideLoading() {
   document.getElementById('loadingPopup').style.display = 'none';
 }
     
-function loadPlayersTable() {
+function loadPlayersTable(players = playersData) {
   const container = document.getElementById('playersTableContainer');
   const countContainer = document.getElementById('playersCount');
 
@@ -603,7 +605,7 @@ function loadPlayersTable() {
           </tr>
         </thead>
         <tbody>
-          ${playersData.map(player => `
+          ${players.map(player => `
             <tr>
               <td>${player.date || 'غير محدد'}</td>
               <td>${player.name} ${player.parent || ''}</td>
@@ -615,7 +617,7 @@ function loadPlayersTable() {
     </div>
   `;
 
-  countContainer.textContent = `عدد اللاعبين: ${playersData.length}`;
+  countContainer.textContent = `عدد اللاعبين: ${players.length}`;
 }
    
 function filterByDate() {
@@ -624,9 +626,9 @@ function filterByDate() {
   
   if (filteredPlayers.length === 0) {
     alert('لا يوجد لاعبون في هذا التاريخ');
-    renderPlayersList(); 
+     loadPlayersTable();
   } else {
-    renderPlayersList(filteredPlayers);
+     loadPlayersTable(filteredPlayers);
   }
 }
     function handleDateChange() {
