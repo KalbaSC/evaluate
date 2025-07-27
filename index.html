@@ -522,30 +522,35 @@ async function loadPlayersData() {
       document.getElementById('sessionDate').addEventListener('change', handleDateChange);
     }
 
-    async function handleLogin(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      
-      if (coaches[username] && coaches[username].password === password) {
-        currentCoach = {
-          username: username,
-          activity: coaches[username].activity
-        };
-      if (document.getElementById('rememberMe').checked) {
-         localStorage.setItem('coachUsername', username);
-         localStorage.setItem('coachPassword', password);
+async function handleLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  
+  if (coaches[username] && coaches[username].password === password) {
+    currentCoach = {
+      username: username,
+      activity: coaches[username].activity
+    };
+    
+    if (document.getElementById('rememberMe').checked) {
+      localStorage.setItem('coachUsername', username);
+      localStorage.setItem('coachPassword', password);
     } else {
-         localStorage.removeItem('coachUsername');
-         localStorage.removeItem('coachPassword');
-      }
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('coachPortal').classList.remove('hidden');
-        await loadPlayersData();
-      } else {
-        alert('اسم المستخدم أو كلمة المرور غير صحيحة');
-      }
+      localStorage.removeItem('coachUsername');
+      localStorage.removeItem('coachPassword');
     }
+    
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('coachPortal').classList.remove('hidden');
+    await loadPlayersData();
+    
+    showTab('playersList');
+    document.querySelector('.nav-tabs button:first-child').classList.add('active');
+  } else {
+    alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+  }
+}
     
 function loadPlayersTable() {
   const container = document.getElementById('playersTableContainer');
@@ -886,14 +891,14 @@ function showTab(tabName, event) {
     btn.classList.remove('active');
   });
 
+  if (tabName === 'playersList' && currentCoach) {
+    loadPlayersTable(); 
+  }
+  
   document.getElementById(`${tabName}Tab`).classList.remove('hidden');
   
   if (event) {
     event.target.classList.add('active');
-  }
-
-  if (tabName === 'playersList') {
-    loadPlayersTable();
   }
 }
 
@@ -903,9 +908,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('sessionDate').value = formattedDate;
   document.getElementById('filterDate').value = formattedDate;
   
-  if (document.getElementById('coachPortal').classList.contains('hidden') === false) {
-    showTab('playersList');
-    document.querySelector('.nav-tabs button:first-child').classList.add('active');
+  setupEventListeners();
+  
+  const savedUsername = localStorage.getItem('coachUsername');
+  const savedPassword = localStorage.getItem('coachPassword');
+  if (savedUsername && savedPassword) {
+    document.getElementById('username').value = savedUsername;
+    document.getElementById('password').value = savedPassword;
   }
 });
 
