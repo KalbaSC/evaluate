@@ -900,6 +900,9 @@ function showTab(tabName, event) {
   if (event) {
     event.target.classList.add('active');
   }
+  if (tabName === 'playersList') {
+    loadPlayersTable();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
