@@ -809,10 +809,10 @@ async function updateRankings() {
 
     let data;
     try {
-      const cloned = response.clone(); // ننسخ الرد
-      data = await response.json();    // نحاول نحوله لـ JSON
+      const cloned = response.clone(); 
+      data = await cloned.json();
     } catch (err) {
-      const fallback = await response.text(); // نقرأ من النسخة الأصلية
+      const fallback = await response.text(); 
       throw new Error("الرد غير صالح كـ JSON:\n" + fallback);
     }
 
