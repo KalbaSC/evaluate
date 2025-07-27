@@ -410,6 +410,11 @@
       <input type="text" id="username" required>
     </div>
     
+<div id="welcomeHeader" style="text-align: center; margin-top: 20px; display: none;">
+  <h2>مرحبا كابتن <span id="coachName"></span></h2>
+  <h2>قائمة لاعبين <span id="activityName"></span></h2>
+</div>
+
     <div class="form-group">
       <label for="password">كلمة المرور</label>
       <input type="password" id="password" required>
@@ -646,6 +651,10 @@ async function handleLogin(e) {
 
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('coachPortal').classList.remove('hidden');
+
+document.getElementById("coachName").textContent = currentCoach.username || '';
+document.getElementById("activityName").textContent = currentCoach.activity || '';
+document.getElementById("welcomeHeader").style.display = 'block';
 
     await loadPlayersData();
 
