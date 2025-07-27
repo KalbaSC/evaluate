@@ -558,25 +558,22 @@
   </header>
 
   <div id="loginView" class="login-container">
-  <h2>تسجيل دخول المدربين</h2>
-  <form id="loginForm">
-    <div class="form-group">
-      <label for="username">اسم المستخدم</label>
-      <input type="text" id="username" required>
-    </div>  
-
-    <div class="form-group">
-      <label for="password">كلمة المرور</label>
-      <input type="password" id="password" required>
-    </div>
-    
-    <div class="form-group remember-me">
-      <input type="checkbox" id="rememberMe" checked>
-      <label for="rememberMe">تذكرني</label>
-    </div>
-    
-    <button type="submit" class="btn btn-block">دخول</button>
-  </form>
+    <h2>تسجيل دخول المدربين</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">اسم المستخدم</label>
+        <input type="text" id="username" required>
+      </div>  
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" required>
+      </div>
+      <div class="form-group remember-me">
+        <input type="checkbox" id="rememberMe" checked>
+        <label for="rememberMe">تذكرني</label>
+      </div>
+      <button type="submit" class="btn btn-block">دخول</button>
+    </form>
   </div>
 
 <div id="loadingPopup" style="
@@ -606,64 +603,51 @@
   جاري تحميل البيانات...
 </div>
   
-<div id="coachPortal" class="container hidden">
-  <div class="nav-tabs">
-<div id="welcomeMessage" class="welcome-banner" style="color:#f4e733; text-align:center; font-size: 22px; margin: 15px 0;"></div>
-    <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
-    <button onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
-    <button onclick="showTab('rankings', event)">التصنيفات</button>
-    <button onclick="showTab('progress', event)">تطور الأداء</button>
-    <button onclick="logout()">خروج</button>
-  </div>
- </div>
-  
-<div style="position: relative; width: 100%; padding-bottom: 20px;">
-
-  <div style="position: absolute; right: 0;">
-    <div id="playersCount" style="
-      background: rgba(255, 255, 255, 0.05);
-      padding: 8px 16px;
-      border-radius: 10px;
-      color: #f4e733;
-      font-weight: bold;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    ">
-      <i class="fas fa-users"></i> عدد اللاعبين: 0
+  <div id="coachPortal" class="container hidden">
+    <div id="welcomeMessage" class="welcome-banner"></div>
+    <div class="nav-tabs">
+      <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
+      <button onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+      <button onclick="showTab('rankings', event)">التصنيفات</button>
+      <button onclick="showTab('progress', event)">تطور الأداء</button>
+      <button onclick="logout()">خروج</button>
     </div>
-  </div>
+    
+    <div style="position: relative; width: 100%; padding-bottom: 20px;">
+      <div style="position: absolute; right: 0;">
+        <div id="playersCount">
+          <i class="fas fa-users"></i> عدد اللاعبين: 0
+        </div>
+      </div>
 
-  <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-    <div class="form-group">
-      <label for="sessionDate">تاريخ الجلسة</label>
-      <input type="date" id="sessionDate">
+      <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <div class="form-group">
+          <label for="sessionDate">تاريخ الجلسة</label>
+          <input type="date" id="sessionDate">
+        </div>
+        <div class="form-group">
+          <label for="filterDate">تصفية حسب التاريخ</label>
+          <input type="date" id="filterDate" onchange="filterByDate()">
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="filterDate">تصفية حسب التاريخ</label>
-      <input type="date" id="filterDate" onchange="filterByDate()">
+
+    <div id="playersListTab">
+      <h2 id="playersListHeader" style="color:#f4e733; text-align:center"></h2>
+      <div id="playersTableContainer"></div>
     </div>
-  </div>
 
-</div>
+    <div id="evaluationTab" class="hidden">
+      <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
+      <div id="playersList"></div>
+    </div>
 
-<div id="playersListTab">
-  <h2 id="playersListHeader" style="color:#f4e733; text-align:center"></h2>
-  <div id="playersTableContainer"></div>
-</div>
-
-<div id="evaluationTab" class="hidden">
-  <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
-  <div id="playersList"></div>
-</div>
-
-<div id="rankingsTab" class="hidden">
-  <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
-  <div id="topThreeContainer" class="top-three-grid"></div>
-  <div id="rankingsContainer" class="ranking-grid"></div>
-  <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
-</div>
+    <div id="rankingsTab" class="hidden">
+      <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
+      <div id="topThreeContainer" class="top-three-grid"></div>
+      <div id="rankingsContainer" class="ranking-grid"></div>
+      <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
+    </div>
 
     <div id="progressTab" class="hidden">
       <h2 style="color:#f4e733; text-align:center">تطور الأداء</h2>
@@ -675,7 +659,7 @@
         <canvas id="progressChart"></canvas>
       </div>
     </div>
-
+  
   <script>
 const CONFIG = {
   EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
@@ -727,22 +711,31 @@ const evaluationCriteria = {
     let playersData = [];
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
-document.addEventListener('DOMContentLoaded', function() {
-  setupMobileSpecificFeatures();
-  const sessionDateInput = document.getElementById('sessionDate');
-  if (sessionDateInput) {
-    sessionDateInput.valueAsDate = new Date();
-  }
-  setupEventListeners();
-  const savedUsername = localStorage.getItem('coachUsername');
-  const savedPassword = localStorage.getItem('coachPassword');
-   if (savedUsername && savedPassword) {
-   const fakeEvent = { preventDefault: () => {} };
-   document.getElementById('username').value = savedUsername;
-   document.getElementById('password').value = savedPassword;
-   handleLogin(fakeEvent);
-}
-});
+    document.addEventListener('DOMContentLoaded', function() {
+      setupMobileSpecificFeatures();
+      const sessionDateInput = document.getElementById('sessionDate');
+      if (sessionDateInput) {
+        sessionDateInput.valueAsDate = new Date();
+      }
+      setupEventListeners();
+      const savedUsername = localStorage.getItem('coachUsername');
+      const savedPassword = localStorage.getItem('coachPassword');
+      if (savedUsername && savedPassword) {
+        document.getElementById('username').value = savedUsername;
+        document.getElementById('password').value = savedPassword;
+      }
+    });
+
+    function setupEventListeners() {
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+      }
+      const sessionDate = document.getElementById('sessionDate');
+      if (sessionDate) {
+        sessionDate.addEventListener('change', handleDateChange);
+      }
+    }    
 
 async function loadPlayersData() {
   showLoading();
@@ -777,49 +770,61 @@ async function loadPlayersData() {
   }
 } 
 
-    function setupEventListeners() {
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      document.getElementById('sessionDate').addEventListener('change', handleDateChange);
-    }
-
 async function handleLogin(e) {
-  e.preventDefault();
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-  if (coaches[username] && coaches[username].password === password) {
-    currentCoach = {
-      username: username,
-      activity: coaches[username].activity
-    };
+      if (coaches[username] && coaches[username].password === password) {
+        currentCoach = {
+          username: username,
+          activity: coaches[username].activity
+        };
 
-    if (document.getElementById('rememberMe').checked) {
-      localStorage.setItem('coachUsername', username);
-      localStorage.setItem('coachPassword', password);
+        if (document.getElementById('rememberMe').checked) {
+          localStorage.setItem('coachUsername', username);
+          localStorage.setItem('coachPassword', password);
+        }
+
+        const key = `playerEvaluations_${username}`;
+        evaluations = JSON.parse(localStorage.getItem(key)) || [];
+        playersData = [];
+
+        // Update welcome message
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        if (welcomeMessage) {
+          welcomeMessage.innerHTML = 
+            `👋 <strong>مرحبا كابتن ${username}</strong><br>🏆 قائمة لاعبين <strong>${currentCoach.activity}</strong>`;
+        }
+
+        // Update players list header
+        const playersListHeader = document.getElementById('playersListHeader');
+        if (playersListHeader) {
+          playersListHeader.innerText = `قائمة لاعبين ${currentCoach.activity}`;
+        }
+
+        // Hide login and show coach portal
+        const loginView = document.getElementById('loginView');
+        const coachPortal = document.getElementById('coachPortal');
+        if (loginView && coachPortal) {
+          loginView.classList.add('hidden');
+          coachPortal.classList.remove('hidden');
+        }
+
+        await loadPlayersData();
+
+        // Activate first tab
+        const firstTabButton = document.querySelector('.nav-tabs button:first-child');
+        if (firstTabButton) {
+          document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
+          firstTabButton.classList.add('active');
+        }
+        showTab('playersList');
+        
+      } else {
+        alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+      }
     }
-
-    const key = `playerEvaluations_${username}`;
-    evaluations = JSON.parse(localStorage.getItem(key)) || [];
-    playersData = [];
-
-    document.getElementById('welcomeMessage').innerHTML = 
-      `👋 <strong>مرحبا كابتن ${username}</strong><br>🏆 قائمة لاعبين <strong>${currentCoach.activity}</strong>`;
-
-    document.getElementById('playersListHeader').innerText = `قائمة لاعبين ${currentCoach.activity}`;
-
-    document.getElementById('loginView').classList.add('hidden');
-    document.getElementById('coachPortal').classList.remove('hidden');
-
-    await loadPlayersData();
-
-    document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('.nav-tabs button:first-child').classList.add('active');
-    showTab('playersList');
-    
-  } else {
-    alert('اسم المستخدم أو كلمة المرور غير صحيحة');
-  }
-}
     
 function showLoading() {
   document.getElementById('loadingPopup').style.display = 'block';
@@ -1315,30 +1320,34 @@ function showToast(message, success = true) {
   }
 
     function setupMobileSpecificFeatures() {
-  document.querySelectorAll('button, .btn').forEach(btn => {
-    btn.addEventListener('touchstart', function() {
-      this.style.transform = 'scale(0.98)';
-      this.style.opacity = '0.9';
-    });
-    
-    btn.addEventListener('touchend', function() {
-      this.style.transform = '';
-      this.style.opacity = '';
-    });
-  });
-  
-  document.querySelectorAll('input, select, textarea').forEach(input => {
-    input.addEventListener('focus', function() {
-      document.querySelector('meta[name="viewport"]')
-        .setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-    });
-    
-    input.addEventListener('blur', function() {
-      document.querySelector('meta[name="viewport"]')
-        .setAttribute('content', 'width=device-width, initial-scale=1.0');
-    });
-  });
-}
+      document.querySelectorAll('button, .btn').forEach(btn => {
+        btn.addEventListener('touchstart', function() {
+          this.style.transform = 'scale(0.98)';
+          this.style.opacity = '0.9';
+        });
+        
+        btn.addEventListener('touchend', function() {
+          this.style.transform = '';
+          this.style.opacity = '';
+        });
+      });
+      
+      document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('focus', function() {
+          const viewportMeta = document.querySelector('meta[name="viewport"]');
+          if (viewportMeta) {
+            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+          }
+        });
+        
+        input.addEventListener('blur', function() {
+          const viewportMeta = document.querySelector('meta[name="viewport"]');
+          if (viewportMeta) {
+            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+          }
+        });
+      });
+    }
     </script>
   
 <div class="footer-container">
