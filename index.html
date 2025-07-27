@@ -765,6 +765,39 @@ async function saveEvaluation(playerId) {
   }
 }
     
+async function sendEvaluation(evaluationData) {
+  const url = CONFIG.USE_CORS_PROXY 
+    ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+    : CONFIG.EVALUATION_SCRIPT_URL;
+
+  const formData = new URLSearchParams();
+
+  for (const key in evaluationData) {
+    if (typeof evaluationData[key] === 'object' && evaluationData[key] !== null) {
+      for (const subKey in evaluationData[key]) {
+        formData.append(subKey, evaluationData[key][subKey]);
+      }
+    } else {
+      formData.append(key, evaluationData[key]);
+    }
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error("Failed to send evaluation: " + errorText);
+  }
+
+  const result = await response.text();
+  if (!result.includes("success")) {
+    throw new Error("Response was not success: " + result);
+  }
+}
+    
 async function updateRankings() {
   showLoading();
   try {
