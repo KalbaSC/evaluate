@@ -508,44 +508,69 @@ async function loadPlayersData() {
         date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
       }));
 
+    localStorage.setItem('playersData', JSON.stringify(playersData));
+    
+    loadPlayersTable();
     renderPlayersList();
     updatePlayerSelect();
+    
+    return true; 
   } catch (error) {
     console.error("Error loading players:", error);
     const cachedData = localStorage.getItem('playersData');
-    if (cachedData) playersData = JSON.parse(cachedData);
+    if (cachedData) {
+      playersData = JSON.parse(cachedData);
+      loadPlayersTable();
+      renderPlayersList();
+      updatePlayerSelect();
+      return true;
+    }
+    throw error; 
   }
-}  
+} 
 
-    function setupEventListeners() {
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      document.getElementById('sessionDate').addEventListener('change', handleDateChange);
-    }
+function setupEventListeners() {
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('sessionDate').addEventListener('change', handleDateChange);
+}
 
-    async function handleLogin(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      
-      if (coaches[username] && coaches[username].password === password) {
-        currentCoach = {
-          username: username,
-          activity: coaches[username].activity
-        };
-      if (document.getElementById('rememberMe').checked) {
-         localStorage.setItem('coachUsername', username);
-         localStorage.setItem('coachPassword', password);
+async function handleLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  
+  if (coaches[username] && coaches[username].password === password) {
+    currentCoach = {
+      username: username,
+      activity: coaches[username].activity
+    };
+    
+    if (document.getElementById('rememberMe').checked) {
+      localStorage.setItem('coachUsername', username);
+      localStorage.setItem('coachPassword', password);
     } else {
-         localStorage.removeItem('coachUsername');
-         localStorage.removeItem('coachPassword');
-      }
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('coachPortal').classList.remove('hidden');
-        await loadPlayersData();
-      } else {
-        alert('اسم المستخدم أو كلمة المرور غير صحيحة');
-      }
+      localStorage.removeItem('coachUsername');
+      localStorage.removeItem('coachPassword');
     }
+    
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('coachPortal').classList.remove('hidden');
+    
+    try {
+      document.getElementById('playersTableContainer').innerHTML = '<p>جاري تحميل البيانات...</p>';
+      
+      await loadPlayersData();
+      
+      showTab('playersList');
+      document.querySelector('.nav-tabs button:first-child').classList.add('active');
+    } catch (error) {
+      showToast('❌ فشل في تحميل بيانات اللاعبين', false);
+      document.getElementById('playersTableContainer').innerHTML = '<p>فشل في تحميل البيانات</p>';
+    }
+  } else {
+    alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+  }
+}
     
 function loadPlayersTable() {
   const container = document.getElementById('playersTableContainer');
@@ -555,7 +580,7 @@ function loadPlayersTable() {
         <thead>
           <tr>
             <th>تاريخ الحضور</th>
-            <th>اسم اللاع </th>
+            <th>اسم اللاعب</th>
             <th>المعرف</th>
           </tr>
         </thead>
@@ -898,14 +923,18 @@ function showTab(tabName, event) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
-  document.getElementById('sessionDate').value = formattedDate;
-  document.getElementById('filterDate').value = formattedDate;
-  
-  if (document.getElementById('coachPortal').classList.contains('hidden') === false) {
-    showTab('playersList');
-    document.querySelector('.nav-tabs button:first-child').classList.add('active');
+  const sessionDateInput = document.getElementById('sessionDate');
+  if (sessionDateInput) {
+    sessionDateInput.valueAsDate = new Date();
+  }
+  setupEventListeners();
+  const savedUsername = localStorage.getItem('coachUsername');
+  const savedPassword = localStorage.getItem('coachPassword');
+  if (savedUsername && savedPassword) {
+    const fakeEvent = { preventDefault: () => {} };
+    document.getElementById('username').value = savedUsername;
+    document.getElementById('password').value = savedPassword;
+    handleLogin(fakeEvent);
   }
 });
 
