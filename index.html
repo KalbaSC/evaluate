@@ -498,24 +498,23 @@ async function loadPlayersData() {
     
     const data = await response.json();
     
-    const coachActivity = currentCoach.activity;
     playersData = data
-      .filter(p => p.Activity === coachActivity)
+      .filter(p => p.Activity === currentCoach.activity)
       .map(player => ({
         id: player.ID,
         name: player["Child Name"],
         parent: player.Parent,
         date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
-      }));
+      })
+          );
 
     renderPlayersList();
     updatePlayerSelect();
   } catch (error) {
     console.error("Error loading players:", error);
-    const cachedData = localStorage.getItem('playersData');
-    if (cachedData) playersData = JSON.parse(cachedData);
+    playersData = []; 
   }
-}  
+} 
 
     function setupEventListeners() {
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -532,14 +531,6 @@ async function handleLogin(e) {
       username: username,
       activity: coaches[username].activity
     };
-    
-    if (document.getElementById('rememberMe').checked) {
-      localStorage.setItem('coachUsername', username);
-      localStorage.setItem('coachPassword', password);
-    } else {
-      localStorage.removeItem('coachUsername');
-      localStorage.removeItem('coachPassword');
-    }
     
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('coachPortal').classList.remove('hidden');
@@ -884,22 +875,19 @@ function updateRankings() {
     }
 
 function showTab(tabName, event) {
-  const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersListTab"];
+  const allTabs = ["playersListTab", "evaluationTab", "rankingsTab", "progressTab"];
   allTabs.forEach(tab => document.getElementById(tab).classList.add('hidden'));
   
   document.querySelectorAll('.nav-tabs button').forEach(btn => {
     btn.classList.remove('active');
   });
 
-  if (tabName === 'playersList' && currentCoach) {
-    loadPlayersTable(); 
-  }
-  
   document.getElementById(`${tabName}Tab`).classList.remove('hidden');
   
   if (event) {
     event.target.classList.add('active');
   }
+
   if (tabName === 'playersList') {
     loadPlayersTable();
   }
@@ -912,19 +900,10 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('filterDate').value = formattedDate;
   
   setupEventListeners();
-  
-  const savedUsername = localStorage.getItem('coachUsername');
-  const savedPassword = localStorage.getItem('coachPassword');
-  if (savedUsername && savedPassword) {
-    document.getElementById('username').value = savedUsername;
-    document.getElementById('password').value = savedPassword;
-  }
 });
 
 function logout() {
   currentCoach = null;
-  localStorage.removeItem('coachUsername');
-  localStorage.removeItem('coachPassword');
   document.getElementById('coachPortal').classList.add('hidden');
   document.getElementById('loginView').classList.remove('hidden');
   document.getElementById('loginForm').reset();
