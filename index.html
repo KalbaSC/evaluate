@@ -300,7 +300,7 @@
     </div>
   </header>
 
-<div id="loginView" class="login-container">
+  <div id="loginView" class="login-container">
   <h2>تسجيل دخول المدربين</h2>
   <form id="loginForm">
     <div class="form-group">
@@ -320,30 +320,31 @@
     
     <button type="submit" class="btn btn-block">دخول</button>
   </form>
-</div>
-
-<div class="nav-tabs">
-  <button class="active" onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
-  <button onclick="showTab('rankings', event)">التصنيفات</button>
-  <button onclick="showTab('progress', event)">تطور الأداء</button>
-  <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
-  <button onclick="logout()">خروج</button>
-</div>
-
-<div id="evaluationTab">
-  <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
-  <div class="form-group">
-    <label for="sessionDate">تاريخ الجلسة</label>
-    <input type="date" id="sessionDate"> 
   </div>
-  
-  <div class="form-group">
-    <label for="filterDate">تصفية اللاعبين حسب التاريخ</label>
-    <input type="date" id="filterDate" onchange="filterByDate()">
-  </div>
-  
-  <div id="playersList"></div>
-</div>
+
+  <div id="coachPortal" class="container hidden">
+    <div class="nav-tabs">
+      <button class="active" onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+      <button onclick="showTab('rankings', event)">التصنيفات</button>
+      <button onclick="showTab('progress', event)">تطور الأداء</button>
+      <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
+      <button onclick="logout()">خروج</button>
+    </div>
+
+    <div id="evaluationTab">
+      <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
+      <div class="date-filter-container">
+        <div class="form-group">
+          <label for="sessionDate">تاريخ الجلسة</label>
+          <input type="date" id="sessionDate" value="2025-07-27">
+        </div>
+        <div class="form-group">
+          <label for="filterDate">تصفية حسب التاريخ</label>
+          <input type="date" id="filterDate" onchange="filterByDate()">
+        </div>
+      </div>
+      <div id="playersList"></div>
+    </div>
 
     <div id="rankingsTab" class="hidden">
       <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
@@ -375,7 +376,6 @@
       </div>
     </div>
   </div>
-
   <script>
 const CONFIG = {
   EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
@@ -833,25 +833,26 @@ function updateRankings() {
       XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
     }
 
-  function showTab(tabName) {
-    const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersList"];
-    allTabs.forEach(tab => {
-       const el = document.getElementById(tab);
-       if (el) el.classList.add('hidden');
-     });
+    function showTab(tabName, event) {
+      const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersList"];
+      allTabs.forEach(tab => {
+        document.getElementById(tab).classList.add('hidden');
+      });
 
-    document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
-    const button = event?.target || document.querySelector(`.nav-tabs button[onclick*="${tabName}"]`);
-    if (button) button.classList.add('active');
+      document.querySelectorAll('.nav-tabs button').forEach(btn => {
+        btn.classList.remove('active');
+      });
 
-    if (tabName === "playersList") {
-     document.getElementById("playersList").classList.remove("hidden");
-    loadPlayersTable();
-  } else {
-    document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-    if (tabName === "rankings") updateRankings();
-  }
-}
+      event.target.classList.add('active');
+      document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0];
+      document.getElementById('sessionDate').value = formattedDate;
+      document.getElementById('filterDate').value = formattedDate;
+    });
 
 function logout() {
   currentCoach = null;
