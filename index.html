@@ -831,7 +831,7 @@ async function updateRankings() {
           count: 0
         };
       }
-      const percentage = parseInt(e.Percentage);
+      const percentage = parseInt(String(e.Percentage).replace('%', '')) || 0;
       playerStats[playerId].total += percentage;
       playerStats[playerId].count += 1;
     });
