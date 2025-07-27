@@ -801,22 +801,24 @@ async function sendEvaluation(evaluationData) {
 async function updateRankings() {
   showLoading();
   try {
+    // No encodeURIComponent() used
     const url = CONFIG.USE_CORS_PROXY 
-      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL
       : CONFIG.EVALUATION_SCRIPT_URL;
 
     const response = await fetch(url);
-    if (!response.ok) throw new Error("فشل في تحميل التقييمات");
-
+    
+    // No Content-Type check
     const data = await response.json();
 
+    // Filter evaluations for current coach's activity
     const filtered = data.filter(e => 
       e.Activity === currentCoach.activity && 
       e.Coach === currentCoach.username
     );
 
+    // Calculate player averages
     const playerStats = {};
-
     filtered.forEach(e => {
       const playerId = e["Player ID"];
       if (!playerStats[playerId]) {
@@ -831,17 +833,19 @@ async function updateRankings() {
       playerStats[playerId].count += 1;
     });
 
+    // Prepare rankings
     const rankings = Object.entries(playerStats).map(([id, player]) => ({
       id,
       name: player.name,
       average: Math.round(player.total / player.count)
     }));
 
+    // Sort by average (descending)
     rankings.sort((a, b) => b.average - a.average);
 
+    // Display rankings
     const container = document.getElementById('rankingsContainer');
     container.innerHTML = '';
-
     rankings.forEach((player, index) => {
       const rankItem = document.createElement('div');
       rankItem.className = 'ranking-item';
@@ -859,7 +863,7 @@ async function updateRankings() {
 
   } catch (err) {
     console.error("Error:", err);
-    showToast('❌ فشل في تحميل التصنيفات', false);
+    showToast('❌ فشل في تحميل التصنيفات: ' + err.message, false);
   } finally {
     hideLoading();
   }
