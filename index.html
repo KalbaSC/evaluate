@@ -301,6 +301,10 @@
     .social-icons a:hover {
       color: #f4e733;
     }
+   @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     @media (max-width: 768px) {
       .header-right {
         padding: 10px;
@@ -327,6 +331,7 @@
   </style>
 </head>
 <body>
+
   <header class="header-container">
     <div class="header-right">
       <img src="Picture3.png" alt="شعار الشارقة" class="logo">
@@ -361,6 +366,18 @@
   </form>
   </div>
 
+<div id="loadingOverlay" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;">
+  <div style="border: 6px solid #f3f3f3; border-top: 6px solid #f4e733; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
+</div> 
+  
 <div id="coachPortal" class="container hidden">
   <div class="nav-tabs">
     <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
@@ -488,6 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function loadPlayersData() {
+  showLoading();
   try {
     const url = CONFIG.USE_CORS_PROXY 
       ? CONFIG.CORS_PROXY_URL + CONFIG.ATTENDANCE_SCRIPT_URL 
@@ -511,9 +529,11 @@ async function loadPlayersData() {
 
     renderPlayersList();
     updatePlayerSelect();
+    hideLoading();
   } catch (error) {
     console.error("Error loading players:", error);
     playersData = []; 
+    hideLoading();
   }
 } 
 
@@ -555,6 +575,14 @@ async function handleLogin(e) {
   } else {
     alert('اسم المستخدم أو كلمة المرور غير صحيحة');
   }
+}
+    
+function showLoading() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
 }
     
 function loadPlayersTable() {
@@ -696,31 +724,32 @@ async function saveEvaluation(playerId) {
     return;
   }
 
-const scores = {};
-const criteria = evaluationCriteria[currentCoach.activity];
-let totalScore = 0;
+  const scores = {};
+  const criteria = evaluationCriteria[currentCoach.activity];
+  let totalScore = 0;
 
-criteria.forEach((criterion, index) => {
-  const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
-  scores[criterion] = score;
-  totalScore += score;
-});
+  criteria.forEach((criterion, index) => {
+    const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
+    scores[criterion] = score;
+    totalScore += score;
+  });
 
-const percentage = Math.round((totalScore / (criteria.length * 5)) * 100); 
+  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100); 
 
-const evaluationData = {
-  Timestamp: new Date().toISOString(),
-  Coach: currentCoach.username,
-  Activity: currentCoach.activity,
-  "Player Name": `${player.name} ${player.parent}`,
-  "Player ID": playerId,
-  Scores: scores,
-  Total: totalScore,
-  Percentage: percentage, 
-  Notes: document.getElementById(`notes-${playerId}`).value
-};
+  const evaluationData = {
+    Timestamp: new Date().toISOString(),
+    Coach: currentCoach.username,
+    Activity: currentCoach.activity,
+    "Player Name": `${player.name} ${player.parent}`,
+    "Player ID": playerId,
+    Scores: scores,
+    Total: totalScore,
+    Percentage: percentage, 
+    Notes: document.getElementById(`notes-${playerId}`).value
+  };
 
   try {
+    showLoading();
     await sendEvaluation(evaluationData);
     evaluations.push(evaluationData);
     const key = `playerEvaluations_${currentCoach.username}`;
@@ -728,6 +757,8 @@ const evaluationData = {
     showToast('✅ تم حفظ التقييم بنجاح', true);
   } catch (err) {
     showToast('❌ فشل في إرسال التقييم: ' + err.message, false);
+  } finally {
+    hideLoading();  
   }
 }
     
