@@ -728,6 +728,7 @@ const evaluationCriteria = {
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
 document.addEventListener('DOMContentLoaded', function() {
+  setupMobileSpecificFeatures();
   const sessionDateInput = document.getElementById('sessionDate');
   if (sessionDateInput) {
     sessionDateInput.valueAsDate = new Date();
@@ -1312,6 +1313,32 @@ function showToast(message, success = true) {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 4000);
   }
+
+    function setupMobileSpecificFeatures() {
+  document.querySelectorAll('button, .btn').forEach(btn => {
+    btn.addEventListener('touchstart', function() {
+      this.style.transform = 'scale(0.98)';
+      this.style.opacity = '0.9';
+    });
+    
+    btn.addEventListener('touchend', function() {
+      this.style.transform = '';
+      this.style.opacity = '';
+    });
+  });
+  
+  document.querySelectorAll('input, select, textarea').forEach(input => {
+    input.addEventListener('focus', function() {
+      document.querySelector('meta[name="viewport"]')
+        .setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    });
+    
+    input.addEventListener('blur', function() {
+      document.querySelector('meta[name="viewport"]')
+        .setAttribute('content', 'width=device-width, initial-scale=1.0');
+    });
+  });
+}
     </script>
   
 <div class="footer-container">
