@@ -471,18 +471,29 @@ const evaluationCriteria = {
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
 document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  
   const sessionDateInput = document.getElementById('sessionDate');
   if (sessionDateInput) {
-    sessionDateInput.valueAsDate = new Date();
+    sessionDateInput.value = formattedDate;
   }
+  document.getElementById('filterDate').value = formattedDate;
+
   setupEventListeners();
+
   const savedUsername = localStorage.getItem('coachUsername');
   const savedPassword = localStorage.getItem('coachPassword');
   if (savedUsername && savedPassword) {
     const fakeEvent = { preventDefault: () => {} };
     document.getElementById('username').value = savedUsername;
     document.getElementById('password').value = savedPassword;
-    handleLogin(fakeEvent);
+    handleLogin(fakeEvent).then(() => {
+      if (!document.getElementById('coachPortal').classList.contains('hidden')) {
+        showTab('playersList');
+        document.querySelector('.nav-tabs button:first-child').classList.add('active');
+      }
+    });
   }
 });
 
@@ -902,18 +913,6 @@ function showTab(tabName, event) {
     loadPlayersTable();
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
-  document.getElementById('sessionDate').value = formattedDate;
-  document.getElementById('filterDate').value = formattedDate;
-  
-  if (document.getElementById('coachPortal').classList.contains('hidden') === false) {
-    showTab('playersList');
-    document.querySelector('.nav-tabs button:first-child').classList.add('active');
-  }
-});
 
 function logout() {
   currentCoach = null;
