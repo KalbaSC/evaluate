@@ -174,6 +174,33 @@
 #playersListTab {
   padding: 20px;
 }
+.table-responsive {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.players-table {
+  width: 100%;
+  border-collapse: collapse;
+  direction: rtl;
+}
+
+.players-table th, 
+.players-table td {
+  padding: 10px 15px;
+  text-align: right;
+  border: 1px solid #f4e733;
+}
+
+.players-table th {
+  background-color: #333;
+  color: #f4e733;
+  font-weight: bold;
+}
+
+.players-table tr:nth-child(even) {
+  background-color: rgba(244, 231, 51, 0.1);
+}
     .evaluation-form {
       background: #222;
       padding: 20px;
@@ -520,26 +547,28 @@ async function loadPlayersData() {
     
 function loadPlayersTable() {
   const container = document.getElementById('playersTableContainer');
+  
   container.innerHTML = `
-    <h3>قائمة اللاعبين</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>المعرف</th>
-          <th>اسم اللاعب وولي الأمر</th>
-          <th>تاريخ الحضور</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${playersData.map(player => `
+    <div class="table-responsive">
+      <table class="players-table">
+        <thead>
           <tr>
-            <td>${player.id}</td>
-            <td>${player.name} ${player.parent}</td>
-            <td>${player.date}</td>
+            <th>تاريخ الحضور</th>
+            <th>اسم اللاعب</th>
+            <th>المعرف</th>
           </tr>
-        `).join('')}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${playersData.map(player => `
+            <tr>
+              <td>${player.date || 'غير محدد'}</td>
+              <td>${player.name} ${player.parent || ''}</td>
+              <td>${player.id}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
   `;
 }
    
@@ -849,17 +878,16 @@ function updateRankings() {
     }
 
 function showTab(tabName, event) {
-  const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersListTab"];
-  allTabs.forEach(tab => {
-    document.getElementById(tab).classList.add('hidden');
+  document.querySelectorAll('[id$="Tab"]').forEach(tab => {
+    tab.classList.add('hidden');
   });
-
+  
   document.querySelectorAll('.nav-tabs button').forEach(btn => {
     btn.classList.remove('active');
   });
-
-  event.target.classList.add('active');
+  
   document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+  event.target.classList.add('active');
   
   if (tabName === 'playersList') {
     loadPlayersTable();
