@@ -482,7 +482,7 @@ function loadPlayersTable() {
         ${playersData.map(player => `
           <tr>
             <td>${player.id}</td>
-            <td>${player.name} - ${player.parent}</td>
+            <td>${player.name} ${player.parent}</td>
             <td>${player.date}</td>
           </tr>
         `).join('')}
