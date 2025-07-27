@@ -470,6 +470,9 @@ const evaluationCriteria = {
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
     let progressChart = null;
     const progressChartCanvas = document.getElementById('progressChart');
+    const rankingsContainer = document.getElementById('rankingsContainer');
+    const playerSelect = document.getElementById('playerSelect');
+    const progressChartContainer = document.getElementById('progressChartContainer');
     let currentCoach = null;
     let playersData = [];
       
@@ -488,10 +491,6 @@ document.addEventListener('DOMContentLoaded', function() {
    handleLogin(fakeEvent);
 }
 }); 
-
-    const rankingsContainer = document.getElementById('rankingsContainer');
-    const playerSelect = document.getElementById('playerSelect');
-    const progressChartContainer = document.getElementById('progressChartContainer'); 
     
 async function loadPlayersData() {
   try {
