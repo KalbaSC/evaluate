@@ -467,11 +467,11 @@ const evaluationCriteria = {
     "التركيز الذهني"
   ]
 };
+    let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
     let progressChart = null;
     const progressChartCanvas = document.getElementById('progressChart');
     let currentCoach = null;
     let playersData = [];
-    let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || 
       
 document.addEventListener('DOMContentLoaded', function() {
   const sessionDateInput = document.getElementById('sessionDate');
@@ -488,6 +488,10 @@ document.addEventListener('DOMContentLoaded', function() {
    handleLogin(fakeEvent);
 }
 }); 
+
+    const rankingsContainer = document.getElementById('rankingsContainer');
+    const playerSelect = document.getElementById('playerSelect');
+    const progressChartContainer = document.getElementById('progressChartContainer'); 
     
 async function loadPlayersData() {
   try {
