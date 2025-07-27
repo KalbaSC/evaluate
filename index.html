@@ -471,8 +471,24 @@ const evaluationCriteria = {
     const progressChartCanvas = document.getElementById('progressChart');
     let currentCoach = null;
     let playersData = [];
-    let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
-
+    let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || 
+      
+document.addEventListener('DOMContentLoaded', function() {
+  const sessionDateInput = document.getElementById('sessionDate');
+  if (sessionDateInput) {
+    sessionDateInput.valueAsDate = new Date();
+  }
+  setupEventListeners();
+  const savedUsername = localStorage.getItem('coachUsername');
+  const savedPassword = localStorage.getItem('coachPassword');
+   if (savedUsername && savedPassword) {
+   const fakeEvent = { preventDefault: () => {} };
+   document.getElementById('username').value = savedUsername;
+   document.getElementById('password').value = savedPassword;
+   handleLogin(fakeEvent);
+}
+}); 
+    
 async function loadPlayersData() {
   try {
     const url = CONFIG.USE_CORS_PROXY 
