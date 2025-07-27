@@ -830,12 +830,15 @@ function updateRankings() {
   }
 }
 
-    function logout() {
-      currentCoach = null;
-      coachPortal.classList.add('hidden');
-      loginView.classList.remove('hidden');
-      loginForm.reset();
-    }
+function logout() {
+  currentCoach = null;
+  localStorage.removeItem('coachUsername');
+  localStorage.removeItem('coachPassword');
+  document.getElementById('coachPortal').classList.add('hidden');
+  document.getElementById('loginView').classList.remove('hidden');
+  document.getElementById('loginForm').reset();
+}
+
 function showToast(message, success = true) {
     const toast = document.createElement('div');
     toast.textContent = message;
