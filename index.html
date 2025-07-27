@@ -305,14 +305,13 @@
   </form>
 </div>
 
-  <div id="coachPortal" class="container hidden">
-    <div class="nav-tabs">
-      <button class="active" onclick="showTab('evaluation')">تقييم اللاعبين</button>
-      <button onclick="showTab('rankings')">التصنيفات</button>
-      <button onclick="showTab('progress')">تطور الأداء</button>
-      <button onclick="showTab('playersList')">عرض اللاعبين</button>
-      <button onclick="logout()">خروج</button>
-    </div>
+<div class="nav-tabs">
+  <button class="active" onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+  <button onclick="showTab('rankings', event)">التصنيفات</button>
+  <button onclick="showTab('progress', event)">تطور الأداء</button>
+  <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
+  <button onclick="logout()">خروج</button>
+</div>
 
 <div id="evaluationTab">
   <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
@@ -439,7 +438,6 @@ async function loadPlayersData() {
     
     const data = await response.json();
     
-    // Process data as before
     const coachActivity = currentCoach.activity;
     playersData = data
       .filter(p => p.Activity === coachActivity)
@@ -454,7 +452,6 @@ async function loadPlayersData() {
     updatePlayerSelect();
   } catch (error) {
     console.error("Error loading players:", error);
-    // Fallback to localStorage if available
     const cachedData = localStorage.getItem('playersData');
     if (cachedData) playersData = JSON.parse(cachedData);
   }
@@ -825,7 +822,8 @@ function updateRankings() {
      });
 
     document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    const button = event?.target || document.querySelector(`.nav-tabs button[onclick*="${tabName}"]`);
+    if (button) button.classList.add('active');
 
     if (tabName === "playersList") {
      document.getElementById("playersList").classList.remove("hidden");
