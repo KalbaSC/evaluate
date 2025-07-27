@@ -498,6 +498,7 @@ async function loadPlayersData() {
     
     const data = await response.json();
     
+    playersData = [];
     playersData = data
       .filter(p => p.Activity === currentCoach.activity)
       .map(player => ({
@@ -531,13 +532,13 @@ async function handleLogin(e) {
       username: username,
       activity: coaches[username].activity
     };
-    
+
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('coachPortal').classList.remove('hidden');
-    await loadPlayersData();
-    
-    showTab('playersList');
+
+    await loadPlayersData(); 
     document.querySelector('.nav-tabs button:first-child').classList.add('active');
+    showTab('playersList');
   } else {
     alert('اسم المستخدم أو كلمة المرور غير صحيحة');
   }
