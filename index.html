@@ -163,6 +163,17 @@
       background-color: #333;
       color: #f4e733;
     }
+  .date-filter-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+#playersListTab {
+  padding: 20px;
+}
     .evaluation-form {
       background: #222;
       padding: 20px;
@@ -329,6 +340,10 @@
       <button onclick="showTab('progress', event)">تطور الأداء</button>
       <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
       <button onclick="logout()">خروج</button>
+      <div id="playersListTab" class="hidden">
+        <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
+        <div id="playersTableContainer"></div>
+      </div>
     </div>
 
     <div id="evaluationTab">
@@ -504,7 +519,7 @@ async function loadPlayersData() {
     }
     
 function loadPlayersTable() {
-  const container = document.getElementById('playersList');
+  const container = document.getElementById('playersTableContainer');
   container.innerHTML = `
     <h3>قائمة اللاعبين</h3>
     <table>
@@ -833,19 +848,23 @@ function updateRankings() {
       XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
     }
 
-    function showTab(tabName, event) {
-      const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersList"];
-      allTabs.forEach(tab => {
-        document.getElementById(tab).classList.add('hidden');
-      });
+function showTab(tabName, event) {
+  const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersListTab"];
+  allTabs.forEach(tab => {
+    document.getElementById(tab).classList.add('hidden');
+  });
 
-      document.querySelectorAll('.nav-tabs button').forEach(btn => {
-        btn.classList.remove('active');
-      });
+  document.querySelectorAll('.nav-tabs button').forEach(btn => {
+    btn.classList.remove('active');
+  });
 
-      event.target.classList.add('active');
-      document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-    }
+  event.target.classList.add('active');
+  document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+  
+  if (tabName === 'playersList') {
+    loadPlayersTable();
+  }
+}
 
     document.addEventListener('DOMContentLoaded', function() {
       const today = new Date();
