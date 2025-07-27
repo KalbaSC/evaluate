@@ -1014,42 +1014,50 @@ others.forEach((player, index) => {
     }
 
     function exportRankings() {
-      const playerStats = {};
-      
-      evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
-        if (!playerStats[eval.playerId]) {
-          playerStats[eval.playerId] = {
-            name: eval.playerName,
-            total: 0,
-            count: 0,
-            evaluations: []
-          };
-        }
-        playerStats[eval.playerId].total += eval.percentage;
-        playerStats[eval.playerId].count++;
-        playerStats[eval.playerId].evaluations.push(eval);
-      });
-      
-      const rankings = Object.values(playerStats).map(player => {
-        return {
-          name: player.name,
-          average: Math.round(player.total / player.count),
-          evaluations: player.evaluations.length
+  if (!Array.isArray(evaluations) || evaluations.length === 0) {
+    showToast("لا توجد بيانات تصنيف لتصديرها", false);
+    return;
+  }
+
+  const playerStats = {};
+
+  evaluations
+    .filter(e => 
+      e.Activity?.trim() === currentCoach.activity?.trim() &&
+      e.Coach?.trim() === currentCoach.username?.trim()
+    )
+    .forEach(e => {
+      const playerId = e["Player ID"];
+      if (!playerStats[playerId]) {
+        playerStats[playerId] = {
+          name: e["Player Name"],
+          total: 0,
+          count: 0
         };
-      });
-      
-      rankings.sort((a, b) => b.average - a.average);
-      
-      const wsData = [
-        ['الترتيب', 'اسم اللاعب', 'المعدل', 'عدد التقييمات'],
-        ...rankings.map((player, index) => [index + 1, player.name, player.average + '%', player.evaluations])
-      ];
-      
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "التصنيفات");
-      XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
-    }
+      }
+      const percentage = Math.round(parseFloat(e.Percentage) * 100) || 0;
+      playerStats[playerId].total += percentage;
+      playerStats[playerId].count++;
+    });
+
+  const rankings = Object.entries(playerStats).map(([id, player]) => ({
+    name: player.name,
+    average: Math.round(player.total / player.count),
+    evaluations: player.count
+  }));
+
+  rankings.sort((a, b) => b.average - a.average);
+
+  const wsData = [
+    ['الترتيب', 'اسم اللاعب', 'المعدل', 'عدد التقييمات'],
+    ...rankings.map((p, i) => [i + 1, p.name, `${p.average}%`, p.evaluations])
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "التصنيفات");
+  XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
+}
 
 function showTab(tabName, event) {
   const allTabs = ["playersListTab", "evaluationTab", "rankingsTab", "progressTab"];
