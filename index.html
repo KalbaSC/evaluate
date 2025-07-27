@@ -361,18 +361,19 @@
   </form>
   </div>
 
-<div class="nav-tabs">
-  <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
-  <button onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
-  <button onclick="showTab('rankings', event)">التصنيفات</button>
-  <button onclick="showTab('progress', event)">تطور الأداء</button>
-  <button onclick="logout()">خروج</button>
-</div>
+<div id="coachPortal" class="container hidden">
+  <div class="nav-tabs">
+    <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
+    <button onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+    <button onclick="showTab('rankings', event)">التصنيفات</button>
+    <button onclick="showTab('progress', event)">تطور الأداء</button>
+    <button onclick="logout()">خروج</button>
+  </div>
 
-<div id="playersListTab" class="hidden">
-  <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
-  <div id="playersTableContainer"></div>
-</div>
+  <div id="playersListTab">
+    <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
+    <div id="playersTableContainer"></div>
+  </div>
 
     <div id="evaluationTab">
       <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
@@ -471,30 +472,19 @@ const evaluationCriteria = {
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
 document.addEventListener('DOMContentLoaded', function() {
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
-  
   const sessionDateInput = document.getElementById('sessionDate');
   if (sessionDateInput) {
-    sessionDateInput.value = formattedDate;
+    sessionDateInput.valueAsDate = new Date();
   }
-  document.getElementById('filterDate').value = formattedDate;
-
   setupEventListeners();
-
   const savedUsername = localStorage.getItem('coachUsername');
   const savedPassword = localStorage.getItem('coachPassword');
-  if (savedUsername && savedPassword) {
-    const fakeEvent = { preventDefault: () => {} };
-    document.getElementById('username').value = savedUsername;
-    document.getElementById('password').value = savedPassword;
-    handleLogin(fakeEvent).then(() => {
-      if (!document.getElementById('coachPortal').classList.contains('hidden')) {
-        showTab('playersList');
-        document.querySelector('.nav-tabs button:first-child').classList.add('active');
-      }
-    });
-  }
+   if (savedUsername && savedPassword) {
+   const fakeEvent = { preventDefault: () => {} };
+   document.getElementById('username').value = savedUsername;
+   document.getElementById('password').value = savedPassword;
+   handleLogin(fakeEvent);
+}
 });
 
 async function loadPlayersData() {
@@ -532,37 +522,30 @@ async function loadPlayersData() {
       document.getElementById('sessionDate').addEventListener('change', handleDateChange);
     }
 
-async function handleLogin(e) {
-  e.preventDefault();
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  
-  if (coaches[username] && coaches[username].password === password) {
-    currentCoach = {
-      username: username,
-      activity: coaches[username].activity
-    };
-    
-    if (document.getElementById('rememberMe').checked) {
-      localStorage.setItem('coachUsername', username);
-      localStorage.setItem('coachPassword', password);
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if (coaches[username] && coaches[username].password === password) {
+        currentCoach = {
+          username: username,
+          activity: coaches[username].activity
+        };
+      if (document.getElementById('rememberMe').checked) {
+         localStorage.setItem('coachUsername', username);
+         localStorage.setItem('coachPassword', password);
     } else {
-      localStorage.removeItem('coachUsername');
-      localStorage.removeItem('coachPassword');
+         localStorage.removeItem('coachUsername');
+         localStorage.removeItem('coachPassword');
+      }
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('coachPortal').classList.remove('hidden');
+        await loadPlayersData();
+      } else {
+        alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+      }
     }
-    
-    document.getElementById('loginView').classList.add('hidden');
-    document.getElementById('coachPortal').classList.remove('hidden');
-    
-    await loadPlayersData();
-    
-    showTab('playersList');
-    
-    document.querySelector('.nav-tabs button:first-child').classList.add('active');
-  } else {
-    alert('اسم المستخدم أو كلمة المرور غير صحيحة');
-  }
-}
     
 function loadPlayersTable() {
   const container = document.getElementById('playersTableContainer');
@@ -913,6 +896,18 @@ function showTab(tabName, event) {
     loadPlayersTable();
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  document.getElementById('sessionDate').value = formattedDate;
+  document.getElementById('filterDate').value = formattedDate;
+  
+  if (document.getElementById('coachPortal').classList.contains('hidden') === false) {
+    showTab('playersList');
+    document.querySelector('.nav-tabs button:first-child').classList.add('active');
+  }
+});
 
 function logout() {
   currentCoach = null;
