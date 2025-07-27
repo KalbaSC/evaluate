@@ -474,8 +474,7 @@ function loadPlayersTable() {
       <thead>
         <tr>
           <th>المعرف</th>
-          <th>اسم اللاعب</th>
-          <th>اسم ولي الأمر</th>
+          <th>اسم اللاعب وولي الأمر</th>
           <th>تاريخ الحضور</th>
         </tr>
       </thead>
@@ -483,8 +482,7 @@ function loadPlayersTable() {
         ${playersData.map(player => `
           <tr>
             <td>${player.id}</td>
-            <td>${player.name}</td>
-            <td>${player.parent}</td>
+            <td>${player.name} - ${player.parent}</td>
             <td>${player.date}</td>
           </tr>
         `).join('')}
