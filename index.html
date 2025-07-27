@@ -364,7 +364,7 @@
 }
 
     @media (max-width: 768px) {
-      .header-right {
+  .header-right {
         padding: 10px;
         flex-direction: row;
         gap: 10px;
@@ -378,14 +378,150 @@
       .english-name {
         font-size: 12px;
       }
-      .container {
-        padding: 15px;
-        margin: 15px auto;
-      }
-      .evaluation-criteria {
-        grid-template-columns: 1fr;
-      }
-    }
+  
+  .login-container {
+    margin: 20px auto;
+    padding: 20px;
+    width: 90%;
+  }
+  
+  .container {
+    padding: 10px;
+    margin: 15px auto;
+    width: 95%;
+  }
+  
+  .nav-tabs {
+    flex-direction: column;
+    border-bottom: none;
+  }
+  
+  .nav-tabs button {
+    width: 100%;
+    padding: 12px;
+    border-bottom: 1px solid #f4e733;
+    text-align: center;
+  }
+  
+  .nav-tabs button.active {
+    border-radius: 5px;
+  }
+  
+  .date-filter-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .form-group {
+    width: 100%;
+  }
+  
+  .player-card {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .evaluation-criteria {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .criteria-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .criteria-item select {
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .players-table th, 
+  .players-table td {
+    padding: 8px 5px;
+    font-size: 14px;
+  }
+  
+  .top-three-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .ranking-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ranking-card {
+    width: 90%;
+    margin: 0 auto 15px;
+  }
+  
+  #progressChartContainer {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* Footer */
+  .footer-container {
+    padding: 15px;
+  }
+  
+  .social-icons {
+    margin-top: 10px;
+  }
+  
+  .social-icons a {
+    margin: 0 8px;
+    font-size: 18px;
+  }
+  
+  /* Loading popup */
+  #loadingPopup {
+    width: 80%;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-right {
+    padding: 8px;
+  }
+  
+  .header-right img.logo {
+    height: 40px;
+  }
+  
+  .arabic-name {
+    font-size: 16px;
+  }
+  
+  .english-name {
+    font-size: 11px;
+  }
+  
+  .login-container {
+    padding: 15px;
+  }
+  
+  .btn {
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  .players-table {
+    font-size: 13px;
+  }
+  
+  .ranking-card {
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
