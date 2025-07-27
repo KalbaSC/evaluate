@@ -402,10 +402,22 @@
     <button onclick="logout()">خروج</button>
   </div>
 
-<div class="date-filter-container" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; width: 100%; direction: rtl; gap: 20px;">
-  
-  <div style="margin-inline-start: auto;">
-    <div id="playersCount" style="color: #f4e733; font-weight: bold; text-align: left;"></div>
+<div style="position: relative; width: 100%; padding-bottom: 20px;">
+
+  <div style="position: absolute; right: 0;">
+    <div id="playersCount" style="
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 10px;
+      color: #f4e733;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    ">
+      <i class="fas fa-users"></i> عدد اللاعبين: 0
+    </div>
   </div>
 
   <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
