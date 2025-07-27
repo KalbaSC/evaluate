@@ -765,49 +765,72 @@ async function saveEvaluation(playerId) {
   }
 }
     
-function updateRankings() {
-      const playerStats = {};
-      evaluations.filter(e => e.activity === currentCoach.activity).forEach(eval => {
-        if (!playerStats[eval.playerId]) {
-          playerStats[eval.playerId] = {
-            name: eval.playerName,
-            total: 0,
-            count: 0,
-            evaluations: []
-          };
-        }
-        playerStats[eval.playerId].total += eval.percentage;
-        playerStats[eval.playerId].count++;
-        playerStats[eval.playerId].evaluations.push(eval);
-      });
-      
-      const rankings = Object.values(playerStats).map(player => {
-        return {
-          id: player.id,
-          name: player.name,
-          average: Math.round(player.total / player.count),
-          evaluations: player.evaluations
+async function updateRankings() {
+  showLoading();
+  try {
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      : CONFIG.EVALUATION_SCRIPT_URL;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("فشل في تحميل التقييمات");
+
+    const data = await response.json();
+
+    const filtered = data.filter(e => 
+      e.Activity === currentCoach.activity && 
+      e.Coach === currentCoach.username
+    );
+
+    const playerStats = {};
+
+    filtered.forEach(e => {
+      const playerId = e["Player ID"];
+      if (!playerStats[playerId]) {
+        playerStats[playerId] = {
+          name: e["Player Name"],
+          total: 0,
+          count: 0
         };
-      });
-      
-      rankings.sort((a, b) => b.average - a.average);
-      
-      rankingsContainer.innerHTML = '';
-      rankings.forEach((player, index) => {
-        const rankItem = document.createElement('div');
-        rankItem.className = 'ranking-item';
-        rankItem.innerHTML = `
-          <div>
-            <span class="rank-badge">${index + 1}</span>
-            <span>${player.name}</span>
-          </div>
-          <div>
-            <span>المعدل: ${player.average}%</span>
-          </div>
-        `;
-        rankingsContainer.appendChild(rankItem);
-      });
-    }
+      }
+      const percentage = parseInt(e.Percentage);
+      playerStats[playerId].total += percentage;
+      playerStats[playerId].count += 1;
+    });
+
+    const rankings = Object.entries(playerStats).map(([id, player]) => ({
+      id,
+      name: player.name,
+      average: Math.round(player.total / player.count)
+    }));
+
+    rankings.sort((a, b) => b.average - a.average);
+
+    const container = document.getElementById('rankingsContainer');
+    container.innerHTML = '';
+
+    rankings.forEach((player, index) => {
+      const rankItem = document.createElement('div');
+      rankItem.className = 'ranking-item';
+      rankItem.innerHTML = `
+        <div>
+          <span class="rank-badge">${index + 1}</span>
+          <span>${player.name}</span>
+        </div>
+        <div>
+          <span>المعدل: ${player.average}%</span>
+        </div>
+      `;
+      container.appendChild(rankItem);
+    });
+
+  } catch (err) {
+    console.error("خطأ في تحميل التصنيفات:", err);
+    showToast('❌ فشل في تحميل التصنيفات', false);
+  } finally {
+    hideLoading();
+  }
+}
 
     function updatePlayerSelect() {
       playerSelect.innerHTML = '';
