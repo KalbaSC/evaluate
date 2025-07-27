@@ -538,8 +538,8 @@ async function handleLogin(e) {
       localStorage.setItem('coachPassword', password);
     }
 
-    evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
-    evaluations = evaluations.filter(e => e.Activity === currentCoach.activity);
+    const key = `playerEvaluations_${username}`;
+    evaluations = JSON.parse(localStorage.getItem(key)) || [];
     playersData = [];
 
     document.getElementById('loginView').classList.add('hidden');
@@ -723,7 +723,8 @@ const evaluationData = {
   try {
     await sendEvaluation(evaluationData);
     evaluations.push(evaluationData);
-    localStorage.setItem('playerEvaluations', JSON.stringify(evaluations));
+    const key = `playerEvaluations_${currentCoach.username}`;
+    localStorage.setItem(key, JSON.stringify(evaluations));
     showToast('✅ تم حفظ التقييم بنجاح', true);
   } catch (err) {
     showToast('❌ فشل في إرسال التقييم: ' + err.message, false);
@@ -917,10 +918,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function logout() {
+  const username = currentCoach?.username;
   currentCoach = null;
+  playersData = [];
+  evaluations = [];
+
+  localStorage.removeItem('coachUsername');
+  localStorage.removeItem('coachPassword');
+
   document.getElementById('coachPortal').classList.add('hidden');
   document.getElementById('loginView').classList.remove('hidden');
   document.getElementById('loginForm').reset();
+
+  document.getElementById('playersList').innerHTML = '';
+  document.getElementById('playersTableContainer').innerHTML = '';
+  document.getElementById('rankingsContainer').innerHTML = '';
+  document.getElementById('playerSelect').innerHTML = '';
+  if (progressChart) {
+    progressChart.destroy();
+    progressChart = null;
+  }
 }
 
 function showToast(message, success = true) {
