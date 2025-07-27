@@ -809,10 +809,11 @@ async function updateRankings() {
 
     let data;
     try {
-      data = await response.json(); 
+      const cloned = response.clone(); // ننسخ الرد
+      data = await response.json();    // نحاول نحوله لـ JSON
     } catch (err) {
-      const fallback = await response.text(); 
-      throw new Error("Invalid JSON response: " + fallback); 
+      const fallback = await response.text(); // نقرأ من النسخة الأصلية
+      throw new Error("الرد غير صالح كـ JSON:\n" + fallback);
     }
 
     const filtered = data.filter(e => 
@@ -862,7 +863,7 @@ async function updateRankings() {
 
   } catch (err) {
     console.error("Error:", err);
-    showToast('❌ فشل في تحميل التصنيفات: ' + err.message, false);
+    showToast('❌ فشل في تحميل التصنيفات:\n' + err.message, false);
   } finally {
     hideLoading();
   }
