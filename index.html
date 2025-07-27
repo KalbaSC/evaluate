@@ -533,10 +533,23 @@ async function handleLogin(e) {
       activity: coaches[username].activity
     };
 
+    if (document.getElementById('rememberMe').checked) {
+      localStorage.setItem('coachUsername', username);
+      localStorage.setItem('coachPassword', password);
+    }
+
+    evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
+    evaluations = evaluations.filter(e => e.Activity === currentCoach.activity);
+    playersData = [];
+
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('coachPortal').classList.remove('hidden');
 
-    await loadPlayersData(); 
+    await loadPlayersData();
+
+    document.querySelectorAll('.nav-tabs button').forEach(btn => {
+      btn.classList.remove('active');
+    });
     document.querySelector('.nav-tabs button:first-child').classList.add('active');
     showTab('playersList');
   } else {
