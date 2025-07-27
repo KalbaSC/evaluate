@@ -292,6 +292,8 @@
       <div class="form-group">
         <label for="password">كلمة المرور</label>
         <input type="password" id="password" required>
+        <input type="checkbox" id="rememberMe" checked>
+        <label for="rememberMe">تذكرني</label>
       </div>
       <button type="submit" class="btn btn-block">دخول</button>
     </form>
@@ -302,7 +304,7 @@
       <button class="active" onclick="showTab('evaluation')">تقييم اللاعبين</button>
       <button onclick="showTab('rankings')">التصنيفات</button>
       <button onclick="showTab('progress')">تطور الأداء</button>
-      <button onclick="loadPlayersTable()">عرض اللاعبين</button> 
+      <button onclick="showTab('playersList')">عرض اللاعبين</button>
       <button onclick="logout()">خروج</button>
     </div>
 
@@ -410,6 +412,14 @@ document.addEventListener('DOMContentLoaded', function() {
     sessionDateInput.valueAsDate = new Date();
   }
   setupEventListeners();
+  const savedUsername = localStorage.getItem('coachUsername');
+  const savedPassword = localStorage.getItem('coachPassword');
+   if (savedUsername && savedPassword) {
+   const fakeEvent = { preventDefault: () => {} };
+   document.getElementById('username').value = savedUsername;
+   document.getElementById('password').value = savedPassword;
+   handleLogin(fakeEvent);
+}
 });
 
 async function loadPlayersData() {
@@ -459,6 +469,13 @@ async function loadPlayersData() {
           username: username,
           activity: coaches[username].activity
         };
+      if (document.getElementById('rememberMe').checked) {
+         localStorage.setItem('coachUsername', username);
+         localStorage.setItem('coachPassword', password);
+    } else {
+         localStorage.removeItem('coachUsername');
+         localStorage.removeItem('coachPassword');
+      }
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('coachPortal').classList.remove('hidden');
         await loadPlayersData();
@@ -466,6 +483,7 @@ async function loadPlayersData() {
         alert('اسم المستخدم أو كلمة المرور غير صحيحة');
       }
     }
+    
 function loadPlayersTable() {
   const container = document.getElementById('playersList');
   container.innerHTML = `
@@ -793,20 +811,24 @@ function updateRankings() {
       XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
     }
 
-    function showTab(tabName) {
-      document.getElementById('evaluationTab').classList.add('hidden');
-      document.getElementById('rankingsTab').classList.add('hidden');
-      document.getElementById('progressTab').classList.add('hidden');
-      
-      document.querySelector('.nav-tabs button.active').classList.remove('active');
-      event.target.classList.add('active');
-      
-      document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-      
-      if (tabName === 'rankings') {
-        updateRankings();
-      }
-    }
+  function showTab(tabName) {
+    const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersList"];
+    allTabs.forEach(tab => {
+       const el = document.getElementById(tab);
+       if (el) el.classList.add('hidden');
+     });
+
+    document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (tabName === "playersList") {
+     document.getElementById("playersList").classList.remove("hidden");
+    loadPlayersTable();
+  } else {
+    document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+    if (tabName === "rankings") updateRankings();
+  }
+}
 
     function logout() {
       currentCoach = null;
