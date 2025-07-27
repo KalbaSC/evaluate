@@ -816,10 +816,10 @@ async function updateRankings() {
       throw new Error("الرد غير صالح كـ JSON:\n" + fallback);
     }
 
-    const filtered = data.filter(e => 
-      e.Activity === currentCoach.activity && 
-      e.Coach === currentCoach.username
-    );
+const filtered = data.filter(e =>
+  e.Activity?.trim() === currentCoach.activity?.trim() &&
+  e.Coach?.trim() === currentCoach.username?.trim()
+);
 
     const playerStats = {};
     filtered.forEach(e => {
@@ -831,7 +831,7 @@ async function updateRankings() {
           count: 0
         };
       }
-      const percentage = parseInt(String(e.Percentage).replace('%', '')) || 0;
+      const percentage = Math.round(parseFloat(e.Percentage) * 100) || 0;
       playerStats[playerId].total += percentage;
       playerStats[playerId].count += 1;
     });
