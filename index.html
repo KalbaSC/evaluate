@@ -7,8 +7,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">  <style>
-    @font-face {
+  <link rel="icon" href="https://i.imgur.com/8lRO3wm.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="https://i.imgur.com/8lRO3wm.png" sizes="64x64" type="image/png">
+  <link rel="apple-touch-icon" href="https://i.imgur.com/8lRO3wm.png">
+  @font-face {
       font-family: 'NotoKufiArabic';
       src: url('NotoKufiArabic.ttf') format('truetype');
     }
@@ -370,12 +372,12 @@
     <button onclick="logout()">خروج</button>
   </div>
 
-  <div id="playersListTab">
+  <div id="playersListTab" class="hidden">
     <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
     <div id="playersTableContainer"></div>
   </div>
 
-    <div id="evaluationTab">
+    <div id="evaluationTab" class="hidden">
       <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
       <div class="date-filter-container">
         <div class="form-group">
@@ -470,22 +472,6 @@ const evaluationCriteria = {
     let currentCoach = null;
     let playersData = [];
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
-
-document.addEventListener('DOMContentLoaded', function() {
-  const sessionDateInput = document.getElementById('sessionDate');
-  if (sessionDateInput) {
-    sessionDateInput.valueAsDate = new Date();
-  }
-  setupEventListeners();
-  const savedUsername = localStorage.getItem('coachUsername');
-  const savedPassword = localStorage.getItem('coachPassword');
-   if (savedUsername && savedPassword) {
-   const fakeEvent = { preventDefault: () => {} };
-   document.getElementById('username').value = savedUsername;
-   document.getElementById('password').value = savedPassword;
-   handleLogin(fakeEvent);
-}
-});
 
 async function loadPlayersData() {
   try {
@@ -904,9 +890,11 @@ function updateRankings() {
     }
 
 function showTab(tabName, event) {
-  const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersListTab"];
-  allTabs.forEach(tab => document.getElementById(tab).classList.add('hidden'));
-  
+  const allTabs = ["playersListTab", "evaluationTab", "rankingsTab", "progressTab"];
+  allTabs.forEach(tab => {
+    document.getElementById(tab).classList.add('hidden');
+  });
+
   document.querySelectorAll('.nav-tabs button').forEach(btn => {
     btn.classList.remove('active');
   });
