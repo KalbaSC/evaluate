@@ -305,6 +305,64 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .ranking-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.ranking-item {
+  background-color: #1c1c1c;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  width: 200px;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+  position: relative;
+  transition: 0.3s;
+  border: 2px solid #333;
+}
+
+.ranking-item.highlight {
+  border-color: #ffeb3b;
+  box-shadow: 0 0 20px #ffeb3b88;
+}
+
+.rank-badge {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.ranking-item img.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 2px solid #fff;
+  background-color: #fff;
+}
+
+.ranking-item .name {
+  font-weight: bold;
+  color: #ffeb3b;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.ranking-item .id {
+  font-size: 13px;
+  color: #ccc;
+  margin-bottom: 8px;
+}
+
+.ranking-item .activities {
+  font-size: 14px;
+  color: #aaa;
+}
+
     @media (max-width: 768px) {
       .header-right {
         padding: 10px;
@@ -443,11 +501,11 @@
   <div id="playersList"></div>
 </div>
 
-    <div id="rankingsTab" class="hidden">
-      <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
-      <div id="rankingsContainer" class="rankings"></div>
-      <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
-    </div>
+<div id="rankingsTab" class="hidden">
+  <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
+  <div id="rankingsContainer" class="ranking-grid"></div>
+  <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
+</div>
 
     <div id="progressTab" class="hidden">
       <h2 style="color:#f4e733; text-align:center">تطور الأداء</h2>
@@ -842,22 +900,29 @@ const filtered = data.filter(e =>
       average: Math.round(player.total / player.count)
     }));
 
-    rankings.sort((a, b) => b.average - a.average);
+   rankings.sort((a, b) => b.average - a.average);
 
     const container = document.getElementById('rankingsContainer');
     container.innerHTML = '';
+
+    const medals = ['👑', '🥈', '🥉'];
+
     rankings.forEach((player, index) => {
       const rankItem = document.createElement('div');
       rankItem.className = 'ranking-item';
+      if (index === 0) rankItem.classList.add('highlight');
+
+      const badge = medals[index] || '🏅';
+      const avatarURL = 'https://cdn-icons-png.flaticon.com/512/4139/4139981.png';
+
       rankItem.innerHTML = `
-        <div>
-          <span class="rank-badge">${index + 1}</span>
-          <span>${player.name}</span>
-        </div>
-        <div>
-          <span>المعدل: ${player.average}%</span>
-        </div>
+        <div class="rank-badge">${badge}</div>
+        <img src="${avatarURL}" class="avatar" alt="avatar">
+        <div class="name">${player.name}</div>
+        <div class="id">ID: ${player.id}</div>
+        <div class="activities">${player.count} :أنشطة</div>
       `;
+
       container.appendChild(rankItem);
     });
 
