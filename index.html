@@ -858,7 +858,7 @@ async function updateRankings() {
     });
 
   } catch (err) {
-    console.error("خطأ في تحميل التصنيفات:", err);
+    console.error("Error:", err);
     showToast('❌ فشل في تحميل التصنيفات', false);
   } finally {
     hideLoading();
