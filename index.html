@@ -183,12 +183,13 @@
   width: 100%;
   border-collapse: collapse;
   direction: rtl;
+  margin: 0 auto;
 }
 
 .players-table th, 
 .players-table td {
-  padding: 10px 15px;
-  text-align: right;
+  padding: 12px 15px;
+  text-align: center;
   border: 1px solid #f4e733;
 }
 
@@ -360,19 +361,19 @@
   </form>
   </div>
 
-  <div id="coachPortal" class="container hidden">
-<div class="nav-tabs">
-  <button class="active" onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
-  <button onclick="showTab('rankings', event)">التصنيفات</button>
-  <button onclick="showTab('progress', event)">تطور الأداء</button>
-  <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
-  <button onclick="logout()">خروج</button>
-</div>
+<div id="coachPortal" class="container hidden">
+  <div class="nav-tabs">
+    <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
+    <button onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+    <button onclick="showTab('rankings', event)">التصنيفات</button>
+    <button onclick="showTab('progress', event)">تطور الأداء</button>
+    <button onclick="logout()">خروج</button>
+  </div>
 
-<div id="playersListTab" class="hidden">
-  <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
-  <div id="playersTableContainer"></div>
-</div>
+  <div id="playersListTab">
+    <h2 style="color:#f4e733; text-align:center">قائمة اللاعبين</h2>
+    <div id="playersTableContainer"></div>
+  </div>
 
     <div id="evaluationTab">
       <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
@@ -879,28 +880,34 @@ function updateRankings() {
 
 function showTab(tabName, event) {
   const allTabs = ["evaluationTab", "rankingsTab", "progressTab", "playersListTab"];
-  allTabs.forEach(tab => {
-    document.getElementById(tab).classList.add('hidden');
-  });
-
+  allTabs.forEach(tab => document.getElementById(tab).classList.add('hidden'));
+  
   document.querySelectorAll('.nav-tabs button').forEach(btn => {
     btn.classList.remove('active');
   });
 
-  event.target.classList.add('active');
   document.getElementById(`${tabName}Tab`).classList.remove('hidden');
   
+  if (event) {
+    event.target.classList.add('active');
+  }
+
   if (tabName === 'playersList') {
     loadPlayersTable();
   }
 }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
-      document.getElementById('sessionDate').value = formattedDate;
-      document.getElementById('filterDate').value = formattedDate;
-    });
+document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  document.getElementById('sessionDate').value = formattedDate;
+  document.getElementById('filterDate').value = formattedDate;
+  
+  if (document.getElementById('coachPortal').classList.contains('hidden') === false) {
+    showTab('playersList');
+    document.querySelector('.nav-tabs button:first-child').classList.add('active');
+  }
+});
 
 function logout() {
   currentCoach = null;
