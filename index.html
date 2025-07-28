@@ -1347,10 +1347,16 @@ function exportRankings() {
 
   rankings.sort((a, b) => b.average - a.average);
 
-  const wsData = [
-    ['الترتيب', 'اسم اللاعب', 'المعدل', 'عدد التقييمات'],
-    ...rankings.map((p, i) => [i + 1, p.name, `${p.average}%`, p.evaluations])
-  ];
+const wsData = [
+  ['الترتيب', 'اسم اللاعب', 'المعدل', 'عدد التقييمات', 'النشاط'],
+  ...rankings.map((p, i) => [
+    i + 1,
+    p.name,
+    `${p.average}%`,
+    p.evaluations,
+    selectedActivity === 'all' ? 'متعدد' : selectedActivity
+  ])
+];
 
   const ws = XLSX.utils.aoa_to_sheet(wsData);
   const wb = XLSX.utils.book_new();
