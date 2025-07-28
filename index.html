@@ -496,19 +496,12 @@
   textarea {
     font-size: 14px !important;
   }
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    position: relative;
-    margin-right: 10px; 
-    white-space: nowrap;
-    font-size: 14px;
-  }
 
   #playersCount i {
     display: inline-block;
     color: #f4e733;
     margin-left: 0; 
+    padding: 15px 10px;
     font-size: 16px; 
   }
   .players-table {
@@ -585,20 +578,20 @@
   canvas {
     max-width: 100%;
   }
-    .footer-container {
+  .footer-container {
     padding: 15px 10px;
   }
 
   .footer-content {
-    padding: 0 10px;
+    padding: 0 12px;
     flex-direction: column;
     gap: 10px;
   }
 
   .footer-container p {
-    font-size: 14px;
-    margin: 7px 0;
-    line-height: 1.4;
+    font-size: 12px;
+    margin: 5.5px 0;
+    line-height: 1.8;
   }
 
   .social-icons {
@@ -613,7 +606,6 @@
     margin: 0;
     font-size: 18px;
   }    
-}
 
 @media (max-width: 480px) {
   button, .btn {
@@ -654,13 +646,14 @@
   }
       #playersCount {
       font-size: 13px;
-      margin-right: 5px;
-    }
+      padding: 10px 6px !important;
+      }
     
     #playersCount i {
       font-size: 14px;
+      padding: 10px 6px !important;
     }
-    .footer-container {
+  .footer-container {
     padding: 12px 8px;
   }
 
@@ -676,7 +669,7 @@
     font-size: 16px;
   }
 }
-
+}
   </style>
 </head>
 <body>
@@ -799,26 +792,6 @@
   <script>
       
 function loadFontAwesome() {
-  const sources = [
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
-    'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css',
-    'https://use.fontawesome.com/releases/v6.5.0/css/all.css'
-  ];
-
-  function trySource(index) {
-    if (index >= sources.length) return;
-    
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = sources[index];
-    link.onerror = () => trySource(index + 1);
-    document.head.appendChild(link);
-  }
-
-  trySource(0);
-}
-loadFontAwesome();
-
     
 const CONFIG = {
   EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
@@ -1601,28 +1574,6 @@ function preventScrollOnTouch() {
     }, { passive: true });
   });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  function checkIcons() {
-    const icon = document.querySelector('#playersCount i');
-    if (!icon || getComputedStyle(icon, ':before').content === 'none') {
-      reloadFontAwesome();
-    }
-  }
-
-  function reloadFontAwesome() {
-    const faCSS = document.querySelector('link[href*="font-awesome"]');
-    if (faCSS) {
-      const newCSS = faCSS.cloneNode();
-      newCSS.href = faCSS.href.split('?')[0] + '?t=' + new Date().getTime();
-      faCSS.parentNode.replaceChild(newCSS, faCSS);
-    }
-  }
-
-  setTimeout(checkIcons, 1000);
-  
-  setInterval(checkIcons, 5000);
-});    
     </script>
   
 <div class="footer-container">
