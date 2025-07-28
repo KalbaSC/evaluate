@@ -741,10 +741,22 @@
     </div>
 
     <div id="rankingsTab" class="hidden">
-      <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
-      <div id="topThreeContainer" class="top-three-grid"></div>
-      <div id="rankingsContainer" class="ranking-grid"></div>
-      <button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
+<h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
+
+<div style="text-align:center; margin-bottom: 15px;">
+  <label for="activityFilter" style="color:#fff; margin-left: 10px;">اختر النشاط:</label>
+  <select id="activityFilter" onchange="updateRankings()">
+    <option value="all">الكل</option>
+    <option value="كرة يد">كرة يد</option>
+    <option value="كرة طائرة">كرة طائرة</option>
+    <option value="كرة سلة">كرة سلة</option>
+    <option value="شطرنج">شطرنج</option>
+  </select>
+</div>
+
+<div id="topThreeContainer" class="top-three-grid"></div>
+<div id="rankingsContainer" class="ranking-grid"></div>
+<button class="btn" onclick="exportRankings()">تصدير التصنيفات</button>
     </div>
 
     <div id="progressTab" class="hidden">
@@ -907,6 +919,7 @@ async function handleLogin(e) {
         }
 
         await loadPlayersData();
+        document.getElementById('activityFilter').value = currentCoach.activity;
 
         const firstTabButton = document.querySelector('.nav-tabs button:first-child');
         if (firstTabButton) {
@@ -1136,10 +1149,12 @@ async function updateRankings() {
       throw new Error("الرد غير صالح كـ JSON:\n" + fallback);
     }
 
-const filtered = data.filter(e =>
-  e.Activity?.trim() === currentCoach.activity?.trim() &&
-  e.Coach?.trim() === currentCoach.username?.trim()
-);
+const selectedActivity = document.getElementById('activityFilter')?.value || 'all';
+
+const filtered = data.filter(e => {
+  const matchesActivity = selectedActivity === 'all' || e.Activity?.trim() === selectedActivity;
+  return matchesActivity;
+});
 
     const playerStats = {};
     filtered.forEach(e => {
@@ -1297,18 +1312,18 @@ function getActivityIcon(activity) {
       });
     }
 
-    function exportRankings() {
+function exportRankings() {
   if (!Array.isArray(evaluations) || evaluations.length === 0) {
     showToast("لا توجد بيانات تصنيف لتصديرها", false);
     return;
   }
 
+  const selectedActivity = document.getElementById('activityFilter')?.value || 'all';
   const playerStats = {};
 
   evaluations
     .filter(e => 
-      e.Activity?.trim() === currentCoach.activity?.trim() &&
-      e.Coach?.trim() === currentCoach.username?.trim()
+      (selectedActivity === 'all' || e.Activity?.trim() === selectedActivity)
     )
     .forEach(e => {
       const playerId = e["Player ID"];
@@ -1340,7 +1355,12 @@ function getActivityIcon(activity) {
   const ws = XLSX.utils.aoa_to_sheet(wsData);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "التصنيفات");
-  XLSX.writeFile(wb, `تصنيفات_${currentCoach.activity}.xlsx`);
+
+  const filename = selectedActivity === 'all' 
+    ? 'تصنيفات_جميع_الأنشطة.xlsx' 
+    : `تصنيفات_${selectedActivity}.xlsx`;
+
+  XLSX.writeFile(wb, filename);
 }
 
 function showTab(tabName, event) {
