@@ -1481,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Debounce scroll and resize events
+    
 function debounce(func, wait = 100) {
   let timeout;
   return function(...args) {
@@ -1544,6 +1544,14 @@ function preventScrollOnTouch() {
     }, { passive: true });
   });
 }
+    
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.location.hash === "#rankings" || window.location.hash === "#rankingsTab") {
+    const btn = document.querySelector('button[onclick*="showTab"][onclick*="rankings"]');
+    if (btn) btn.click();
+  }
+});
+
     </script>
 
 <div class="footer-container">
