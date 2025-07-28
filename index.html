@@ -419,22 +419,43 @@
    html {
   -webkit-text-size-adjust: 100%; 
        }
+      
+  .header-container {
+    padding: 0;
+  }
+
   .header-right {
-        padding: 8px 10px;
-        flex-direction: row;
-        gap: 10px;
-      }
-      .header-right img.logo {
-        height: 45px;
-      }
-      .arabic-name {
-        font-size: 14px;
-      }
-      .english-name {
-        font-size: 10px;
-      }
+    padding: 10px 15px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .header-content {
+    padding: 0;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .header-right img.logo {
+    height: 50px;
+    width: auto;
+  }
+
   .divider {
     height: 40px;
+  }
+
+  .arabic-name {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .english-name {
+    font-size: 12px;
   }
   .container {
     padding: 10px;
@@ -454,8 +475,8 @@
   }
   
   input, select, textarea {
-    font-size: 16px !important; 
-    min-height: 44px !important;
+    font-size: 14px !important; 
+    min-height: 37px !important;
   }
   
   textarea {
@@ -494,15 +515,6 @@
   .criteria-item select {
     width: 100% !important;
     margin-top: 8px;
-  }
-  
-  .footer-container {
-    padding: 15px 10px;
-  }
-  
-  .social-icons a {
-    margin: 0 12px;
-    font-size: 20px;
   }
   
 #loadingPopup {
@@ -545,6 +557,34 @@
   canvas {
     max-width: 100%;
   }
+    .footer-container {
+    padding: 15px 10px;
+  }
+
+  .footer-content {
+    padding: 0 10px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-container p {
+    font-size: 14px;
+    margin: 5px 0;
+    line-height: 1.4;
+  }
+
+  .social-icons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .social-icons a {
+    margin: 0;
+    font-size: 18px;
+  }    
 }
 
 @media (max-width: 480px) {
@@ -553,21 +593,24 @@
   }
   
   .header-right {
-    gap: 8px;
+    padding: 8px 10px;
   }
-  
+
   .header-right img.logo {
     height: 40px;
   }
-  
+
   .arabic-name {
-    font-size: 12px;
+    font-size: 14px;
   }
-  
+
   .english-name {
-    font-size: 9px;
+    font-size: 11px;
   }
-  
+
+  .divider {
+    display: none; 
+  }
   .players-table {
     font-size: 12px;
   }
@@ -579,78 +622,25 @@
   
   .form-group input, 
   .form-group select {
-    padding: 12px 8px !important;
+    padding: 10px 6px !important;
   }
-}
-@media (max-width: 992px) {
-  .header-right {
-    padding: 12px 15px;
+    .footer-container {
+    padding: 12px 8px;
   }
-  
-  .header-right img.logo {
-    height: 60px;
-  }
-  
-  .divider {
-    height: 55px;
-  }
-  
-  .arabic-name {
-    font-size: 18px;
-  }
-  
-  .english-name {
-    font-size: 13px;
-  }
-}
 
-@media (max-width: 768px) {
-  .header-right {
-    padding: 10px 12px;
-    gap: 12px;
-  }
-  
-  .header-right img.logo {
-    height: 50px;
-  }
-  
-  .divider {
-    height: 45px;
-  }
-  
-  .arabic-name {
-    font-size: 16px;
-  }
-  
-  .english-name {
+  .footer-container p {
     font-size: 12px;
   }
+
+  .social-icons {
+    gap: 10px;
+  }
+
+  .social-icons a {
+    font-size: 16px;
+  }
 }
 
-@media (max-width: 576px) {
-  .header-right {
-    padding: 8px 10px;
-    gap: 8px;
-  }
-  
-  .header-right img.logo {
-    height: 40px;
-  }
-  
-  .divider {
-    height: 35px;
-  }
-  
-  .arabic-name {
-    font-size: 14px;
-    white-space: normal;
-  }
-  
-  .english-name {
-    font-size: 11px;
-    white-space: normal;
-  }
-}
   </style>
 </head>
 <body>
