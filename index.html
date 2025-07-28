@@ -1199,7 +1199,7 @@ orderedTop3.forEach((player, index) => {
     <div class="player-badge">${badges[index]}</div>
     <img src="user-icon.png" class="player-avatar" />
     <h3>${player.name}</h3>
-<p class="activity-label">${getActivityIcon(currentCoach.activity)} ${currentCoach.activity}</p>
+<p class="activity-label">${getActivityIcon(player.activity)} ${player.activity}</p>
 <p>ID: ${player.id}</p>
 <p>المعدل: ${player.average}%</p>
   `;
@@ -1214,7 +1214,7 @@ others.forEach((player, index) => {
     <div class="player-badge">${index + 4}</div>
     <img src="user-icon.png" class="player-avatar" />
     <h3>${player.name}</h3>
-<p class="activity-label">${getActivityIcon(currentCoach.activity)} ${currentCoach.activity}</p>
+<p class="activity-label">${getActivityIcon(player.activity)} ${player.activity}</p>
 <p>ID: ${player.id}</p>
 <p>المعدل: ${player.average}%</p>
   `;
