@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نادي كلباء - تقييم اللاعبين</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="نادي كلباء">
+  <title>نادي كلباء الرياضي الثقافي - تقييم اللاعبين</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -398,13 +402,7 @@
       .english-name {
         font-size: 12px;
       }
-  
-  .login-container {
-    margin: 20px auto;
-    padding: 20px;
-    width: 90%;
-  }
-  
+
   .container {
     padding: 10px;
     margin: 15px auto;
@@ -416,34 +414,43 @@
     border-bottom: none;
   }
   
-  .nav-tabs button {
+    button, .btn, .nav-tabs button, .criteria-item select {
+    min-height: 48px;
+    padding: 12px 16px !important;
+    touch-action: manipulation;
+  }
+  
+  input, select, textarea {
+    font-size: 16px !important; 
+    min-height: 44px !important;
+  }
+  
+  textarea {
+    font-size: 14px !important;
+  }
+  
+  .players-table {
+    font-size: 14px;
+  }
+  
+  .players-table th, 
+  .players-table td {
+    padding: 8px 4px;
+    white-space: nowrap;
+  }
+  
+  .ranking-card {
     width: 100%;
-    padding: 12px;
-    border-bottom: 1px solid #f4e733;
-    text-align: center;
+    margin: 0 0 15px 0;
   }
   
-  .nav-tabs button.active {
-    border-radius: 5px;
-  }
-  
-  .date-filter-container {
+  .top-three-grid {
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
   }
   
-  .form-group {
-    width: 100%;
-  }
-  
-  .player-card {
-    padding: 12px;
-    margin-bottom: 15px;
-  }
-  
-  .evaluation-criteria {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .evaluation-form {
+    padding: 15px;
   }
   
   .criteria-item {
@@ -452,34 +459,49 @@
   }
   
   .criteria-item select {
-    width: 100%;
-    margin-top: 5px;
+    width: 100% !important;
+    margin-top: 8px;
   }
   
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .footer-container {
+    padding: 15px 10px;
   }
   
-  .players-table th, 
-  .players-table td {
-    padding: 8px 5px;
-    font-size: 14px;
+  .social-icons a {
+    margin: 0 12px;
+    font-size: 20px;
   }
   
-  .top-three-grid {
+#loadingPopup {
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid #f4e733;
+  max-width: 300px;
+  width: 80%;
+  text-align: center;
+  padding: 25px !important;
+  border-radius: 15px !important;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+}
+
+#loadingPopup .spinner {
+  width: 50px !important;
+  height: 50px !important;
+  margin: 0 auto 15px !important;
+  border-width: 4px !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-top-color: #f4e733 !important;
+}
+  
+  .login-container {
+    padding: 20px 15px;
+    margin: 20px auto;
+  }
+  
+  .date-filter-container {
     flex-direction: column;
-    align-items: center;
-  }
-  
-  .ranking-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .ranking-card {
-    width: 90%;
-    margin: 0 auto 15px;
+    gap: 10px;
   }
   
   #progressChartContainer {
@@ -487,29 +509,18 @@
     overflow-x: auto;
   }
   
-  .footer-container {
-    padding: 15px;
-  }
-  
-  .social-icons {
-    margin-top: 10px;
-  }
-  
-  .social-icons a {
-    margin: 0 8px;
-    font-size: 18px;
-  }
-  
-  /* Loading popup */
-  #loadingPopup {
-    width: 80%;
-    padding: 15px;
+  canvas {
+    max-width: 100%;
   }
 }
 
 @media (max-width: 480px) {
+  button, .btn {
+    padding: 14px 16px !important;
+  }
+  
   .header-right {
-    padding: 8px;
+    gap: 8px;
   }
   
   .header-right img.logo {
@@ -517,28 +528,25 @@
   }
   
   .arabic-name {
-    font-size: 16px;
+    font-size: 12px;
   }
   
   .english-name {
-    font-size: 11px;
-  }
-  
-  .login-container {
-    padding: 15px;
-  }
-  
-  .btn {
-    padding: 12px;
-    font-size: 16px;
+    font-size: 9px;
   }
   
   .players-table {
-    font-size: 13px;
+    font-size: 12px;
   }
   
-  .ranking-card {
-    width: 100%;
+  .login-container {
+    margin: 10px auto;
+    padding: 15px;
+  }
+  
+  .form-group input, 
+  .form-group select {
+    padding: 12px 8px !important;
   }
 }
   </style>
@@ -1319,35 +1327,137 @@ function showToast(message, success = true) {
     setTimeout(() => toast.remove(), 4000);
   }
 
-    function setupMobileSpecificFeatures() {
-      document.querySelectorAll('button, .btn').forEach(btn => {
-        btn.addEventListener('touchstart', function() {
-          this.style.transform = 'scale(0.98)';
-          this.style.opacity = '0.9';
-        });
-        
-        btn.addEventListener('touchend', function() {
-          this.style.transform = '';
-          this.style.opacity = '';
-        });
+function setupMobileSpecificFeatures() {
+  document.querySelectorAll('button, .btn, .nav-tabs button').forEach(btn => {
+    btn.style.transition = 'all 0.2s ease';
+    
+    btn.addEventListener('touchstart', function() {
+      this.style.transform = 'scale(0.96)';
+      this.style.opacity = '0.9';
+      this.style.backgroundColor = this.classList.contains('btn') ? '#e6d429' : 'rgba(244, 231, 51, 0.8)';
+    });
+    
+    btn.addEventListener('touchend', function() {
+      this.style.transform = '';
+      this.style.opacity = '';
+      this.style.backgroundColor = this.classList.contains('btn') ? '#f4e733' : '';
+    });
+  });
+  
+  document.querySelectorAll('input, select, textarea').forEach(input => {
+    let lastZoom = window.visualViewport.scale;
+    
+    input.addEventListener('focus', function() {
+      lastZoom = window.visualViewport.scale;
+      document.querySelector('meta[name="viewport"]').content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    });
+    
+    input.addEventListener('blur', function() {
+      document.querySelector('meta[name="viewport"]').content = 'width=device-width, initial-scale=1.0';
+      if (window.visualViewport.scale !== lastZoom) {
+        window.visualViewport.scale = lastZoom;
+      }
+    });
+  });
+  
+  document.querySelectorAll('.table-responsive').forEach(table => {
+    table.style.webkitOverflowScrolling = 'touch';
+    table.style.overflowX = 'auto';
+  });
+  
+  document.addEventListener('dblclick', function(e) {
+    e.preventDefault();
+  }, { passive: false });
+  
+  document.querySelectorAll('select').forEach(select => {
+    select.style.webkitAppearance = 'none';
+    select.style.paddingRight = '30px';
+    select.style.backgroundImage = 'url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23f4e733\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")';
+    select.style.backgroundRepeat = 'no-repeat';
+    select.style.backgroundPosition = 'right 10px center';
+    select.style.backgroundSize = '16px';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setupMobileSpecificFeatures();
+  
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  if (isMobile) {
+    document.body.classList.add('is-mobile');
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('sessionDate').value = today;
+    document.getElementById('filterDate').value = today;
+    
+    document.querySelectorAll('*').forEach(el => {
+      el.style.pointerEvents = 'auto';
+    });
+  }
+});
+// Debounce scroll and resize events
+function debounce(func, wait = 100) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(this, args);
+    }, wait);
+  };
+}
+
+window.addEventListener('resize', debounce(() => {
+  if (progressChart) {
+    progressChart.resize();
+  }
+}));
+
+document.addEventListener('DOMContentLoaded', function() {
+  const lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
+  
+  if ('IntersectionObserver' in window) {
+    let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target;
+          lazyImage.src = lazyImage.dataset.src;
+          lazyImage.classList.remove('lazy');
+          lazyImageObserver.unobserve(lazyImage);
+        }
       });
-      
-      document.querySelectorAll('input, select, textarea').forEach(input => {
-        input.addEventListener('focus', function() {
-          const viewportMeta = document.querySelector('meta[name="viewport"]');
-          if (viewportMeta) {
-            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-          }
-        });
-        
-        input.addEventListener('blur', function() {
-          const viewportMeta = document.querySelector('meta[name="viewport"]');
-          if (viewportMeta) {
-            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
-          }
-        });
-      });
-    }
+    });
+
+    lazyImages.forEach(function(lazyImage) {
+      lazyImageObserver.observe(lazyImage);
+    });
+  }
+});
+// Better touch handling for tables
+function setupTableTouchEvents() {
+  document.querySelectorAll('.players-table tr').forEach(row => {
+    row.addEventListener('touchstart', function() {
+      this.style.backgroundColor = 'rgba(244, 231, 51, 0.1)';
+    });
+    
+    row.addEventListener('touchend', function() {
+      this.style.backgroundColor = '';
+    });
+  });
+}
+
+function preventScrollOnTouch() {
+  document.querySelectorAll('input, select, textarea, button').forEach(el => {
+    el.addEventListener('touchstart', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+        document.body.style.overflow = 'hidden';
+      }
+    });
+    
+    el.addEventListener('touchend', function() {
+      document.body.style.overflow = '';
+    }, { passive: true });
+  });
+}
     </script>
   
 <div class="footer-container">
