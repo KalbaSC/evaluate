@@ -13,7 +13,9 @@
   <title>نادي كلباء الرياضي الثقافي - لوحة التقييم</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></noscript>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">  <style>
     @font-face {
       font-family: 'NotoKufiArabic';
@@ -406,10 +408,22 @@
 .welcome-banner span {
   color: #fff;
 }
-#playersCount i {
+    
+#playersCount i.fas {
   display: inline-block;
-  margin-left: 5px;
-  color: #f4e733;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+#playersCount i.fas:before {
+  content: "👥"; 
+  display: inline-block;
+}
+
+.fa-users:before {
+  content: "\f0c0"; 
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
@@ -783,6 +797,29 @@
     </div>
   </div>
   <script>
+      
+function loadFontAwesome() {
+  const sources = [
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
+    'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css',
+    'https://use.fontawesome.com/releases/v6.5.0/css/all.css'
+  ];
+
+  function trySource(index) {
+    if (index >= sources.length) return;
+    
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = sources[index];
+    link.onerror = () => trySource(index + 1);
+    document.head.appendChild(link);
+  }
+
+  trySource(0);
+}
+loadFontAwesome();
+
+    
 const CONFIG = {
   EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
   ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzJwZ7Ulx_pfSOsnpQ-fEicYnXPWsGB7b0k_pTrpglnkFXBPQpU-WEXV7VXYyIQkHh2nw/exec',
@@ -912,20 +949,17 @@ async function handleLogin(e) {
         evaluations = JSON.parse(localStorage.getItem(key)) || [];
         playersData = [];
 
-        // Update welcome message
         const welcomeMessage = document.getElementById('welcomeMessage');
         if (welcomeMessage) {
           welcomeMessage.innerHTML = 
             `👋 <strong>مرحبا كابتن ${username}</strong><br>🏆 قائمة لاعبين <strong>${currentCoach.activity}</strong>`;
         }
 
-        // Update players list header
         const playersListHeader = document.getElementById('playersListHeader');
         if (playersListHeader) {
           playersListHeader.innerText = `قائمة لاعبين ${currentCoach.activity}`;
         }
 
-        // Hide login and show coach portal
         const loginView = document.getElementById('loginView');
         const coachPortal = document.getElementById('coachPortal');
         if (loginView && coachPortal) {
@@ -935,7 +969,6 @@ async function handleLogin(e) {
 
         await loadPlayersData();
 
-        // Activate first tab
         const firstTabButton = document.querySelector('.nav-tabs button:first-child');
         if (firstTabButton) {
           document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
@@ -1505,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Debounce scroll and resize events
+    
 function debounce(func, wait = 100) {
   let timeout;
   return function(...args) {
@@ -1542,7 +1575,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Better touch handling for tables
+    
 function setupTableTouchEvents() {
   document.querySelectorAll('.players-table tr').forEach(row => {
     row.addEventListener('touchstart', function() {
@@ -1568,6 +1601,28 @@ function preventScrollOnTouch() {
     }, { passive: true });
   });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  function checkIcons() {
+    const icon = document.querySelector('#playersCount i');
+    if (!icon || getComputedStyle(icon, ':before').content === 'none') {
+      reloadFontAwesome();
+    }
+  }
+
+  function reloadFontAwesome() {
+    const faCSS = document.querySelector('link[href*="font-awesome"]');
+    if (faCSS) {
+      const newCSS = faCSS.cloneNode();
+      newCSS.href = faCSS.href.split('?')[0] + '?t=' + new Date().getTime();
+      faCSS.parentNode.replaceChild(newCSS, faCSS);
+    }
+  }
+
+  setTimeout(checkIcons, 1000);
+  
+  setInterval(checkIcons, 5000);
+});    
     </script>
   
 <div class="footer-container">
@@ -1583,5 +1638,6 @@ function preventScrollOnTouch() {
 </div>
 </footer>
 </div>  
+  
   </body>
 </html>
