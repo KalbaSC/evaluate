@@ -13,9 +13,7 @@
   <title>نادي كلباء الرياضي الثقافي - لوحة التقييم</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></noscript>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">  <style>
     @font-face {
       font-family: 'NotoKufiArabic';
@@ -148,17 +146,17 @@
     margin-top: 10px;
     direction: rtl;
   }
-  
+
   .remember-me input[type="checkbox"] {
     margin: 0;
     width: auto;
   }
-  
+
   .remember-me label {
     margin: 0;
     color: white !important;
   }
-    
+
     .nav-tabs {
       display: flex;
       justify-content: center;
@@ -171,7 +169,7 @@
       color: white;
       padding: 10px 20px;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 16px;
     }
     .nav-tabs button.active {
       background: #f4e733;
@@ -408,22 +406,10 @@
 .welcome-banner span {
   color: #fff;
 }
-    
-#playersCount i.fas {
+#playersCount i {
   display: inline-block;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-}
-
-#playersCount i.fas:before {
-  content: "👥"; 
-  display: inline-block;
-}
-
-.fa-users:before {
-  content: "\f0c0"; 
+  margin-left: 5px;
+  color: #f4e733;
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
@@ -433,7 +419,7 @@
    html {
   -webkit-text-size-adjust: 100%; 
        }
-      
+
   .header-container {
     padding: 0;
   }
@@ -476,68 +462,61 @@
     margin: 15px auto;
     width: 95%;
   }
-  
+
   .nav-tabs {
     flex-direction: column;
     border-bottom: none;
   }
-  
+
     button, .btn, .nav-tabs button, .criteria-item select {
     min-height: 44px;
     padding: 12px 16px !important;
     touch-action: manipulation;
   }
-  
+
   input, select, textarea {
     font-size: 14px !important; 
     min-height: 37px !important;
   }
-  
+
   textarea {
     font-size: 14px !important;
   }
 
-  #playersCount i {
-    display: inline-block;
-    color: #f4e733;
-    margin-left: 0; 
-    padding: 15px 10px;
-    font-size: 16px; 
-  }
   .players-table {
     font-size: 14px;
   }
-  
+
   .players-table th, 
   .players-table td {
     padding: 8px 4px;
     white-space: nowrap;
   }
-  
+
   .ranking-card {
     width: 100%;
     margin: 0 0 15px 0;
   }
-  
+
   .top-three-grid {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .evaluation-form {
     padding: 15px;
   }
-  
+
   .criteria-item {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .criteria-item select {
     width: 100% !important;
     margin-top: 8px;
   }
-  
+
 #loadingPopup {
   background: rgba(0, 0, 0, 0.9) !important;
   backdrop-filter: blur(5px);
@@ -559,39 +538,39 @@
   border-color: rgba(255, 255, 255, 0.2) !important;
   border-top-color: #f4e733 !important;
 }
-  
+
   .login-container {
     padding: 20px 15px;
     margin: 20px auto;
   }
-  
+
   .date-filter-container {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   #progressChartContainer {
     width: 100%;
     overflow-x: auto;
   }
-  
+
   canvas {
     max-width: 100%;
   }
-  .footer-container {
+    .footer-container {
     padding: 15px 10px;
   }
 
   .footer-content {
-    padding: 0 12px;
+    padding: 0 10px;
     flex-direction: column;
     gap: 10px;
   }
 
   .footer-container p {
-    font-size: 12px;
-    margin: 5.5px 0;
-    line-height: 1.8;
+    font-size: 14px;
+    margin: 5px 0;
+    line-height: 1.4;
   }
 
   .social-icons {
@@ -606,12 +585,13 @@
     margin: 0;
     font-size: 18px;
   }    
+}
 
 @media (max-width: 480px) {
   button, .btn {
     padding: 14px 16px !important;
   }
-  
+
   .header-right {
     padding: 8px 10px;
   }
@@ -634,26 +614,17 @@
   .players-table {
     font-size: 12px;
   }
-  
+
   .login-container {
     margin: 10px auto;
     padding: 15px;
   }
-  
+
   .form-group input, 
   .form-group select {
     padding: 10px 6px !important;
   }
-      #playersCount {
-      font-size: 13px;
-      padding: 10px 6px !important;
-      }
-    
-    #playersCount i {
-      font-size: 14px;
-      padding: 10px 6px !important;
-    }
-  .footer-container {
+    .footer-container {
     padding: 12px 8px;
   }
 
@@ -669,7 +640,7 @@
     font-size: 16px;
   }
 }
-}
+
   </style>
 </head>
 <body>
@@ -731,7 +702,7 @@
   "></div>
   جاري تحميل البيانات...
 </div>
-  
+
   <div id="coachPortal" class="container hidden">
     <div id="welcomeMessage" class="welcome-banner"></div>
     <div class="nav-tabs">
@@ -741,7 +712,7 @@
       <button onclick="showTab('progress', event)">تطور الأداء</button>
       <button onclick="logout()">خروج</button>
     </div>
-    
+
     <div style="position: relative; width: 100%; padding-bottom: 20px;">
       <div style="position: absolute; right: 0;">
         <div id="playersCount">
@@ -790,9 +761,6 @@
     </div>
   </div>
   <script>
-      
-function loadFontAwesome() {
-    
 const CONFIG = {
   EVALUATION_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz3uCLPvjazvaFRAiZVppFkKMMS2AlOWC4P3Fpy4XluiJ7xGV3BUVuwgmxfww7bMEcR/exec',
   ATTENDANCE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzJwZ7Ulx_pfSOsnpQ-fEicYnXPWsGB7b0k_pTrpglnkFXBPQpU-WEXV7VXYyIQkHh2nw/exec',
@@ -878,9 +846,9 @@ async function loadPlayersData() {
 
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch players");
-    
+
     const data = await response.json();
-    
+
     playersData = [];
     playersData = data
       .filter(p => p.Activity === currentCoach.activity)
@@ -922,17 +890,20 @@ async function handleLogin(e) {
         evaluations = JSON.parse(localStorage.getItem(key)) || [];
         playersData = [];
 
+        // Update welcome message
         const welcomeMessage = document.getElementById('welcomeMessage');
         if (welcomeMessage) {
           welcomeMessage.innerHTML = 
             `👋 <strong>مرحبا كابتن ${username}</strong><br>🏆 قائمة لاعبين <strong>${currentCoach.activity}</strong>`;
         }
 
+        // Update players list header
         const playersListHeader = document.getElementById('playersListHeader');
         if (playersListHeader) {
           playersListHeader.innerText = `قائمة لاعبين ${currentCoach.activity}`;
         }
 
+        // Hide login and show coach portal
         const loginView = document.getElementById('loginView');
         const coachPortal = document.getElementById('coachPortal');
         if (loginView && coachPortal) {
@@ -942,18 +913,19 @@ async function handleLogin(e) {
 
         await loadPlayersData();
 
+        // Activate first tab
         const firstTabButton = document.querySelector('.nav-tabs button:first-child');
         if (firstTabButton) {
           document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
           firstTabButton.classList.add('active');
         }
         showTab('playersList');
-        
+
       } else {
         alert('اسم المستخدم أو كلمة المرور غير صحيحة');
       }
     }
-    
+
 function showLoading() {
   document.getElementById('loadingPopup').style.display = 'block';
 }
@@ -961,7 +933,7 @@ function showLoading() {
 function hideLoading() {
   document.getElementById('loadingPopup').style.display = 'none';
 }
-    
+
 function loadPlayersTable(players = playersData) {
   const container = document.getElementById('playersTableContainer');
   const countContainer = document.getElementById('playersCount');
@@ -995,7 +967,7 @@ function loadPlayersTable(players = playersData) {
 
    countContainer.textContent = `عدد اللاعبين: ${players.length}`;
 }
-   
+
 function filterByDate() {
   const selectedDate = document.getElementById('filterDate').value;
   const filteredPlayers = playersData.filter(player => player.date === selectedDate);
@@ -1012,7 +984,7 @@ if (filteredPlayers.length === 0) {
     function handleDateChange() {
       const selectedDate = document.getElementById('sessionDate').value;
       const filteredPlayers = playersData.filter(player => player.date === selectedDate);
-      
+
       if (filteredPlayers.length === 0) {
         alert('لا يوجد لاعبون مسجلون في هذا التاريخ');
         renderPlayersList(playersData);
@@ -1118,7 +1090,7 @@ async function saveEvaluation(playerId) {
     hideLoading();  
   }
 }
-    
+
 async function sendEvaluation(evaluationData) {
   const url = CONFIG.USE_CORS_PROXY 
     ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
@@ -1151,7 +1123,7 @@ async function sendEvaluation(evaluationData) {
     throw new Error("Response was not success: " + result);
   }
 }
-    
+
 async function updateRankings() {
   showLoading();
   try {
@@ -1244,7 +1216,7 @@ others.forEach((player, index) => {
     hideLoading();
   }
 }
-    
+
 function getActivityIcon(activity) {
   const icons = {
     "كرة سلة": "🏀",
@@ -1263,7 +1235,7 @@ function getActivityIcon(activity) {
         option.textContent = player.name;
         playerSelect.appendChild(option);
       });
-      
+
       if (playersData.length > 0) {
         showPlayerProgress();
       }
@@ -1273,20 +1245,20 @@ function getActivityIcon(activity) {
       const playerId = playerSelect.value;
       const playerName = playersData.find(p => p.id === playerId).name;
       const playerEvals = evaluations.filter(e => e.playerId === playerId && e.activity === currentCoach.activity);
-      
+
       if (playerEvals.length === 0) {
         progressChartContainer.innerHTML = '<p>لا توجد بيانات تطور لهذا اللاعب بعد</p>';
         if (progressChart) progressChart.destroy();
         return;
       }
-      
+
       playerEvals.sort((a, b) => new Date(a.date) - new Date(b.date));
-      
+
       const dates = playerEvals.map(e => e.date);
       const percentages = playerEvals.map(e => e.percentage);
-      
+
       if (progressChart) progressChart.destroy();
-      
+
       const ctx = progressChartCanvas.getContext('2d');
       progressChart = new Chart(ctx, {
         type: 'line',
@@ -1403,7 +1375,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const formattedDate = today.toISOString().split('T')[0];
   document.getElementById('sessionDate').value = formattedDate;
   document.getElementById('filterDate').value = formattedDate;
-  
+
   setupEventListeners();
 });
 
@@ -1450,41 +1422,41 @@ function showToast(message, success = true) {
 function setupMobileSpecificFeatures() {
   document.querySelectorAll('button, .btn, .nav-tabs button').forEach(btn => {
     btn.style.transition = 'all 0.2s ease';
-    
+
     btn.addEventListener('touchstart', function() {
       this.style.transform = 'scale(0.96)';
       this.style.opacity = '0.9';
       this.style.backgroundColor = this.classList.contains('btn') ? '#e6d429' : 'rgba(244, 231, 51, 0.8)';
     });
-    
+
     btn.addEventListener('touchend', function() {
       this.style.transform = '';
       this.style.opacity = '';
       this.style.backgroundColor = this.classList.contains('btn') ? '#f4e733' : '';
     });
   });
-  
+
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('input, select, textarea').forEach(input => {
     input.addEventListener('focus', function() {
       document.querySelector('meta[name="viewport"]').content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
     });
-    
+
     input.addEventListener('blur', function() {
       document.querySelector('meta[name="viewport"]').content = 'width=device-width, initial-scale=1.0';
     });
   });
 });
-  
+
   document.querySelectorAll('.table-responsive').forEach(table => {
     table.style.webkitOverflowScrolling = 'touch';
     table.style.overflowX = 'auto';
   });
-  
+
   document.addEventListener('dblclick', function(e) {
     e.preventDefault();
   }, { passive: false });
-  
+
   document.querySelectorAll('select').forEach(select => {
     select.style.webkitAppearance = 'none';
     select.style.paddingRight = '30px';
@@ -1497,21 +1469,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function() {
   setupMobileSpecificFeatures();
-  
+
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
+
   if (isMobile) {
     document.body.classList.add('is-mobile');
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('sessionDate').value = today;
     document.getElementById('filterDate').value = today;
-    
+
     document.querySelectorAll('*').forEach(el => {
       el.style.pointerEvents = 'auto';
     });
   }
 });
-    
+// Debounce scroll and resize events
 function debounce(func, wait = 100) {
   let timeout;
   return function(...args) {
@@ -1530,7 +1502,7 @@ window.addEventListener('resize', debounce(() => {
 
 document.addEventListener('DOMContentLoaded', function() {
   const lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
-  
+
   if ('IntersectionObserver' in window) {
     let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
       entries.forEach(function(entry) {
@@ -1548,13 +1520,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-    
+// Better touch handling for tables
 function setupTableTouchEvents() {
   document.querySelectorAll('.players-table tr').forEach(row => {
     row.addEventListener('touchstart', function() {
       this.style.backgroundColor = 'rgba(244, 231, 51, 0.1)';
     });
-    
+
     row.addEventListener('touchend', function() {
       this.style.backgroundColor = '';
     });
@@ -1568,14 +1540,14 @@ function preventScrollOnTouch() {
         document.body.style.overflow = 'hidden';
       }
     });
-    
+
     el.addEventListener('touchend', function() {
       document.body.style.overflow = '';
     }, { passive: true });
   });
 }
     </script>
-  
+
 <div class="footer-container">
 <footer>
 <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
@@ -1589,6 +1561,5 @@ function preventScrollOnTouch() {
 </div>
 </footer>
 </div>  
-  
   </body>
 </html>
