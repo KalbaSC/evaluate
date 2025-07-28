@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,7 +10,7 @@
   <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png">
   <link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png">
-  <title>نادي كلباء الرياضي الثقافي - تقييم اللاعبين</title>
+  <title>نادي كلباء الرياضي الثقافي - لوحة التقييم</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -35,10 +34,18 @@
   position: relative;
   z-index: 100;
 }
-
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+}
 .header-right {
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -52,16 +59,20 @@
 
 .header-right img.logo {
   height: 70px;
+  width: auto;
 }
 
 .divider {
   width: 1.5px;
   height: 65px;
   background-color: #f4e733;
+  flex-shrink: 0;
 }
 
 .header-info {
   text-align: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .arabic-name {
@@ -400,6 +411,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
     @media (max-width: 768px) {
+   html {
+  -webkit-text-size-adjust: 100%; 
+       }
   .header-right {
         padding: 8px 10px;
         flex-direction: row;
@@ -429,7 +443,7 @@
   }
   
     button, .btn, .nav-tabs button, .criteria-item select {
-    min-height: 48px;
+    min-height: 44px;
     padding: 12px 16px !important;
     touch-action: manipulation;
   }
@@ -1427,21 +1441,17 @@ function setupMobileSpecificFeatures() {
     });
   });
   
+document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('input, select, textarea').forEach(input => {
-    let lastZoom = window.visualViewport.scale;
-    
     input.addEventListener('focus', function() {
-      lastZoom = window.visualViewport.scale;
       document.querySelector('meta[name="viewport"]').content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
     });
     
     input.addEventListener('blur', function() {
       document.querySelector('meta[name="viewport"]').content = 'width=device-width, initial-scale=1.0';
-      if (window.visualViewport.scale !== lastZoom) {
-        window.visualViewport.scale = lastZoom;
-      }
     });
   });
+});
   
   document.querySelectorAll('.table-responsive').forEach(table => {
     table.style.webkitOverflowScrolling = 'touch';
