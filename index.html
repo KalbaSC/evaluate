@@ -888,20 +888,17 @@ async function handleLogin(e) {
         evaluations = JSON.parse(localStorage.getItem(key)) || [];
         playersData = [];
 
-        // Update welcome message
         const welcomeMessage = document.getElementById('welcomeMessage');
         if (welcomeMessage) {
           welcomeMessage.innerHTML = 
             `👋 <strong>مرحبا كابتن ${username}</strong><br>🏆 قائمة لاعبين <strong>${currentCoach.activity}</strong>`;
         }
 
-        // Update players list header
         const playersListHeader = document.getElementById('playersListHeader');
         if (playersListHeader) {
           playersListHeader.innerText = `قائمة لاعبين ${currentCoach.activity}`;
         }
 
-        // Hide login and show coach portal
         const loginView = document.getElementById('loginView');
         const coachPortal = document.getElementById('coachPortal');
         if (loginView && coachPortal) {
@@ -911,7 +908,6 @@ async function handleLogin(e) {
 
         await loadPlayersData();
 
-        // Activate first tab
         const firstTabButton = document.querySelector('.nav-tabs button:first-child');
         if (firstTabButton) {
           document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
@@ -1545,16 +1541,19 @@ function preventScrollOnTouch() {
   });
 }
     
-  document.addEventListener('DOMContentLoaded', () => {
-    const hash = window.location.hash;
+  const isInIframe = window !== window.parent;
 
-    if (hash === "#rankingsTab" || hash === "#rankings") {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (isInIframe) {
+      const loginView = document.getElementById('loginView');
+      const coachPortal = document.getElementById('coachPortal');
+
+      if (loginView) loginView.classList.add('hidden');
+      if (coachPortal) coachPortal.classList.remove('hidden');
+
       setTimeout(() => {
         if (typeof showTab === "function") {
-          showTab('rankings');  
-        } else {
-          const btn = document.querySelector('button[onclick*="showTab"][onclick*="rankings"]');
-          if (btn) btn.click();
+          showTab('rankings');
         }
       }, 100);
     }
