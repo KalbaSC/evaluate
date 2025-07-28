@@ -28,43 +28,63 @@
       margin: 0;
       padding: 0;
     }
-    .header-container {
-      width: 100%;
-      background: #111;
-      border-bottom: 2px solid #f4e733;
-    }
-    .header-right {
-      width: 100%;
-      max-width: 1170px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px 42px;
-      background-color: #111;
-      color: white;
-      box-sizing: border-box;
-    }
-    .header-right img.logo {
-      height: 70px;
-    }
-    .divider {
-      width: 1.5px;
-      height: 65px;
-      background-color: #f4e733;
-    }
-    .header-info {
-      text-align: center;
-    }
-    .arabic-name {
-      font-weight: bold;
-      font-size: 20px;
-    }
-    .english-name {
-      font-size: 14px;
-      color: #f4e733;
-    }
+.header-container {
+  width: 100%;
+  background: #111;
+  border-bottom: 2px solid #f4e733;
+  position: relative;
+  z-index: 100;
+}
+
+.header-right {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px 20px;
+  background-color: #111;
+  color: white;
+  box-sizing: border-box;
+}
+
+.header-right img.logo {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
+}
+
+.divider {
+  width: 1.5px;
+  height: 65px;
+  background-color: #f4e733;
+  flex-shrink: 0;
+}
+
+.header-info {
+  text-align: center;
+  flex: 1;
+  min-width: 0; /* Prevents text overflow issues */
+}
+
+.arabic-name {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.english-name {
+  font-size: 14px;
+  color: #f4e733;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
     .container {
       display: grid;
       grid-template-columns: 1fr;
@@ -553,6 +573,75 @@
   .form-group input, 
   .form-group select {
     padding: 12px 8px !important;
+  }
+}
+@media (max-width: 992px) {
+  .header-right {
+    padding: 12px 15px;
+  }
+  
+  .header-right img.logo {
+    height: 60px;
+  }
+  
+  .divider {
+    height: 55px;
+  }
+  
+  .arabic-name {
+    font-size: 18px;
+  }
+  
+  .english-name {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-right {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+  
+  .header-right img.logo {
+    height: 50px;
+  }
+  
+  .divider {
+    height: 45px;
+  }
+  
+  .arabic-name {
+    font-size: 16px;
+  }
+  
+  .english-name {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-right {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  
+  .header-right img.logo {
+    height: 40px;
+  }
+  
+  .divider {
+    height: 35px;
+  }
+  
+  .arabic-name {
+    font-size: 14px;
+    white-space: normal;
+  }
+  
+  .english-name {
+    font-size: 11px;
+    white-space: normal;
   }
 }
   </style>
