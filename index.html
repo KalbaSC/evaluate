@@ -1146,6 +1146,7 @@ function renderPlayersList(players = playersData) {
       container.appendChild(playerCard);
     });
   }
+  
   const countContainer = document.getElementById('playersCount');
   if (countContainer) {
     countContainer.textContent = `عدد اللاعبين: ${players.length}`;
@@ -1153,7 +1154,7 @@ function renderPlayersList(players = playersData) {
 }
 
 async function saveEvaluation(playerId) {
-const sessionDate = document.getElementById('sessionDate').value;
+  const sessionDate = document.getElementById('sessionDate').value;
   if (!sessionDate) {
     showToast('الرجاء إدخال تاريخ الجلسة', false);
     return;
@@ -1175,21 +1176,21 @@ const sessionDate = document.getElementById('sessionDate').value;
     totalScore += score;
   });
 
-  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100); 
+  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100; 
 
-const evaluationData = {
-  Timestamp: new Date().toISOString(),
-  Coach: currentCoach.username,
-  Activity: currentCoach.activity,
-  "Player Name": `${player.name} ${player.parent}`,
-  "Player ID": playerId,
-  Scores: scores,
-  Total: totalScore,
-  Percentage: percentage,
-  Notes: document.getElementById(`notes-${playerId}`).value
-  "AttendanceDate": player.date, 
-  "EvaluationDate": new Date().toISOString().split('T')[0] 
-};
+  const evaluationData = {
+    Timestamp: new Date().toISOString(),
+    Coach: currentCoach.username,
+    Activity: currentCoach.activity,
+    "Player Name": `${player.name} ${player.parent || ''}`.trim(),
+    "Player ID": playerId,
+    Scores: scores,
+    Total: totalScore,
+    Percentage: `${percentage}%`,
+    Notes: document.getElementById(`notes-${playerId}`).value,
+    "AttendanceDate": player.date || sessionDate,
+    "EvaluationDate": new Date().toISOString().split('T')[0]
+  };
 
   try {
     showLoading();
@@ -1198,46 +1199,58 @@ const evaluationData = {
     const key = `playerEvaluations_${currentCoach.username}`;
     localStorage.setItem(key, JSON.stringify(evaluations));
     showToast('✅ تم حفظ التقييم بنجاح', true);
+    renderPlayersList(); // Refresh the list after saving
   } catch (err) {
-    showToast('❌ فشل في إرسال التقييم: ' + err.message, false);
+    console.error("Evaluation error:", err);
+    showToast('❌ فشل في إرسال التقييم: ' + (err.message || err), false);
   } finally {
     hideLoading();  
   }
 }
 
 async function sendEvaluation(evaluationData) {
-  const url = CONFIG.USE_CORS_PROXY 
-    ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
-    : CONFIG.EVALUATION_SCRIPT_URL;
+  try {
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      : CONFIG.EVALUATION_SCRIPT_URL;
 
-  const formData = new URLSearchParams();
-
-  for (const key in evaluationData) {
-    if (typeof evaluationData[key] === 'object' && evaluationData[key] !== null) {
-      for (const subKey in evaluationData[key]) {
-        formData.append(subKey, evaluationData[key][subKey]);
+    const formData = new URLSearchParams();
+    
+    // Flatten the evaluation data
+    for (const key in evaluationData) {
+      if (typeof evaluationData[key] === 'object') {
+        for (const subKey in evaluationData[key]) {
+          formData.append(`${key}.${subKey}`, evaluationData[key][subKey]);
+        }
+      } else {
+        formData.append(key, evaluationData[key]);
       }
-    } else {
-      formData.append(key, evaluationData[key]);
     }
-  }
 
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData
-  });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error("Failed to send evaluation: " + errorText);
-  }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to send evaluation");
+    }
 
-  const result = await response.text();
-  if (!result.includes("success")) {
-    throw new Error("Response was not success: " + result);
+    const result = await response.text();
+    if (!result.toLowerCase().includes("success")) {
+      throw new Error(result || "Unexpected response from server");
+    }
+    return result;
+  } catch (error) {
+    console.error("Send evaluation error:", error);
+    throw error;
   }
 }
-
+    
 async function updateRankings() {
   showLoading();
   try {
