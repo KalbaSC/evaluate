@@ -1153,9 +1153,7 @@ async function saveEvaluation(playerId) {
   });
 
   // Calculate percentage (ensuring no division by zero)
-  const percentage = criteria.length > 0 
-    ? Math.round((totalScore / (criteria.length * 5)) * 100
-    : 0;
+  const percentage = criteria.length > 0 ? Math.round((totalScore / (criteria.length * 5)) * 100) : 0;
 
   // Prepare evaluation data matching Google Sheets format
   const evaluationData = {
