@@ -826,9 +826,9 @@ const CONFIG = {
 };
 
 const coaches = {
-  "c.sameh": { password: "sameh123", activity: "كرة يد", name: "سامح" },
+  "handball1": { password: "pass1", activity: "كرة يد", name: "سالم" },
   "c.wahed": { password: "wahed123", activity: "كرة طائرة", name: "وحيد" },
-  "c.ahmed": { password: "ahmed123", activity: "كرة سلة", name: "احمد ندا" },
+  "Wahed": { password: "pass3", activity: "كرة سلة", name: "محمد" },
   "c.Jafer": { password: "jafer123", activity: "شطرنج", name: "جعفر" }
 };
 
@@ -938,105 +938,36 @@ async function loadPlayersData() {
   renderEvaluatedPlayersList();
 }
     
-async function renderEvaluatedPlayersList() {
+function renderEvaluatedPlayersList() {
   const container = document.getElementById('evaluatedPlayersList');
-  container.innerHTML = '<div class="spinner"></div>'; // Show loading indicator
-
-  try {
-    showLoading();
-    
-    // Fetch evaluation data from the Google Apps Script
-    const url = CONFIG.USE_CORS_PROXY 
-      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
-      : CONFIG.EVALUATION_SCRIPT_URL;
-    
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch evaluations");
-    
-    const allEvaluations = await response.json();
-    
-    // Filter evaluations for the current coach's activity and format dates
-    const evaluatedPlayers = allEvaluations
-      .filter(eval => currentCoach && eval.Activity === currentCoach.activity)
-      .map(eval => {
-        // Format the date from "29/07/2025 20:38:22" to "29-07-2025"
-        if (eval.date && typeof eval.date === 'string') {
-          const [datePart] = eval.date.split(' ');
-          const [day, month, year] = datePart.split('/');
-          eval.formattedDate = `${day}-${month}-${year}`;
-        }
-        return eval;
-      });
-
-    if (evaluatedPlayers.length === 0) {
-      container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
-      return;
-    }
-
-    // Sort by evaluation date (newest first)
-    evaluatedPlayers.sort((a, b) => {
-      const dateA = a.date ? new Date(a.date.split(' ')[0].split('/').reverse().join('-')) : 0;
-      const dateB = b.date ? new Date(b.date.split(' ')[0].split('/').reverse().join('-')) : 0;
-      return dateB - dateA;
-    });
-
-    container.innerHTML = ''; // Clear loading indicator
-    
-    evaluatedPlayers.forEach(eval => {
-      const playerCard = document.createElement('div');
-      playerCard.className = 'evaluated-player-card';
-      
-      // Extract player name without parent if it's in "name - parent" format
-      let playerName = eval["Player Name"];
-      if (playerName && playerName.includes(' - ')) {
-        playerName = playerName.split(' - ')[0];
-      }
-
-      playerCard.innerHTML = `
-        <h3>${playerName || 'لاعب غير معروف'} <small>(${eval["Player ID"] || 'بدون معرف'})</small></h3>
-        ${eval.date ? `<p>تاريخ التقييم: ${eval.formattedDate || eval.date.split(' ')[0].replace(/\//g, '-')}</p>` : ''}
-        ${eval["Total Score"] ? `<p>المجموع: ${eval["Total Score"]}/25 (${Math.round((eval["Total Score"]/25)*100)}%)</p>` : ''}
-        <div class="criteria-scores">
-          ${getCriteriaScoresHtml(eval)}
-        </div>
-        ${eval.Notes ? `<p>ملاحظات: ${eval.Notes}</p>` : ''}
-      `;
-      container.appendChild(playerCard);
-    });
-    
-  } catch (error) {
-    console.error("Error loading evaluations:", error);
-    container.innerHTML = `
-      <div style="color: #ff6b6b; text-align: center; padding: 20px;">
-        <p>حدث خطأ في تحميل بيانات التقييمات</p>
-        <button class="btn" onclick="renderEvaluatedPlayersList()">
-          <i class="fas fa-sync-alt"></i> إعادة المحاولة
-        </button>
-      </div>
-    `;
-  } finally {
-    hideLoading();
-  }
-}
-
-function getCriteriaScoresHtml(eval) {
-  // Check if we have specific scores in the evaluation
-  if (eval["قوة التصويب"] || eval["الصحة البدنية"] || eval["التصويب من المسافات المختلفة"] || eval["حب التعلم"]) {
-    const activity = eval.Activity;
-    const criteria = {
-      "كرة يد": ["قوة التصويب", "دقة التمرير", "التمركز الدفاعي", "الانسجام مع الفريق", "اللياقة البدنية"],
-      "كرة طائرة": ["الصحة البدنية", "الالتزام بالتعليمات", "التركيز", "الحركة في الملعب", "سرعة رد الفعل"],
-      "كرة سلة": ["التصويب من المسافات المختلفة", "المراوغة بالكرة", "التمرير الحاسم", "التحرك بدون كرة", "القوة البدنية"],
-      "شطرنج": ["حب التعلم", "الهدوء", "سرعة البديهة", "إدارة الوقت", "التركيز"]
-    }[activity] || [];
-    
-    return criteria.map(c => {
-      const score = eval[c] || 0;
-      return score ? `<p>${c}: ${score}/5</p>` : '';
-    }).join('');
-  }
+  container.innerHTML = '';
   
-  return '<p>لا توجد تفاصيل التقييم متاحة</p>';
+  const evaluatedPlayers = evaluations.filter(eval => 
+    eval.Activity === currentCoach.activity
+  );
+  
+  if (evaluatedPlayers.length === 0) {
+    container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
+    return;
+  }
+
+  evaluatedPlayers.forEach(eval => {
+    const playerCard = document.createElement('div');
+    playerCard.className = 'evaluated-player-card';
+    playerCard.innerHTML = `
+      <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
+      <p>تاريخ الحضور: ${eval["AttendanceDate"]}</p>
+      <p>تاريخ التقييم: ${eval["EvaluationDate"]}</p>
+      <p>المجموع: ${eval["Total"]}/25 (${eval["Percentage"]}%)</p>
+      <div class="criteria-scores">
+        ${Object.entries(eval.Scores || {}).map(([criteria, score]) => `
+          <p>${criteria}: ${score}/5</p>
+        `).join('')}
+      </div>
+      ${eval.Notes ? `<p>ملاحظات: ${eval.Notes}</p>` : ''}
+    `;
+    container.appendChild(playerCard);
+  });
 }
     
 function addAlToSecondWord(activity) {
