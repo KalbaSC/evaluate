@@ -1231,9 +1231,7 @@ async function renderEvaluatedPlayersList() {
     
     let data = await response.json();
     
-    // Process data to fix display issues
     const processedData = data.map(eval => {
-      // Fix numeric values
       let total = 0;
       try {
         total = parseInt(eval["Total Score"]) || 0;
@@ -1282,11 +1280,9 @@ async function renderEvaluatedPlayersList() {
       const playerCard = document.createElement('div');
       playerCard.className = 'evaluated-player-card';
       
-      // Get scores from evaluation data
       const scores = {};
       const criteria = evaluationCriteria[currentCoach.activity] || [];
       criteria.forEach(criterion => {
-        // Handle different key formats (Arabic with prefixes)
         const scoreKey = Object.keys(eval).find(key => 
           key.includes(criterion) || key.replace(/[^a-zA-Zء-ي]/g, '') === criterion.replace(/[^a-zA-Zء-ي]/g, '')
         );
