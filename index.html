@@ -1171,14 +1171,14 @@ async function saveEvaluation(playerId) {
   let totalScore = 0;
 
   criteria.forEach((criterion, index) => {
-    const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
-    scores[criterion] = score;
-    totalScore += score;
-  });
+const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
+scores[criterion] = score;
+totalScore += score;
+});
 
-  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100; 
+const percentage = Math.round((totalScore / (criteria.length * 5)) * 100);
 
-  const evaluationData = {
+const evaluationData = {
     Timestamp: new Date().toISOString(),
     Coach: currentCoach.username,
     Activity: currentCoach.activity,
@@ -1190,8 +1190,8 @@ async function saveEvaluation(playerId) {
     Notes: document.getElementById(`notes-${playerId}`).value,
     "AttendanceDate": player.date || sessionDate,
     "EvaluationDate": new Date().toISOString().split('T')[0]
-  };
-
+};
+  
   try {
     showLoading();
     await sendEvaluation(evaluationData);
