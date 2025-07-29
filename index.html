@@ -866,6 +866,7 @@ const evaluationCriteria = {
     const progressChartCanvas = document.getElementById('progressChart');
     let currentCoach = null;
     let playersData = [];
+    let evaluations = [];
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
 
     document.addEventListener('DOMContentLoaded', function() {
