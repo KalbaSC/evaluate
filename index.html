@@ -1074,7 +1074,7 @@ function renderPlayersList(players = playersData) {
 
   const unevaluatedPlayers = players.filter(player => {
     return !evaluations.some(eval =>
-      eval["Player ID"] === player.id &&
+            eval["Player ID"] === player.id && eval["Date"] === player.date &&
       eval["Date"] === player.date
     );
   });
