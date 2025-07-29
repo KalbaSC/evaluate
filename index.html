@@ -798,10 +798,10 @@ const CONFIG = {
 };
 
 const coaches = {
-  "handball1": { password: "pass1", activity: "كرة يد" },
-  "volley2": { password: "pass2", activity: "كرة طائرة" },
-  "Wahed": { password: "pass3", activity: "كرة سلة" },
-  "c.Jafer": { password: "jafer123", activity: "شطرنج" }
+  "handball1": { password: "pass1", activity: "كرة يد", name: "سالم" },
+  "c.wahed": { password: "wahed123", activity: "كرة طائرة", name: "وحيد" },
+  "Wahed": { password: "pass3", activity: "كرة سلة", name: "محمد" },
+  "c.Jafer": { password: "jafer123", activity: "شطرنج", name: "جعفر" }
 };
 
 const evaluationCriteria = {
@@ -813,10 +813,10 @@ const evaluationCriteria = {
     "اللياقة البدنية"
   ],
   "كرة طائرة": [
-    "الإرسال القوي",
-    "الاستقبال تحت الضغط",
-    "الضرب الساحق",
-    "التمركز في الملعب",
+    "الصحة البدنية",
+    "الالتزام بالتعليمات",
+    "التركيز",
+    "الحركة في الملعب",
     "سرعة رد الفعل"
   ],
   "كرة سلة": [
@@ -898,6 +898,14 @@ async function loadPlayersData() {
     hideLoading();
   }
 } 
+    
+function addAlToSecondWord(activity) {
+  const parts = activity.trim().split(" ");
+  if (parts.length === 2) {
+    return `${parts[0]} الـ${parts[1]}`;
+  }
+  return `ال${activity}`; 
+}
 
 async function handleLogin(e) {
       e.preventDefault();
@@ -919,16 +927,16 @@ async function handleLogin(e) {
         evaluations = JSON.parse(localStorage.getItem(key)) || [];
         playersData = [];
 
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        if (welcomeMessage) {
-          welcomeMessage.innerHTML = 
-            `👋 <strong>مرحبا كابتن ${username}</strong><br>🏆 قائمة لاعبين <strong>${currentCoach.activity}</strong>`;
-        }
+const welcomeMessage = document.getElementById('welcomeMessage');
+if (welcomeMessage) {
+  welcomeMessage.innerHTML = 
+  `👋 <strong>مرحبا كابتن ${coaches[username].name}</strong><br>🏆 قائمة لاعبين <strong>${addAlToSecondWord(currentCoach.activity)}</strong>`;
+}
 
-        const playersListHeader = document.getElementById('playersListHeader');
-        if (playersListHeader) {
-          playersListHeader.innerText = `قائمة لاعبين ${currentCoach.activity}`;
-        }
+const playersListHeader = document.getElementById('playersListHeader');
+if (playersListHeader) {
+playersListHeader.innerText = `قائمة لاعبين ${addAlToSecondWord(currentCoach.activity)}`;
+}
 
         const loginView = document.getElementById('loginView');
         const coachPortal = document.getElementById('coachPortal');
