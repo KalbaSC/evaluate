@@ -1099,18 +1099,18 @@ async function saveEvaluation(playerId) {
 
   const percentage = Math.round((totalScore / (criteria.length * 5)) * 100); 
 
-  const evaluationData = {
-    Timestamp: new Date().toISOString(),
-    Date: sessionDate,
-    Coach: currentCoach.username,
-    Activity: currentCoach.activity,
-    "Player Name": `${player.name} ${player.parent}`,
-    "Player ID": playerId,
-    Scores: scores,
-    Total: totalScore,
-    Percentage: percentage, 
-    Notes: document.getElementById(`notes-${playerId}`).value
-  };
+const evaluationData = {
+  Timestamp: new Date().toISOString(),
+  Date: player.date, 
+  Coach: currentCoach.username,
+  Activity: currentCoach.activity,
+  "Player Name": `${player.name} ${player.parent}`,
+  "Player ID": playerId,
+  Scores: scores,
+  Total: totalScore,
+  Percentage: percentage,
+  Notes: document.getElementById(`notes-${playerId}`).value
+};
 
   try {
     showLoading();
