@@ -885,7 +885,7 @@ async function loadPlayersData() {
         id: player.ID,
         name: player["Child Name"],
         parent: player.Parent,
-        date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
+        date: player.Date || ""
       })
           );
 
