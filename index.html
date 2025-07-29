@@ -977,7 +977,7 @@ async function renderEvaluatedPlayersList() {
       playerCard.innerHTML = `
         <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
         <p>تاريخ الحضور: ${eval["Date"] || 'غير محدد'}</p>
-        <p>تاريخ التقييم: ${eval["Time-stamp"] || 'غير محدد'}</p>
+        <p>تاريخ التقييم: ${new Date(eval["Time-stamp"]).toLocaleDateString('ar-AE') || 'غير محدد'}</p>
         <p>المجموع: ${eval["Total Score"] || 0}/25 (${eval["Percentage"] || '0%'})</p>
         <div class="criteria-scores">
           ${Object.entries(scores).map(([criteria, score]) => `
@@ -1180,15 +1180,14 @@ function renderPlayersList(players = playersData) {
 }
 
 async function saveEvaluation(playerId) {
-  const sessionDate = document.getElementById('sessionDate').value;
-  if (!sessionDate) {
-    showToast('الرجاء إدخال تاريخ الجلسة', false);
-    return;
-  }
-
   const player = playersData.find(p => p.id === playerId);
   if (!player) {
     showToast('لاعب غير موجود', false);
+    return;
+  }
+
+  if (!player.date) {
+    showToast('لا يوجد تاريخ حضور مسجل لهذا اللاعب', false);
     return;
   }
 
@@ -1211,7 +1210,7 @@ async function saveEvaluation(playerId) {
     "Player Name": player.name,
     "Player ID": playerId,
     "Parent": player.parent || "",
-    "Date": sessionDate,
+    "Date": player.date,
     "Notes": document.getElementById(`notes-${playerId}`).value,
     "Total Score": totalScore,
     "Percentage": percentage + "%",
