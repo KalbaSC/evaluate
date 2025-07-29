@@ -938,36 +938,62 @@ async function loadPlayersData() {
   renderEvaluatedPlayersList();
 }
     
-function renderEvaluatedPlayersList() {
+async function renderEvaluatedPlayersList() {
   const container = document.getElementById('evaluatedPlayersList');
-  container.innerHTML = '';
+  container.innerHTML = '<p>جاري تحميل البيانات...</p>';
   
-  const evaluatedPlayers = evaluations.filter(eval => 
-    eval.Activity === currentCoach.activity
-  );
-  
-  if (evaluatedPlayers.length === 0) {
-    container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
-    return;
-  }
+  try {
+    showLoading();
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      : CONFIG.EVALUATION_SCRIPT_URL;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch evaluations");
+    
+    const data = await response.json();
+    
+    const evaluatedPlayers = data.filter(eval => 
+      eval.Activity === currentCoach.activity
+    );
+    
+    container.innerHTML = '';
+    
+    if (evaluatedPlayers.length === 0) {
+      container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
+      return;
+    }
 
-  evaluatedPlayers.forEach(eval => {
-    const playerCard = document.createElement('div');
-    playerCard.className = 'evaluated-player-card';
-    playerCard.innerHTML = `
-      <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
-      <p>تاريخ الحضور: ${eval["AttendanceDate"]}</p>
-      <p>تاريخ التقييم: ${eval["EvaluationDate"]}</p>
-      <p>المجموع: ${eval["Total"]}/25 (${eval["Percentage"]}%)</p>
-      <div class="criteria-scores">
-        ${Object.entries(eval.Scores || {}).map(([criteria, score]) => `
-          <p>${criteria}: ${score}/5</p>
-        `).join('')}
-      </div>
-      ${eval.Notes ? `<p>ملاحظات: ${eval.Notes}</p>` : ''}
-    `;
-    container.appendChild(playerCard);
-  });
+    evaluatedPlayers.forEach(eval => {
+      const playerCard = document.createElement('div');
+      playerCard.className = 'evaluated-player-card';
+      
+      const scores = {};
+      const criteria = evaluationCriteria[currentCoach.activity] || [];
+      criteria.forEach(criterion => {
+        scores[criterion] = eval[criterion] || 0;
+      });
+      
+      playerCard.innerHTML = `
+        <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
+        <p>تاريخ الحضور: ${eval["Date"] || 'غير محدد'}</p>
+        <p>تاريخ التقييم: ${eval["Time-stamp"] || 'غير محدد'}</p>
+        <p>المجموع: ${eval["Total Score"] || 0}/25 (${eval["Percentage"] || '0%'})</p>
+        <div class="criteria-scores">
+          ${Object.entries(scores).map(([criteria, score]) => `
+            <p>${criteria}: ${score}/5</p>
+          `).join('')}
+        </div>
+        ${eval["Notes"] ? `<p>ملاحظات: ${eval["Notes"]}</p>` : ''}
+      `;
+      container.appendChild(playerCard);
+    });
+  } catch (error) {
+    console.error("Error loading evaluations:", error);
+    container.innerHTML = '<p>حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى لاحقاً.</p>';
+  } finally {
+    hideLoading();
+  }
 }
     
 function addAlToSecondWord(activity) {
@@ -1171,35 +1197,39 @@ async function saveEvaluation(playerId) {
   let totalScore = 0;
 
   criteria.forEach((criterion, index) => {
-const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
-scores[criterion] = score;
-totalScore += score;
-});
+    const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
+    scores[criterion] = score;
+    totalScore += score;
+  });
 
-const percentage = Math.round((totalScore / (criteria.length * 5)) * 100);
+  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100);
 
-const evaluationData = {
+  const evaluationData = {
     Timestamp: new Date().toISOString(),
     Coach: currentCoach.username,
     Activity: currentCoach.activity,
-    "Player Name": `${player.name} ${player.parent || ''}`.trim(),
+    "Player Name": player.name,
     "Player ID": playerId,
-    Scores: scores,
-    Total: totalScore,
-    Percentage: `${percentage}%`,
-    Notes: document.getElementById(`notes-${playerId}`).value,
-    "AttendanceDate": player.date || sessionDate,
-    "EvaluationDate": new Date().toISOString().split('T')[0]
-};
-  
+    "Parent": player.parent || "",
+    "Date": sessionDate,
+    "Notes": document.getElementById(`notes-${playerId}`).value,
+    "Total Score": totalScore,
+    "Percentage": percentage + "%",
+    ...scores  
+  };
+
   try {
     showLoading();
     await sendEvaluation(evaluationData);
-    evaluations.push(evaluationData);
+    
     const key = `playerEvaluations_${currentCoach.username}`;
+    let evaluations = JSON.parse(localStorage.getItem(key)) || [];
+    evaluations.push(evaluationData);
     localStorage.setItem(key, JSON.stringify(evaluations));
+    
     showToast('✅ تم حفظ التقييم بنجاح', true);
-    renderPlayersList(); // Refresh the list after saving
+    renderPlayersList(); 
+    renderEvaluatedPlayersList(); 
   } catch (err) {
     console.error("Evaluation error:", err);
     showToast('❌ فشل في إرسال التقييم: ' + (err.message || err), false);
@@ -1216,15 +1246,8 @@ async function sendEvaluation(evaluationData) {
 
     const formData = new URLSearchParams();
     
-    // Flatten the evaluation data
     for (const key in evaluationData) {
-      if (typeof evaluationData[key] === 'object') {
-        for (const subKey in evaluationData[key]) {
-          formData.append(`${key}.${subKey}`, evaluationData[key][subKey]);
-        }
-      } else {
-        formData.append(key, evaluationData[key]);
-      }
+      formData.append(key, evaluationData[key]);
     }
 
     const response = await fetch(url, {
@@ -1241,9 +1264,6 @@ async function sendEvaluation(evaluationData) {
     }
 
     const result = await response.text();
-    if (!result.toLowerCase().includes("success")) {
-      throw new Error(result || "Unexpected response from server");
-    }
     return result;
   } catch (error) {
     console.error("Send evaluation error:", error);
@@ -1685,7 +1705,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Better touch handling for tables
+
 function setupTableTouchEvents() {
   document.querySelectorAll('.players-table tr').forEach(row => {
     row.addEventListener('touchstart', function() {
