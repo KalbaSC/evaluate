@@ -406,7 +406,17 @@
   padding-left: 40px;
   cursor: pointer;
 }
-   
+#evaluatedPlayersTab {
+  padding: 20px;
+}
+
+.evaluated-player-card {
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  border-left: 4px solid #4CAF50; /* Green border for completed */
+}   
 .welcome-banner {
   text-align: center;
   padding: 20px;
@@ -725,6 +735,7 @@
     <div class="nav-tabs">
       <button onclick="showTab('playersList', event)">عرض اللاعبين</button>
       <button onclick="showTab('evaluation', event)">تقييم اللاعبين</button>
+      <button onclick="showTab('evaluatedPlayers', event)">اللاعبون المقييمون</button>
       <button onclick="showTab('rankings', event)">التصنيفات</button>
       <button onclick="showTab('progress', event)">تطور الأداء</button>
       <button onclick="logout()">خروج</button>
@@ -758,6 +769,11 @@
       <h2 style="color:#f4e733; text-align:center">تقييم اللاعبين</h2>
       <div id="playersList"></div>
     </div>
+
+  <div id="evaluatedPlayersTab" class="hidden">
+  <h2 style="color:#f4e733; text-align:center">اللاعبون المقييمون</h2>
+  <div id="evaluatedPlayersList"></div>
+</div>
 
     <div id="rankingsTab" class="hidden">
 <h2 style="color:#f4e733; text-align:center">تصنيف اللاعبين</h2>
@@ -866,6 +882,8 @@ const evaluationCriteria = {
       }
     }    
 
+let evaluatedPlayers = [];
+    
 async function loadPlayersData() {
   showLoading();
   try {
@@ -897,7 +915,42 @@ async function loadPlayersData() {
     playersData = []; 
     hideLoading();
   }
-} 
+  const unevaluatedPlayers = playersData.filter(player => {
+    return !evaluations.some(eval => 
+      eval["Player ID"] === player.id && 
+      eval["AttendanceDate"] === player.date
+    );
+  });
+
+  renderPlayersList(unevaluatedPlayers);
+  renderEvaluatedPlayersList();
+}
+    
+function renderEvaluatedPlayersList() {
+  const container = document.getElementById('evaluatedPlayersList');
+  container.innerHTML = '';
+  
+  const evaluatedPlayers = evaluations.filter(eval => 
+    eval.Activity === currentCoach.activity
+  );
+  
+  if (evaluatedPlayers.length === 0) {
+    container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
+    return;
+  }
+
+  evaluatedPlayers.forEach(eval => {
+    const playerCard = document.createElement('div');
+    playerCard.className = 'player-card';
+    playerCard.innerHTML = `
+      <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
+      <p>تاريخ الحضور: ${eval["AttendanceDate"]}</p>
+      <p>تاريخ التقييم: ${eval["EvaluationDate"]}</p>
+      <p>المجموع: ${eval["Total"]}/25 (${eval["Percentage"]})</p>
+    `;
+    container.appendChild(playerCard);
+  });
+}
     
 function addAlToSecondWord(activity) {
   const parts = activity.trim().split(" ");
@@ -1425,7 +1478,11 @@ function showTab(tabName, event) {
   if (event) {
     event.target.classList.add('active');
   }
-
+  
+  if (tabName === 'evaluatedPlayers') {
+    renderEvaluatedPlayersList();
+  }
+  
   if (tabName === 'playersList') {
     loadPlayersTable();
   } else if (tabName === 'rankings') {
