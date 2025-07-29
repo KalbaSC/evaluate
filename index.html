@@ -1242,7 +1242,7 @@ async function renderEvaluatedPlayersList() {
       }
       
       let percentage = "0%";
-      if (!eval.Percentage || eval.Percentage.includes("NaN")) {
+      if (!eval.Percentage || (eval.Percentage + "").includes("NaN")) {
         const criteriaCount = evaluationCriteria[currentCoach.activity]?.length || 5;
         percentage = Math.round((total / (criteriaCount * 5)) * 100) + "%";
       } else {
