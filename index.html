@@ -1147,9 +1147,9 @@ async function saveEvaluation(playerId) {
     const score = parseInt(document.getElementById(`${playerId}-skill${index + 1}`).value);
     scores[criterion] = score;
     totalScore += score;
-  });
+});
 
-  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100;
+  const percentage = Math.round((totalScore / (criteria.length * 5)) * 100);
 
   const evaluationData = {
     Timestamp: new Date().toISOString(),
@@ -1158,7 +1158,7 @@ async function saveEvaluation(playerId) {
     "Player Name": player.name,
     "Player ID": playerId,
     "Parent": player.parent || "",
-    "Date": player.date, // Use the original date from attendance
+    "Date": player.date, 
     "Total Score": totalScore,
     "Percentage": percentage + "%",
     "Notes": document.getElementById(`notes-${playerId}`).value,
