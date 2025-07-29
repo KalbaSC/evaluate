@@ -416,7 +416,19 @@
   border-radius: 10px;
   margin-bottom: 15px;
   border-left: 4px solid #4CAF50; /* Green border for completed */
-}   
+}
+
+.evaluated-player-card h3 {
+  margin-top: 0;
+  color: #f4e733;
+}
+
+.criteria-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0;
+}
 .welcome-banner {
   text-align: center;
   padding: 20px;
@@ -941,12 +953,18 @@ function renderEvaluatedPlayersList() {
 
   evaluatedPlayers.forEach(eval => {
     const playerCard = document.createElement('div');
-    playerCard.className = 'player-card';
+    playerCard.className = 'evaluated-player-card';
     playerCard.innerHTML = `
       <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
       <p>تاريخ الحضور: ${eval["AttendanceDate"]}</p>
       <p>تاريخ التقييم: ${eval["EvaluationDate"]}</p>
-      <p>المجموع: ${eval["Total"]}/25 (${eval["Percentage"]})</p>
+      <p>المجموع: ${eval["Total"]}/25 (${eval["Percentage"]}%)</p>
+      <div class="criteria-scores">
+        ${Object.entries(eval.Scores || {}).map(([criteria, score]) => `
+          <p>${criteria}: ${score}/5</p>
+        `).join('')}
+      </div>
+      ${eval.Notes ? `<p>ملاحظات: ${eval.Notes}</p>` : ''}
     `;
     container.appendChild(playerCard);
   });
@@ -1084,10 +1102,18 @@ function renderPlayersList(players = playersData) {
   const container = document.getElementById('playersList');
   container.innerHTML = '';
 
-  if (players.length === 0) {
+  const sessionDate = document.getElementById('sessionDate').value;
+  const unevaluatedPlayers = players.filter(player => {
+    return !evaluations.some(eval => 
+      eval["Player ID"] === player.id && 
+      eval["AttendanceDate"] === player.date
+    );
+  });
+
+  if (unevaluatedPlayers.length === 0) {
     container.innerHTML = '<p>لا يوجد لاعبون متاحون للتقييم</p>';
   } else {
-    players.forEach(player => {
+    unevaluatedPlayers.forEach(player => {
       const playerCard = document.createElement('div');
       playerCard.className = 'player-card';
       playerCard.innerHTML = `
@@ -1120,7 +1146,6 @@ function renderPlayersList(players = playersData) {
       container.appendChild(playerCard);
     });
   }
-
   const countContainer = document.getElementById('playersCount');
   if (countContainer) {
     countContainer.textContent = `عدد اللاعبين: ${players.length}`;
@@ -1128,7 +1153,7 @@ function renderPlayersList(players = playersData) {
 }
 
 async function saveEvaluation(playerId) {
-  const sessionDate = document.getElementById('sessionDate').value;
+const sessionDate = document.getElementById('sessionDate').value;
   if (!sessionDate) {
     showToast('الرجاء إدخال تاريخ الجلسة', false);
     return;
@@ -1154,7 +1179,6 @@ async function saveEvaluation(playerId) {
 
 const evaluationData = {
   Timestamp: new Date().toISOString(),
-  Date: player.date, 
   Coach: currentCoach.username,
   Activity: currentCoach.activity,
   "Player Name": `${player.name} ${player.parent}`,
@@ -1163,6 +1187,8 @@ const evaluationData = {
   Total: totalScore,
   Percentage: percentage,
   Notes: document.getElementById(`notes-${playerId}`).value
+  "AttendanceDate": player.date, 
+  "EvaluationDate": new Date().toISOString().split('T')[0] 
 };
 
   try {
@@ -1466,7 +1492,7 @@ const wsData = [
 }
 
 function showTab(tabName, event) {
-  const allTabs = ["playersListTab", "evaluationTab", "rankingsTab", "progressTab"];
+  const allTabs = ["playersListTab", "evaluationTab", "evaluatedPlayersTab", "rankingsTab", "progressTab"];
   allTabs.forEach(tab => document.getElementById(tab).classList.add('hidden'));
 
   document.querySelectorAll('.nav-tabs button').forEach(btn => {
@@ -1483,10 +1509,16 @@ function showTab(tabName, event) {
     renderEvaluatedPlayersList();
   }
   
-  if (tabName === 'playersList') {
+  document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+  
+  if (tabName === 'evaluatedPlayers') {
+    renderEvaluatedPlayersList();
+  } else if (tabName === 'playersList') {
     loadPlayersTable();
+  } else if (tabName === 'evaluation') {
+    renderPlayersList();
   } else if (tabName === 'rankings') {
-    updateRankings(); 
+    updateRankings();
   }
 }
 
