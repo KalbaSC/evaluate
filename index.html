@@ -938,36 +938,76 @@ async function loadPlayersData() {
   renderEvaluatedPlayersList();
 }
     
-function renderEvaluatedPlayersList() {
+async function renderEvaluatedPlayersList() {
   const container = document.getElementById('evaluatedPlayersList');
-  container.innerHTML = '';
-  
-  const evaluatedPlayers = evaluations.filter(eval => 
-    eval.Activity === currentCoach.activity
-  );
-  
-  if (evaluatedPlayers.length === 0) {
-    container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
-    return;
-  }
+  container.innerHTML = '<div class="spinner"></div>'; 
 
-  evaluatedPlayers.forEach(eval => {
-    const playerCard = document.createElement('div');
-    playerCard.className = 'evaluated-player-card';
-    playerCard.innerHTML = `
-      <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
-      <p>تاريخ الحضور: ${eval["AttendanceDate"]}</p>
-      <p>تاريخ التقييم: ${eval["EvaluationDate"]}</p>
-      <p>المجموع: ${eval["Total"]}/25 (${eval["Percentage"]}%)</p>
-      <div class="criteria-scores">
-        ${Object.entries(eval.Scores || {}).map(([criteria, score]) => `
-          <p>${criteria}: ${score}/5</p>
-        `).join('')}
-      </div>
-      ${eval.Notes ? `<p>ملاحظات: ${eval.Notes}</p>` : ''}
+  try {
+    showLoading();
+    
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      : CONFIG.EVALUATION_SCRIPT_URL;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch evaluations");
+    
+    const allEvaluations = await response.json();
+    
+    const evaluatedPlayers = allEvaluations.filter(eval => 
+      currentCoach && eval.Activity === currentCoach.activity
+    );
+    
+    if (evaluatedPlayers.length === 0) {
+      container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
+      return;
+    }
+
+    evaluatedPlayers.sort((a, b) => 
+      new Date(b["EvaluationDate"] || b.Timestamp) - new Date(a["EvaluationDate"] || a.Timestamp)
+    );
+
+    container.innerHTML = ''; 
+    
+    evaluatedPlayers.forEach(eval => {
+      const playerCard = document.createElement('div');
+      playerCard.className = 'evaluated-player-card';
+      
+      let totalScore = eval.Total;
+      if (!totalScore && eval.Scores) {
+        totalScore = Object.values(eval.Scores).reduce((sum, score) => sum + parseInt(score), 0);
+      }
+      
+      let percentage = eval.Percentage;
+      if (!percentage && totalScore) {
+        const criteriaCount = eval.Scores ? Object.keys(eval.Scores).length : 5;
+        percentage = Math.round((totalScore / (criteriaCount * 5)) * 100);
+      }
+      
+      playerCard.innerHTML = `
+        <h3>${eval["Player Name"]} <small>(${eval["Player ID"]})</small></h3>
+        <p>تاريخ الحضور: ${eval["AttendanceDate"] || eval.date || "غير معروف"}</p>
+        <p>تاريخ التقييم: ${eval["EvaluationDate"] || new Date(eval.Timestamp).toISOString().split('T')[0] || "غير معروف"}</p>
+        ${totalScore ? `<p>المجموع: ${totalScore}/${eval.Scores ? Object.keys(eval.Scores).length * 5 : 25} (${percentage}%)</p>` : ''}
+        <div class="criteria-scores">
+          ${eval.Scores ? Object.entries(eval.Scores).map(([criteria, score]) => `
+            <p>${criteria}: ${score}/5</p>
+          `).join('') : '<p>لا توجد تفاصيل التقييم متاحة</p>'}
+        </div>
+        ${eval.Notes ? `<p>ملاحظات: ${eval.Notes}</p>` : ''}
+      `;
+      container.appendChild(playerCard);
+    });
+    
+  } catch (error) {
+    console.error("Error loading evaluations:", error);
+    container.innerHTML = `
+      <p style="color: #ff6b6b;">حدث خطأ في تحميل بيانات التقييمات</p>
+      <button class="btn" onclick="renderEvaluatedPlayersList()">إعادة المحاولة</button>
     `;
-    container.appendChild(playerCard);
-  });
+  } finally {
+    hideLoading();
+  }
 }
     
 function addAlToSecondWord(activity) {
