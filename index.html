@@ -885,7 +885,7 @@ async function loadPlayersData() {
         id: player.ID,
         name: player["Child Name"],
         parent: player.Parent,
-        date: player.Date || ""
+        date: player.Timestamp ? new Date(player.Timestamp).toISOString().split('T')[0] : ""
       })
           );
 
@@ -1101,6 +1101,7 @@ async function saveEvaluation(playerId) {
 
   const evaluationData = {
     Timestamp: new Date().toISOString(),
+    Date: sessionDate,
     Coach: currentCoach.username,
     Activity: currentCoach.activity,
     "Player Name": `${player.name} ${player.parent}`,
