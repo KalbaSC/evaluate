@@ -820,8 +820,7 @@
       <h2 style="color:#f4e733; text-align:center">تطور الأداء</h2>
       <div class="form-group">
         <label for="playerSelect">اختر اللاعب</label>
-        <select id="playerSelect" onchange="showPlayerProgress()"></select>
-      </div>
+<select id="playerSelect"></select>
 <div id="progressChartContainer">
   <canvas id="progressChart"></canvas>
 </div>
@@ -891,7 +890,6 @@ function formatDate(dateStr) {
   }
 }
 
-    let progressChart = null;
     let currentCoach = null;
     let playersData = [];
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
@@ -1502,120 +1500,155 @@ function updatePlayerSelect() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  
-  function showPlayerProgress() {
-    const container = document.getElementById('progressChartContainer');
-    const canvas = document.getElementById('progressChart');
-    
-    console.log("Elements:", {container, canvas});
-    
-    if (!container || !canvas) {
-      console.error("Chart elements missing!");
-      return;
-    }
+  let progressChart = null;
+  function showToast(message, isSuccess) {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '5px';
+    toast.style.backgroundColor = isSuccess ? '#4CAF50' : '#F44336';
+    toast.style.color = 'white';
+    toast.style.zIndex = '10000';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
 
-  container.innerHTML = '<canvas id="progressChart"></canvas>';
-  const ctx = canvas.getContext('2d');
-
-  if (progressChart) {
+  async function showPlayerProgress() {
     try {
-      progressChart.destroy();
-    } catch (err) {
-      console.log("Cleanup of previous chart failed:", err);
-    }
-  }
+      const container = document.getElementById('progressChartContainer');
+      const canvas = document.getElementById('progressChart');
+      const playerSelect = document.getElementById('playerSelect');
+      
+      if (!container || !canvas || !playerSelect) {
+        throw new Error('Missing required DOM elements');
+      }
 
-  const playerId = document.getElementById('playerSelect').value;
-  if (!playerId) {
-    container.innerHTML = '<p style="color:white; text-align:center">الرجاء اختيار لاعب</p>';
-    return;
-  }
+      if (progressChart) {
+        try {
+          progressChart.destroy();
+        } catch (err) {
+          console.warn('Chart destruction error:', err);
+        }
+      }
 
-  const playerEvals = evaluations.filter(e => 
-    String(e["Player ID"]).trim() === String(playerId).trim() &&
-    e.Activity === currentCoach.activity
-  );
+      const playerId = playerSelect.value.trim();
+      if (!playerId) {
+        container.innerHTML = '<p style="color:white; text-align:center; padding:20px;">الرجاء اختيار لاعب</p>';
+        return;
+      }
 
-  if (playerEvals.length === 0) {
-    container.innerHTML = '<p style="color:white; text-align:center">لا توجد بيانات لهذا اللاعب</p>';
-    return;
-  }
+      if (evaluations.length === 0) {
+        evaluations = await fetchEvaluationsFromSheet();
+      }
 
-  const dates = playerEvals.map(e => formatDate(e["Date"]));
-  const percentages = playerEvals.map(e => {
-    const criteria = evaluationCriteria[currentCoach.activity] || [];
-    const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0), 0);
-    return Math.round((total / (criteria.length * 5)) * 100);
-  });
+      const playerEvals = evaluations
+        .filter(e => String(e["Player ID"]).trim() === playerId && 
+                     e.Activity === currentCoach.activity)
+        .sort((a, b) => new Date(a.Date) - new Date(b.Date));
 
-  progressChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: dates,
-      datasets: [{
-        label: 'تقييم الأداء',
-        data: percentages,
-        borderColor: '#f4e733',
-        backgroundColor: 'rgba(244, 231, 51, 0.2)',
-        borderWidth: 2,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#fff',
-            font: {
-              family: 'NotoKufiArabic'
+      if (playerEvals.length === 0) {
+        container.innerHTML = '<p style="color:white; text-align:center; padding:20px;">لا توجد بيانات لهذا اللاعب</p>';
+        return;
+      }
+
+      const dates = playerEvals.map(e => formatDate(e.Date));
+      const percentages = playerEvals.map(e => {
+        const criteria = evaluationCriteria[currentCoach.activity] || [];
+        const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0), 0);
+        return Math.round((total / (criteria.length * 5)) * 100);
+      });
+
+      container.innerHTML = '<canvas id="progressChart"></canvas>';
+      const ctx = canvas.getContext('2d');
+
+      progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'تطور الأداء (%)',
+            data: percentages,
+            borderColor: '#f4e733',
+            backgroundColor: 'rgba(244, 231, 51, 0.2)',
+            borderWidth: 3,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              rtl: true,
+              labels: {
+                color: '#fff',
+                font: {
+                  family: 'NotoKufiArabic',
+                  size: 14
+                }
+              }
+            },
+            tooltip: {
+              rtl: true,
+              bodyFont: {
+                family: 'NotoKufiArabic'
+              },
+              callbacks: {
+                label: (context) => `${context.parsed.y}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#fff' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                color: '#fff',
+                callback: (val) => `${val}%`
+              },
+              grid: { color: 'rgba(255,255,255,0.1)' }
             }
           }
         }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#fff' }
-        },
-        y: {
-          min: 0,
-          max: 100,
-          ticks: {
-            color: '#fff',
-            callback: (value) => `${value}%`
-          }
-        }
-      }
-    }
-  });
-                          
- } 
-  updatePlayerSelect();
-});
+      });
 
-async function fetchEvaluationsFromSheet() {
-  try {
-    const url = CONFIG.USE_CORS_PROXY 
-      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
-      : CONFIG.EVALUATION_SCRIPT_URL;
-    
-    console.log("Fetching evaluations from:", url);
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    } catch (error) {
+      console.error('Error in showPlayerProgress:', error);
+      showToast('❌ حدث خطأ في عرض التطور', false);
     }
-    
-    const data = await response.json();
-    console.log("Fetched evaluations:", data.slice(0, 3)); // Log first 3 entries
-    return Array.isArray(data) ? data : [];
-  } catch (err) {
-    console.error("Failed to fetch evaluations:", err);
-    showToast('❌ فشل تحميل التقييمات', false);
-    return [];
   }
-}
+
+  async function fetchEvaluationsFromSheet() {
+    try {
+      const url = CONFIG.USE_CORS_PROXY 
+        ? `${CONFIG.CORS_PROXY_URL}${CONFIG.EVALUATION_SCRIPT_URL}`
+        : CONFIG.EVALUATION_SCRIPT_URL;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+      
+    } catch (error) {
+      console.error('Failed to fetch evaluations:', error);
+      showToast('❌ فشل تحميل التقييمات', false);
+      return [];
+    }
+  }
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('sessionDate').value = today;
+  document.getElementById('filterDate').value = today;
+});
 
 function exportRankings() {
   if (!Array.isArray(evaluations) || evaluations.length === 0) {
