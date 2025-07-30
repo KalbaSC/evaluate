@@ -1029,7 +1029,7 @@ function loadPlayersTable(players = playersData) {
       ? `<tr><td colspan="3">لا يوجد لاعبون في هذا التاريخ</td></tr>`
       : players.map(player => `
           <tr>
-            <td>${player.date || 'غير محدد'}</td>
+            <td>${formatDate(player.date) || 'غير محدد'}</td>
             <td>${player.name} ${player.parent || ''}</td>
             <td>${player.id}</td>
           </tr>
@@ -1108,7 +1108,7 @@ function renderPlayersList(players = playersData) {
     playerCard.innerHTML = `
       <h3>${player.name} <small>(${player.id})</small></h3>
       <p>ولي الأمر: ${player.parent || "غير معروف"}</p>
-      <p>تاريخ الحضور: ${player.date || "غير محدد"}</p>
+      <p>تاريخ الحضور: ${formatDate(player.date) || "غير محدد"}</p>
       <div class="evaluation-form">
         <h4>تقييم الأداء:</h4>
         <div class="evaluation-criteria" id="criteria-${player.id}"></div>
@@ -1259,50 +1259,46 @@ async function sendEvaluation(evaluationData) {
 async function renderEvaluatedPlayersList() {
   const container = document.getElementById('evaluatedPlayersList');
   container.innerHTML = '<p>جاري تحميل البيانات...</p>';
-  
+
+  // ✅ دالة تنسيق التاريخ واحدة موحدة
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      if (dateStr.includes('/')) {
+        const [day, month, year] = dateStr.split(' ')[0].split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      return dateStr.split('T')[0];
+    } catch {
+      return dateStr;
+    }
+  }
+
   try {
     showLoading();
-    
+
     const url = CONFIG.USE_CORS_PROXY 
       ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
       : CONFIG.EVALUATION_SCRIPT_URL;
-    
+
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch evaluations");
-    
+
     let data = await response.json();
-    
-    // 2. Process and filter evaluations
+
     const processedData = data
       .filter(eval => eval.Activity === currentCoach.activity)
       .map(eval => {
-        // Calculate total score if missing
         let total = 0;
         const criteria = evaluationCriteria[currentCoach.activity] || [];
-        
-        // Sum scores for all criteria
+
         criteria.forEach(criterion => {
           const score = parseInt(eval[criterion]) || 0;
           total += score;
         });
 
-        // Calculate percentage
         const percentage = Math.round((total / (criteria.length * 5)) * 100) + "%";
-        
-        // Format dates consistently
-        const formatDate = (dateStr) => {
-          if (!dateStr) return 'غير محدد';
-          try {
-            if (dateStr.includes('/')) {
-              const [day, month, year] = dateStr.split(' ')[0].split('/');
-              return `${year}-${month}-${day}`;
-            }
-            return dateStr.split('T')[0]; 
-          } catch {
-            return dateStr; 
-          }
-        };
-        
+
         return {
           ...eval,
           "Date": formatDate(eval.Date),
@@ -1313,11 +1309,9 @@ async function renderEvaluatedPlayersList() {
           normalizedDate: formatDate(eval.Date)
         };
       });
-    
-    // 3. Update global evaluations array
+
     evaluations = processedData;
-    
-    // 4. Group evaluations by player ID
+
     const playersMap = new Map();
     processedData.forEach(eval => {
       const playerId = eval.normalizedPlayerId;
@@ -1331,15 +1325,13 @@ async function renderEvaluatedPlayersList() {
       playersMap.get(playerId).evaluations.push(eval);
     });
 
-    // 5. Display results
     container.innerHTML = '';
-    
+
     if (playersMap.size === 0) {
       container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
       return;
     }
 
-    // Sort by most recent evaluation first
     const sortedPlayers = Array.from(playersMap.values()).sort((a, b) => {
       const dateA = new Date(b.evaluations[0]["Time-stamp"]);
       const dateB = new Date(a.evaluations[0]["Time-stamp"]);
@@ -1349,7 +1341,7 @@ async function renderEvaluatedPlayersList() {
     sortedPlayers.forEach(player => {
       const playerCard = document.createElement('div');
       playerCard.className = 'evaluated-player-card';
-      
+
       playerCard.innerHTML = `
         <h3>${player.name || 'غير معروف'} <small>(${player.id || 'غير معروف'})</small></h3>
         <div class="player-evaluations">
@@ -1365,7 +1357,7 @@ async function renderEvaluatedPlayersList() {
       `;
       container.appendChild(playerCard);
     });
-    
+
   } catch (error) {
     console.error("Error loading evaluations:", error);
     container.innerHTML = '<p>حدث خطأ أثناء تحميل البيانات</p>';
@@ -1514,7 +1506,7 @@ function getActivityIcon(activity) {
 
       playerEvals.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-      const dates = playerEvals.map(e => e.date);
+      const dates = playerEvals.map(e => formatDate(e.date));
       const percentages = playerEvals.map(e => e.percentage);
 
       if (progressChart) progressChart.destroy();
