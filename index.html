@@ -1223,7 +1223,6 @@ async function renderEvaluatedPlayersList() {
   try {
     showLoading();
     
-    // First fetch fresh evaluations from server
     const url = CONFIG.USE_CORS_PROXY 
       ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
       : CONFIG.EVALUATION_SCRIPT_URL;
@@ -1233,121 +1232,104 @@ async function renderEvaluatedPlayersList() {
     
     let data = await response.json();
     
-    // Process and filter evaluations for current coach's activity
-    const processedData = data.map(eval => {
-      let total = 0;
-      try {
-        total = parseInt(eval["Total Score"]) || 0;
-      } catch (e) {
-        console.warn("Invalid Total Score:", eval["Total Score"]);
-      }
-      
-      let percentage = "0%";
-      if (!eval.Percentage || (eval.Percentage + "").includes("NaN")) {
-        const criteriaCount = evaluationCriteria[currentCoach.activity]?.length || 5;
-        percentage = Math.round((total / (criteriaCount * 5)) * 100) + "%";
-      } else {
-        percentage = eval.Percentage;
-      }
-      
-      const formatDate = (dateStr) => {
-        if (!dateStr) return 'غير محدد';
-        try {
-          if (dateStr.includes('/')) {
-            const [day, month, year] = dateStr.split(' ')[0].split('/');
-            return `${year}-${month}-${day}`;
+    // 2. Process and filter evaluations
+    const processedData = data
+      .filter(eval => eval.Activity === currentCoach.activity)
+      .map(eval => {
+        // Calculate total score if missing
+        let total = 0;
+        const criteria = evaluationCriteria[currentCoach.activity] || [];
+        
+        // Sum scores for all criteria
+        criteria.forEach(criterion => {
+          const score = parseInt(eval[criterion]) || 0;
+          total += score;
+        });
+
+        // Calculate percentage
+        const percentage = Math.round((total / (criteria.length * 5)) * 100) + "%";
+        
+        // Format dates consistently
+        const formatDate = (dateStr) => {
+          if (!dateStr) return 'غير محدد';
+          try {
+            if (dateStr.includes('/')) {
+              const [day, month, year] = dateStr.split(' ')[0].split('/');
+              return `${year}-${month}-${day}`;
+            }
+            return dateStr.split('T')[0]; 
+          } catch {
+            return dateStr; 
           }
-          return dateStr.split('T')[0]; 
-        } catch {
-          return dateStr; 
-        }
-      };
-      
-      return {
-        ...eval,
-        "Date": formatDate(eval.Date),
-        "Time-stamp": formatDate(eval["Timestamp"]),
-        "Total Score": total,
-        "Percentage": percentage,
-        // Add normalized fields for easier comparison
-        normalizedPlayerId: String(eval["Player ID"]).trim(),
-        normalizedDate: formatDate(eval.Date)
-      };
-    }).filter(eval => eval.Activity === currentCoach.activity);
+        };
+        
+        return {
+          ...eval,
+          "Date": formatDate(eval.Date),
+          "Time-stamp": formatDate(eval["Timestamp"]),
+          "Total Score": total,
+          "Percentage": percentage,
+          normalizedPlayerId: String(eval["Player ID"]).trim(),
+          normalizedDate: formatDate(eval.Date)
+        };
+      });
     
-    // Update the global evaluations array
+    // 3. Update global evaluations array
     evaluations = processedData;
     
-    container.innerHTML = '';
-    
-    if (processedData.length === 0) {
-      container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
-      return;
-    }
-
-    // Group evaluations by player ID for better display
+    // 4. Group evaluations by player ID
     const playersMap = new Map();
     processedData.forEach(eval => {
-      if (!playersMap.has(eval.normalizedPlayerId)) {
-        playersMap.set(eval.normalizedPlayerId, {
-          id: eval["Player ID"],
+      const playerId = eval.normalizedPlayerId;
+      if (!playersMap.has(playerId)) {
+        playersMap.set(playerId, {
+          id: playerId,
           name: eval["Player Name"],
           evaluations: []
         });
       }
-      playersMap.get(eval.normalizedPlayerId).evaluations.push(eval);
+      playersMap.get(playerId).evaluations.push(eval);
     });
 
-    // Sort players by most recent evaluation
+    // 5. Display results
+    container.innerHTML = '';
+    
+    if (playersMap.size === 0) {
+      container.innerHTML = '<p>لا يوجد لاعبون مقييمون بعد</p>';
+      return;
+    }
+
+    // Sort by most recent evaluation first
     const sortedPlayers = Array.from(playersMap.values()).sort((a, b) => {
-      const aLatest = new Date(a.evaluations[0]["Time-stamp"]);
-      const bLatest = new Date(b.evaluations[0]["Time-stamp"]);
-      return bLatest - aLatest;
+      const dateA = new Date(b.evaluations[0]["Time-stamp"]);
+      const dateB = new Date(a.evaluations[0]["Time-stamp"]);
+      return dateA - dateB;
     });
 
-    // Display each player with their evaluations
     sortedPlayers.forEach(player => {
       const playerCard = document.createElement('div');
       playerCard.className = 'evaluated-player-card';
       
-      let evaluationsHTML = '';
-      
-      player.evaluations.forEach(eval => {
-        const scores = {};
-        const criteria = evaluationCriteria[currentCoach.activity] || [];
-        criteria.forEach(criterion => {
-          const scoreKey = Object.keys(eval).find(key => 
-            key.includes(criterion) || key.replace(/[^a-zA-Zء-ي]/g, '') === criterion.replace(/[^a-zA-Zء-ي]/g, '')
-          );
-          scores[criterion] = scoreKey ? parseInt(eval[scoreKey]) || 0 : 0;
-        });
-        
-        evaluationsHTML += `
-          <div class="evaluation-session">
-            <p><strong>تاريخ الحضور:</strong> ${eval["Date"] || 'غير محدد'}</p>
-            <p><strong>تاريخ التقييم:</strong> ${eval["Time-stamp"] || 'غير محدد'}</p>
-            <p><strong>المجموع:</strong> ${eval["Total Score"] || 0}/25 (${eval["Percentage"] || '0%'})</p>
-            <div class="criteria-scores">
-              ${Object.entries(scores).map(([criteria, score]) => `
-                <p>${criteria}: ${score}/5</p>
-              `).join('')}
-            </div>
-            ${eval["Notes"] ? `<p><strong>ملاحظات:</strong> ${eval["Notes"]}</p>` : ''}
-          </div>
-          <hr class="evaluation-divider">
-        `;
-      });
-
       playerCard.innerHTML = `
         <h3>${player.name || 'غير معروف'} <small>(${player.id || 'غير معروف'})</small></h3>
-        ${evaluationsHTML}
+        <div class="player-evaluations">
+          ${player.evaluations.map(eval => `
+            <div class="evaluation-session">
+              <p><strong>تاريخ الحضور:</strong> ${eval["Date"] || 'غير محدد'}</p>
+              <p><strong>تاريخ التقييم:</strong> ${eval["Time-stamp"] || 'غير محدد'}</p>
+              <p><strong>المجموع:</strong> ${eval["Total Score"] || 0}/25 (${eval["Percentage"] || '0%'})</p>
+              ${eval["Notes"] ? `<p><strong>ملاحظات:</strong> ${eval["Notes"]}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
       `;
       container.appendChild(playerCard);
     });
-
+    
   } catch (error) {
     console.error("Error loading evaluations:", error);
     container.innerHTML = '<p>حدث خطأ أثناء تحميل البيانات</p>';
+    showToast('❌ فشل في تحميل التقييمات: ' + error.message, false);
   } finally {
     hideLoading();
   }
