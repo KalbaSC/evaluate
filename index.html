@@ -1545,8 +1545,8 @@ async function showPlayerProgress() {
       return Math.round((total / (criteria.length * 5)) * 100);
     });
 
-    container.innerHTML = '<canvas id="progressChart"></canvas>';
-    const ctx = document.getElementById('progressChart').getContext('2d');
+container.innerHTML = '<canvas id="progressChart"></canvas>';
+const ctx = document.getElementById('progressChart').getContext('2d');
 
     progressChart = new Chart(ctx, {
       type: 'line',
