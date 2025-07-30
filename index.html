@@ -822,9 +822,9 @@
         <label for="playerSelect">اختر اللاعب</label>
         <select id="playerSelect" onchange="showPlayerProgress()"></select>
       </div>
-      <div id="progressChartContainer">
-        <canvas id="progressChart"></canvas>
-      </div>
+<div id="progressChartContainer">
+  <canvas id="progressChart"></canvas>
+</div>
     </div>
   </div>
   <script>
@@ -1501,14 +1501,18 @@ function updatePlayerSelect() {
 }
 
 
-function showPlayerProgress() {
-  const canvas = document.getElementById('progressChart');
-  const container = document.getElementById('progressChartContainer');
+document.addEventListener('DOMContentLoaded', function() {
   
-  if (!canvas || !container) {
-    console.error("Chart elements not found!");
-    return;
-  }
+  function showPlayerProgress() {
+    const container = document.getElementById('progressChartContainer');
+    const canvas = document.getElementById('progressChart');
+    
+    console.log("Elements:", {container, canvas});
+    
+    if (!container || !canvas) {
+      console.error("Chart elements missing!");
+      return;
+    }
 
   container.innerHTML = '<canvas id="progressChart"></canvas>';
   const ctx = canvas.getContext('2d');
@@ -1584,8 +1588,10 @@ function showPlayerProgress() {
         }
       }
     }
-  });
-}
+  }
+ } 
+  updatePlayerSelect();
+});
 
 async function fetchEvaluationsFromSheet() {
   try {
