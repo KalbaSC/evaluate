@@ -1072,52 +1072,62 @@ function renderPlayersList(players = playersData) {
   const container = document.getElementById('playersList');
   container.innerHTML = '';
 
-  // Filter players who haven't been evaluated for the selected date
+  // Get the selected date from the date picker
   const selectedDate = document.getElementById('sessionDate').value;
+  
+  // Filter players who haven't been evaluated for the selected date
   const unevaluatedPlayers = players.filter(player => {
-    return !evaluations.some(eval => 
-      eval["Player ID"] === player.id && 
-      eval["Date"] === selectedDate
-    );
+    // Make sure we're checking against the same date format
+    const playerDate = player.date || selectedDate;
+    
+    return !evaluations.some(eval => {
+      // Compare both ID and date (normalized)
+      return eval["Player ID"] === player.id && 
+             eval["Date"] === playerDate;
+    });
   });
 
   if (unevaluatedPlayers.length === 0) {
     container.innerHTML = '<p>لا يوجد لاعبون متاحون للتقييم في هذا التاريخ</p>';
-  } else {
-    unevaluatedPlayers.forEach(player => {
-      const playerCard = document.createElement('div');
-      playerCard.className = 'player-card';
-      playerCard.innerHTML = `
-        <h3>${player.name} <small>(${player.id})</small></h3>
-        <p>ولي الأمر: ${player.parent || "غير معروف"}</p>
-        <p>تاريخ الحضور: ${player.date || "غير محدد"}</p>
-        <div class="evaluation-form">
-          <h4>تقييم الأداء:</h4>
-          <div class="evaluation-criteria" id="criteria-${player.id}"></div>
-          <textarea id="notes-${player.id}" placeholder="ملاحظات إضافية..."></textarea>
-          <button class="btn" onclick="saveEvaluation('${player.id}', '${player.date}')">حفظ التقييم</button>
+    return;
+  }
+
+  unevaluatedPlayers.forEach(player => {
+    const playerCard = document.createElement('div');
+    playerCard.className = 'player-card';
+    playerCard.innerHTML = `
+      <h3>${player.name} <small>(${player.id})</small></h3>
+      <p>ولي الأمر: ${player.parent || "غير معروف"}</p>
+      <p>تاريخ الحضور: ${player.date || "غير محدد"}</p>
+      <div class="evaluation-form">
+        <h4>تقييم الأداء:</h4>
+        <div class="evaluation-criteria" id="criteria-${player.id}"></div>
+        <textarea id="notes-${player.id}" placeholder="ملاحظات إضافية..."></textarea>
+        <button class="btn" onclick="saveEvaluation('${player.id}', '${player.date || selectedDate}')">حفظ التقييم</button>
+      </div>
+    `;
+
+    const criteriaContainer = playerCard.querySelector(`#criteria-${player.id}`);
+    evaluationCriteria[currentCoach.activity].forEach((criteria, index) => {
+      criteriaContainer.innerHTML += `
+        <div class="criteria-item">
+          <label>${criteria}</label>
+          <select id="${player.id}-skill${index + 1}">
+            <option value="5">ممتاز (5)</option>
+            <option value="4">جيد جداً (4)</option>
+            <option value="3">جيد (3)</option>
+            <option value="2">مقبول (2)</option>
+            <option value="1">ضعيف (1)</option>
+          </select>
         </div>
       `;
-
-      const criteriaContainer = playerCard.querySelector(`#criteria-${player.id}`);
-      evaluationCriteria[currentCoach.activity].forEach((criteria, index) => {
-        criteriaContainer.innerHTML += `
-          <div class="criteria-item">
-            <label>${criteria}</label>
-            <select id="${player.id}-skill${index + 1}">
-              <option value="5">ممتاز (5)</option>
-              <option value="4">جيد جداً (4)</option>
-              <option value="3">جيد (3)</option>
-              <option value="2">مقبول (2)</option>
-              <option value="1">ضعيف (1)</option>
-            </select>
-          </div>
-        `;
-      });
-
-      container.appendChild(playerCard);
     });
-  }
+
+    container.appendChild(playerCard);
+  });
+
+  // Update the players count display
+  document.getElementById('playersCount').textContent = `عدد اللاعبين: ${unevaluatedPlayers.length}`;
 }
 
 async function saveEvaluation(playerId, playerDate) {
@@ -1127,9 +1137,13 @@ async function saveEvaluation(playerId, playerDate) {
     return;
   }
 
-  const existingEval = evaluations.find(e => 
+  // Use the provided date or fallback to the selected session date
+  const evaluationDate = playerDate || document.getElementById('sessionDate').value;
+
+  // Check if this player has already been evaluated for this specific date
+  const existingEval = evaluations.some(e => 
     e["Player ID"] === playerId && 
-    e["Date"] === playerDate
+    e["Date"] === evaluationDate
   );
   
   if (existingEval) {
@@ -1144,10 +1158,11 @@ async function saveEvaluation(playerId, playerDate) {
     "Player Name": player.name,
     "Player ID": player.id,
     "Parent": player.parent || "",
-    "Date": playerDate,
+    "Date": evaluationDate,
     "Notes": document.getElementById(`notes-${player.id}`)?.value || "",
   };
 
+  // Add all criteria scores
   evaluationCriteria[currentCoach.activity].forEach((criteria, index) => {
     const score = document.getElementById(`${player.id}-skill${index + 1}`)?.value;
     evaluationData[criteria] = score ? parseInt(score) : 0;
@@ -1155,17 +1170,25 @@ async function saveEvaluation(playerId, playerDate) {
 
   try {
     showLoading();
-    await sendEvaluation(evaluationData);  
+    
+    // Send to server
+    await sendEvaluation(evaluationData);
+    
+    // Add to local evaluations array
     evaluations.push(evaluationData);
     
+    // Remove the player card immediately
     const playerCard = document.querySelector(`.player-card:has(#criteria-${playerId})`);
     if (playerCard) {
       playerCard.remove();
     }
     
     showToast('✅ تم حفظ التقييم بنجاح', true);
+    
+    // Update evaluated players list
     renderEvaluatedPlayersList();
     
+    // Update the players count
     const remainingPlayers = document.querySelectorAll('.player-card').length;
     document.getElementById('playersCount').textContent = `عدد اللاعبين: ${remainingPlayers}`;
     
@@ -1596,26 +1619,28 @@ function showTab(tabName, event) {
     btn.classList.remove('active');
   });
 
-  document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-
   if (event) {
     event.target.classList.add('active');
   }
-  
-  if (tabName === 'evaluatedPlayers') {
-    renderEvaluatedPlayersList();
-  }
-  
+
   document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-  
-  if (tabName === 'evaluatedPlayers') {
-    renderEvaluatedPlayersList();
-  } else if (tabName === 'playersList') {
-    loadPlayersTable();
-  } else if (tabName === 'evaluation') {
-    renderPlayersList();
-  } else if (tabName === 'rankings') {
-    updateRankings();
+
+  switch(tabName) {
+    case 'evaluatedPlayers':
+      renderEvaluatedPlayersList();
+      break;
+    case 'playersList':
+      loadPlayersTable();
+      break;
+    case 'evaluation':
+      renderPlayersList();
+      break;
+    case 'rankings':
+      updateRankings();
+      break;
+    case 'progress':
+      showPlayerProgress();
+      break;
   }
 }
 
