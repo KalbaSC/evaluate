@@ -863,14 +863,19 @@ const evaluationCriteria = {
   ]
 };
 
-    function formatDate(dateStr) {
+function formatDate(dateStr) {
   if (!dateStr) return '';
   try {
     if (dateStr.includes('/')) {
       const [day, month, year] = dateStr.split(' ')[0].split('/');
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
-    return dateStr.split('T')[0];
+
+    const d = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   } catch {
     return dateStr;
   }
@@ -1273,21 +1278,7 @@ async function sendEvaluation(evaluationData) {
 async function renderEvaluatedPlayersList() {
   const container = document.getElementById('evaluatedPlayersList');
   container.innerHTML = '<p>جاري تحميل البيانات...</p>';
-
-  // ✅ دالة تنسيق التاريخ واحدة موحدة
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
-    try {
-      if (dateStr.includes('/')) {
-        const [day, month, year] = dateStr.split(' ')[0].split('/');
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
-      return dateStr.split('T')[0];
-    } catch {
-      return dateStr;
-    }
-  }
-
+  
   try {
     showLoading();
 
