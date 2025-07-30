@@ -862,6 +862,20 @@ const evaluationCriteria = {
     "التركيز"
   ]
 };
+
+    function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    if (dateStr.includes('/')) {
+      const [day, month, year] = dateStr.split(' ')[0].split('/');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    return dateStr.split('T')[0];
+  } catch {
+    return dateStr;
+  }
+}
+
     let progressChart = null;
     const progressChartCanvas = document.getElementById('progressChart');
     let currentCoach = null;
