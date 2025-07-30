@@ -1072,23 +1072,33 @@ function renderPlayersList(players = playersData) {
   const container = document.getElementById('playersList');
   container.innerHTML = '';
 
-  // Get the selected date from the date picker
-  const selectedDate = document.getElementById('sessionDate').value;
-  
-  // Filter players who haven't been evaluated for the selected date
   const unevaluatedPlayers = players.filter(player => {
-    // Make sure we're checking against the same date format
-    const playerDate = player.date || selectedDate;
+    if (!player.date) return true; 
+    
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '';
+      try {
+        if (dateStr.includes('/')) {
+          const [day, month, year] = dateStr.split(' ')[0].split('/');
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        return dateStr.split('T')[0]; 
+      } catch {
+        return dateStr;
+      }
+    };
+
+    const playerDateFormatted = formatDate(player.date);
     
     return !evaluations.some(eval => {
-      // Compare both ID and date (normalized)
+      const evalDateFormatted = formatDate(eval["Date"]);
       return eval["Player ID"] === player.id && 
-             eval["Date"] === playerDate;
+             evalDateFormatted === playerDateFormatted;
     });
   });
 
   if (unevaluatedPlayers.length === 0) {
-    container.innerHTML = '<p>لا يوجد لاعبون متاحون للتقييم في هذا التاريخ</p>';
+    container.innerHTML = '<p>لا يوجد لاعبون متاحون للتقييم</p>';
     return;
   }
 
@@ -1103,7 +1113,7 @@ function renderPlayersList(players = playersData) {
         <h4>تقييم الأداء:</h4>
         <div class="evaluation-criteria" id="criteria-${player.id}"></div>
         <textarea id="notes-${player.id}" placeholder="ملاحظات إضافية..."></textarea>
-        <button class="btn" onclick="saveEvaluation('${player.id}', '${player.date || selectedDate}')">حفظ التقييم</button>
+        <button class="btn" onclick="saveEvaluation('${player.id}', '${player.date}')">حفظ التقييم</button>
       </div>
     `;
 
@@ -1126,7 +1136,6 @@ function renderPlayersList(players = playersData) {
     container.appendChild(playerCard);
   });
 
-  // Update the players count display
   document.getElementById('playersCount').textContent = `عدد اللاعبين: ${unevaluatedPlayers.length}`;
 }
 
@@ -1137,16 +1146,30 @@ async function saveEvaluation(playerId, playerDate) {
     return;
   }
 
-  // Use the provided date or fallback to the selected session date
-  const evaluationDate = playerDate || document.getElementById('sessionDate').value;
-
-  // Check if this player has already been evaluated for this specific date
-  const existingEval = evaluations.some(e => 
-    e["Player ID"] === playerId && 
-    e["Date"] === evaluationDate
-  );
+  const evaluationDate = player.date;
   
-  if (existingEval) {
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    try {
+      if (dateStr.includes('/')) {
+        const [day, month, year] = dateStr.split(' ')[0].split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      return dateStr.split('T')[0];
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const playerDateFormatted = formatDate(evaluationDate);
+  
+  const alreadyEvaluated = evaluations.some(eval => {
+    const evalDateFormatted = formatDate(eval["Date"]);
+    return eval["Player ID"] === playerId && 
+           evalDateFormatted === playerDateFormatted;
+  });
+
+  if (alreadyEvaluated) {
     showToast('تم تقييم هذا اللاعب بالفعل في هذا التاريخ', false);
     return;
   }
@@ -1158,11 +1181,10 @@ async function saveEvaluation(playerId, playerDate) {
     "Player Name": player.name,
     "Player ID": player.id,
     "Parent": player.parent || "",
-    "Date": evaluationDate,
+    "Date": evaluationDate, 
     "Notes": document.getElementById(`notes-${player.id}`)?.value || "",
   };
 
-  // Add all criteria scores
   evaluationCriteria[currentCoach.activity].forEach((criteria, index) => {
     const score = document.getElementById(`${player.id}-skill${index + 1}`)?.value;
     evaluationData[criteria] = score ? parseInt(score) : 0;
@@ -1171,13 +1193,10 @@ async function saveEvaluation(playerId, playerDate) {
   try {
     showLoading();
     
-    // Send to server
     await sendEvaluation(evaluationData);
     
-    // Add to local evaluations array
     evaluations.push(evaluationData);
     
-    // Remove the player card immediately
     const playerCard = document.querySelector(`.player-card:has(#criteria-${playerId})`);
     if (playerCard) {
       playerCard.remove();
@@ -1185,10 +1204,8 @@ async function saveEvaluation(playerId, playerDate) {
     
     showToast('✅ تم حفظ التقييم بنجاح', true);
     
-    // Update evaluated players list
     renderEvaluatedPlayersList();
     
-    // Update the players count
     const remainingPlayers = document.querySelectorAll('.player-card').length;
     document.getElementById('playersCount').textContent = `عدد اللاعبين: ${remainingPlayers}`;
     
