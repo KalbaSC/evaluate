@@ -1472,20 +1472,16 @@ function getActivityIcon(activity) {
   };
   return icons[activity] || "";
 }
-// 1. Ensure elements exist and are properly referenced
 const playerSelect = document.getElementById('playerSelect');
-const progressChartCanvas = document.getElementById('progressChart');
 
-// 2. Modified updatePlayerSelect() with better error handling
 function updatePlayerSelect() {
   if (!playerSelect) {
     console.error("playerSelect element not found!");
     return;
   }
 
-  playerSelect.innerHTML = ''; // Clear existing options
+  playerSelect.innerHTML = ''; 
 
-  // Add default placeholder option
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
   defaultOption.textContent = '-- اختر لاعب --';
@@ -1493,7 +1489,6 @@ function updatePlayerSelect() {
   defaultOption.selected = true;
   playerSelect.appendChild(defaultOption);
 
-  // Add player options
   playersData.forEach(player => {
     const option = document.createElement('option');
     option.value = player.id;
