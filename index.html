@@ -1154,13 +1154,22 @@ async function saveEvaluation(playerId, playerDate) {
 
   const evaluationDate = player.date;
 
-  const playerDateFormatted = formatDate(evaluationDate);
+const playerDateFormatted = formatDate(evaluationDate); 
   
-  const alreadyEvaluated = evaluations.some(eval => {
-    const evalDateFormatted = formatDate(eval["Date"]);
-    return eval["Player ID"] === playerId && 
-           evalDateFormatted === playerDateFormatted;
+const alreadyEvaluated = evaluations.some(eval => {
+  const evalDateFormatted = formatDate(eval["Date"]);
+
+  console.log("✅ Comparing:", {
+    evalDate: eval["Date"],
+    evalFormatted: evalDateFormatted,
+    currentDate: playerDateFormatted,
+    playerIdEval: eval["Player ID"],
+    playerIdCurrent: playerId
   });
+
+  return eval["Player ID"] === playerId && 
+         evalDateFormatted === playerDateFormatted;
+});
 
   if (alreadyEvaluated) {
     showToast('تم تقييم هذا اللاعب بالفعل في هذا التاريخ', false);
