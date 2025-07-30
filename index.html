@@ -1152,7 +1152,7 @@ async function saveEvaluation(playerId, playerDate) {
     return;
   }
 
-  const evaluationDate = player.date;
+  const evaluationDate = document.getElementById(`evaluationDate-${playerId}`)?.value;
 
 const playerDateFormatted = formatDate(evaluationDate); 
   
