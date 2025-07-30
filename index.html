@@ -454,6 +454,12 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+    #progressChartContainer {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  direction: ltr; 
+}
     @media (max-width: 768px) {
    html {
   -webkit-text-size-adjust: 100%; 
@@ -945,6 +951,7 @@ async function loadPlayersData() {
   } finally {
     hideLoading();
   }
+  updatePlayerSelect();
 }
 
 async function fetchEvaluationsFromSheet() {
@@ -1465,82 +1472,171 @@ function getActivityIcon(activity) {
   };
   return icons[activity] || "";
 }
+// 1. Ensure elements exist and are properly referenced
+const playerSelect = document.getElementById('playerSelect');
+const progressChartCanvas = document.getElementById('progressChart');
 
-    function updatePlayerSelect() {
-      playerSelect.innerHTML = '';
-      playersData.forEach(player => {
-        const option = document.createElement('option');
-        option.value = player.id;
-        option.textContent = player.name;
-        playerSelect.appendChild(option);
-      });
+// 2. Modified updatePlayerSelect() with better error handling
+function updatePlayerSelect() {
+  if (!playerSelect) {
+    console.error("playerSelect element not found!");
+    return;
+  }
 
-      if (playersData.length > 0) {
-        showPlayerProgress();
-      }
-    }
+  playerSelect.innerHTML = ''; // Clear existing options
 
-    function showPlayerProgress() {
-      const playerId = playerSelect.value;
-      const playerName = playersData.find(p => p.id === playerId).name;
-      const playerEvals = evaluations.filter(e => e.playerId === playerId && e.activity === currentCoach.activity);
+  // Add default placeholder option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = '-- اختر لاعب --';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  playerSelect.appendChild(defaultOption);
 
-      if (playerEvals.length === 0) {
-        progressChartContainer.innerHTML = '<p>لا توجد بيانات تطور لهذا اللاعب بعد</p>';
-        if (progressChart) progressChart.destroy();
-        return;
-      }
+  // Add player options
+  playersData.forEach(player => {
+    const option = document.createElement('option');
+    option.value = player.id;
+    option.textContent = `${player.name} (${player.id})`;
+    playerSelect.appendChild(option);
+  });
+}
 
-      playerEvals.sort((a, b) => new Date(a.date) - new Date(b.date));
+// 3. Enhanced showPlayerProgress() with complete chart implementation
+async function showPlayerProgress() {
+  if (!progressChartCanvas) {
+    console.error("Progress chart canvas not found!");
+    return;
+  }
 
-      const dates = playerEvals.map(e => formatDate(e.date));
-      const percentages = playerEvals.map(e => e.percentage);
+  const playerId = playerSelect.value;
+  
+  // Case 1: No player selected
+  if (!playerId) {
+    progressChartCanvas.closest('#progressChartContainer').innerHTML = `
+      <p style="color: white; text-align: center; padding: 20px;">
+        الرجاء اختيار لاعب من القائمة
+      </p>
+      <canvas id="progressChart" style="display: none;"></canvas>
+    `;
+    if (window.progressChart) window.progressChart.destroy();
+    return;
+  }
 
-      if (progressChart) progressChart.destroy();
+  // Case 2: Filter and prepare data
+  const playerEvals = evaluations.filter(e => 
+    String(e["Player ID"]).trim() === String(playerId).trim() && 
+    e.Activity === currentCoach.activity
+  ).sort((a, b) => new Date(a["Date"]) - new Date(b["Date"])); // Sort by date
 
-      const ctx = progressChartCanvas.getContext('2d');
-      progressChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: dates,
-          datasets: [{
-            label: `تطور أداء ${playerName}`,
-            data: percentages,
-            borderColor: '#f4e733',
-            backgroundColor: 'rgba(244, 231, 51, 0.1)',
-            fill: true,
-            tension: 0.1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: false,
-              min: 0,
-              max: 100,
-              ticks: {
-                callback: function(value) {
-                  return value + '%';
-                }
-              }
-            }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: `تطور أداء ${playerName}`,
-              color: '#f4e733'
-            },
-            legend: {
-              labels: {
-                color: 'white'
-              }
+  // Case 3: No evaluations found
+  if (playerEvals.length === 0) {
+    progressChartCanvas.closest('#progressChartContainer').innerHTML = `
+      <p style="color: white; text-align: center; padding: 20px;">
+        لا توجد بيانات تطور لهذا اللاعب بعد
+      </p>
+      <canvas id="progressChart" style="display: none;"></canvas>
+    `;
+    if (window.progressChart) window.progressChart.destroy();
+    return;
+  }
+
+  // Prepare chart data
+  const dates = playerEvals.map(e => formatDate(e["Date"]));
+  const percentages = playerEvals.map(e => {
+    const criteria = evaluationCriteria[currentCoach.activity] || [];
+    const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0, 0);
+    return Math.round((total / (criteria.length * 5)) * 100);
+  });
+
+  // Destroy previous chart instance
+  if (window.progressChart) window.progressChart.destroy();
+
+  // Create new chart
+  const ctx = progressChartCanvas.getContext('2d');
+  progressChartCanvas.style.display = 'block';
+  
+  window.progressChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [{
+        label: 'نسبة التطور',
+        data: percentages,
+        borderColor: '#f4e733',
+        backgroundColor: 'rgba(244, 231, 51, 0.2)',
+        borderWidth: 2,
+        pointBackgroundColor: '#f4e733',
+        pointRadius: 4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#fff',
+            font: {
+              family: 'NotoKufiArabic'
             }
           }
+        },
+        tooltip: {
+          rtl: true,
+          bodyFont: {
+            family: 'NotoKufiArabic'
+          }
         }
-      });
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#fff'
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        },
+        y: {
+          min: 0,
+          max: 100,
+          ticks: {
+            color: '#fff',
+            callback: (value) => `${value}%`
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
     }
+  });
+}
+
+async function fetchEvaluationsFromSheet() {
+  try {
+    const url = CONFIG.USE_CORS_PROXY 
+      ? CONFIG.CORS_PROXY_URL + CONFIG.EVALUATION_SCRIPT_URL 
+      : CONFIG.EVALUATION_SCRIPT_URL;
+    
+    console.log("Fetching evaluations from:", url);
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Fetched evaluations:", data.slice(0, 3)); // Log first 3 entries
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Failed to fetch evaluations:", err);
+    showToast('❌ فشل تحميل التقييمات', false);
+    return [];
+  }
+}
 
 function exportRankings() {
   if (!Array.isArray(evaluations) || evaluations.length === 0) {
