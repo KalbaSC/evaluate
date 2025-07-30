@@ -460,6 +460,10 @@
   position: relative;
   direction: ltr; 
 }
+#progressChart {
+  width: 100% !important;
+  height: 100% !important;
+}
     @media (max-width: 768px) {
    html {
   -webkit-text-size-adjust: 100%; 
@@ -888,7 +892,6 @@ function formatDate(dateStr) {
 }
 
     let progressChart = null;
-    const progressChartCanvas = document.getElementById('progressChart');
     let currentCoach = null;
     let playersData = [];
     let evaluations = JSON.parse(localStorage.getItem('playerEvaluations')) || [];
@@ -1497,71 +1500,60 @@ function updatePlayerSelect() {
   });
 }
 
-// 3. Enhanced showPlayerProgress() with complete chart implementation
-async function showPlayerProgress() {
-  if (!progressChartCanvas) {
-    console.error("Progress chart canvas not found!");
-    return;
-  }
 
-  const playerId = playerSelect.value;
+function showPlayerProgress() {
+  const canvas = document.getElementById('progressChart');
+  const container = document.getElementById('progressChartContainer');
   
-  // Case 1: No player selected
-  if (!playerId) {
-    progressChartCanvas.closest('#progressChartContainer').innerHTML = `
-      <p style="color: white; text-align: center; padding: 20px;">
-        الرجاء اختيار لاعب من القائمة
-      </p>
-      <canvas id="progressChart" style="display: none;"></canvas>
-    `;
-    if (window.progressChart) window.progressChart.destroy();
+  if (!canvas || !container) {
+    console.error("Chart elements not found!");
     return;
   }
 
-  // Case 2: Filter and prepare data
-  const playerEvals = evaluations.filter(e => 
-    String(e["Player ID"]).trim() === String(playerId).trim() && 
-    e.Activity === currentCoach.activity
-  ).sort((a, b) => new Date(a["Date"]) - new Date(b["Date"])); // Sort by date
+  container.innerHTML = '<canvas id="progressChart"></canvas>';
+  const ctx = canvas.getContext('2d');
 
-  // Case 3: No evaluations found
+  if (progressChart) {
+    try {
+      progressChart.destroy();
+    } catch (err) {
+      console.log("Cleanup of previous chart failed:", err);
+    }
+  }
+
+  const playerId = document.getElementById('playerSelect').value;
+  if (!playerId) {
+    container.innerHTML = '<p style="color:white; text-align:center">الرجاء اختيار لاعب</p>';
+    return;
+  }
+
+  const playerEvals = evaluations.filter(e => 
+    String(e["Player ID"]).trim() === String(playerId).trim() &&
+    e.Activity === currentCoach.activity
+  );
+
   if (playerEvals.length === 0) {
-    progressChartCanvas.closest('#progressChartContainer').innerHTML = `
-      <p style="color: white; text-align: center; padding: 20px;">
-        لا توجد بيانات تطور لهذا اللاعب بعد
-      </p>
-      <canvas id="progressChart" style="display: none;"></canvas>
-    `;
-    if (window.progressChart) window.progressChart.destroy();
+    container.innerHTML = '<p style="color:white; text-align:center">لا توجد بيانات لهذا اللاعب</p>';
     return;
   }
 
   const dates = playerEvals.map(e => formatDate(e["Date"]));
   const percentages = playerEvals.map(e => {
-  const criteria = evaluationCriteria[currentCoach.activity] || [];
-  const total = criteria.reduce((sum, crit) => 
-    sum + (parseInt(e[crit]) || 0),  
-  0);
-  return Math.round((total / (criteria.length * 5)) * 100);
-});
+    const criteria = evaluationCriteria[currentCoach.activity] || [];
+    const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0), 0);
+    return Math.round((total / (criteria.length * 5)) * 100);
+  });
 
-  if (window.progressChart) window.progressChart.destroy();
-
-  const ctx = progressChartCanvas.getContext('2d');
-  progressChartCanvas.style.display = 'block';
-  
-  window.progressChart = new Chart(ctx, {
+  progressChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: dates,
       datasets: [{
-        label: 'نسبة التطور',
+        label: 'تقييم الأداء',
         data: percentages,
         borderColor: '#f4e733',
         backgroundColor: 'rgba(244, 231, 51, 0.2)',
         borderWidth: 2,
-        pointBackgroundColor: '#f4e733',
-        pointRadius: 4,
         fill: true
       }]
     },
@@ -1576,22 +1568,11 @@ async function showPlayerProgress() {
               family: 'NotoKufiArabic'
             }
           }
-        },
-        tooltip: {
-          rtl: true,
-          bodyFont: {
-            family: 'NotoKufiArabic'
-          }
         }
       },
       scales: {
         x: {
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
+          ticks: { color: '#fff' }
         },
         y: {
           min: 0,
@@ -1599,9 +1580,6 @@ async function showPlayerProgress() {
           ticks: {
             color: '#fff',
             callback: (value) => `${value}%`
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
           }
         }
       }
