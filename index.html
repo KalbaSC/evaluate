@@ -1093,19 +1093,6 @@ function renderPlayersList(players = playersData) {
 
   const unevaluatedPlayers = players.filter(player => {
     if (!player.date) return true; 
-    
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '';
-      try {
-        if (dateStr.includes('/')) {
-          const [day, month, year] = dateStr.split(' ')[0].split('/');
-          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        }
-        return dateStr.split('T')[0]; 
-      } catch {
-        return dateStr;
-      }
-    };
 
     const playerDateFormatted = formatDate(player.date);
     
@@ -1166,19 +1153,6 @@ async function saveEvaluation(playerId, playerDate) {
   }
 
   const evaluationDate = player.date;
-  
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      if (dateStr.includes('/')) {
-        const [day, month, year] = dateStr.split(' ')[0].split('/');
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
-      return dateStr.split('T')[0];
-    } catch {
-      return dateStr;
-    }
-  };
 
   const playerDateFormatted = formatDate(evaluationDate);
   
