@@ -1536,18 +1536,17 @@ async function showPlayerProgress() {
     return;
   }
 
-  // Prepare chart data
   const dates = playerEvals.map(e => formatDate(e["Date"]));
   const percentages = playerEvals.map(e => {
-    const criteria = evaluationCriteria[currentCoach.activity] || [];
-    const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0, 0);
-    return Math.round((total / (criteria.length * 5)) * 100);
-  });
+  const criteria = evaluationCriteria[currentCoach.activity] || [];
+  const total = criteria.reduce((sum, crit) => 
+    sum + (parseInt(e[crit]) || 0),  
+  0);
+  return Math.round((total / (criteria.length * 5)) * 100);
+});
 
-  // Destroy previous chart instance
   if (window.progressChart) window.progressChart.destroy();
 
-  // Create new chart
   const ctx = progressChartCanvas.getContext('2d');
   progressChartCanvas.style.display = 'block';
   
