@@ -1498,9 +1498,121 @@ function updatePlayerSelect() {
   });
 }
 
+let progressChart = null;
+
+async function showPlayerProgress() {
+  try {
+    const container = document.getElementById('progressChartContainer');
+    const canvas = document.getElementById('progressChart');
+    const playerSelect = document.getElementById('playerSelect');
+    
+    if (!container || !canvas || !playerSelect) {
+      throw new Error('Missing required DOM elements');
+    }
+
+    if (progressChart) {
+      try {
+        progressChart.destroy();
+      } catch (err) {
+        console.warn('Chart destruction error:', err);
+      }
+    }
+
+    const playerId = playerSelect.value.trim();
+    if (!playerId) {
+      container.innerHTML = '<p style="color:white; text-align:center; padding:20px;">الرجاء اختيار لاعب</p>';
+      return;
+    }
+
+    if (evaluations.length === 0) {
+      evaluations = await fetchEvaluationsFromSheet();
+    }
+
+    const playerEvals = evaluations
+      .filter(e => String(e["Player ID"]).trim() === playerId && 
+                   e.Activity === currentCoach.activity)
+      .sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
+    if (playerEvals.length === 0) {
+      container.innerHTML = '<p style="color:white; text-align:center; padding:20px;">لا توجد بيانات لهذا اللاعب</p>';
+      return;
+    }
+
+    const dates = playerEvals.map(e => formatDate(e.Date));
+    const percentages = playerEvals.map(e => {
+      const criteria = evaluationCriteria[currentCoach.activity] || [];
+      const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0), 0);
+      return Math.round((total / (criteria.length * 5)) * 100);
+    });
+
+    container.innerHTML = '<canvas id="progressChart"></canvas>';
+    const ctx = document.getElementById('progressChart').getContext('2d');
+
+    progressChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: 'تطور الأداء (%)',
+          data: percentages,
+          borderColor: '#f4e733',
+          backgroundColor: 'rgba(244, 231, 51, 0.2)',
+          borderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            rtl: true,
+            labels: {
+              color: '#fff',
+              font: {
+                family: 'NotoKufiArabic',
+                size: 14
+              }
+            }
+          },
+          tooltip: {
+            rtl: true,
+            bodyFont: {
+              family: 'NotoKufiArabic'
+            },
+            callbacks: {
+              label: (context) => `${context.parsed.y}%`
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#fff' },
+            grid: { color: 'rgba(255,255,255,0.1)' }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            ticks: {
+              color: '#fff',
+              callback: (val) => `${val}%`
+            },
+            grid: { color: 'rgba(255,255,255,0.1)' }
+          }
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in showPlayerProgress:', error);
+    showToast('❌ حدث خطأ في عرض التطور', false);
+  }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-  let progressChart = null;
+  
   function showToast(message, isSuccess) {
     const toast = document.createElement('div');
     toast.textContent = message;
@@ -1515,118 +1627,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 4000);
   }
-
-  async function showPlayerProgress() {
-    try {
-      const container = document.getElementById('progressChartContainer');
-      const canvas = document.getElementById('progressChart');
-      const playerSelect = document.getElementById('playerSelect');
-      
-      if (!container || !canvas || !playerSelect) {
-        throw new Error('Missing required DOM elements');
-      }
-
-      if (progressChart) {
-        try {
-          progressChart.destroy();
-        } catch (err) {
-          console.warn('Chart destruction error:', err);
-        }
-      }
-
-      const playerId = playerSelect.value.trim();
-      if (!playerId) {
-        container.innerHTML = '<p style="color:white; text-align:center; padding:20px;">الرجاء اختيار لاعب</p>';
-        return;
-      }
-
-      if (evaluations.length === 0) {
-        evaluations = await fetchEvaluationsFromSheet();
-      }
-
-      const playerEvals = evaluations
-        .filter(e => String(e["Player ID"]).trim() === playerId && 
-                     e.Activity === currentCoach.activity)
-        .sort((a, b) => new Date(a.Date) - new Date(b.Date));
-
-      if (playerEvals.length === 0) {
-        container.innerHTML = '<p style="color:white; text-align:center; padding:20px;">لا توجد بيانات لهذا اللاعب</p>';
-        return;
-      }
-
-      const dates = playerEvals.map(e => formatDate(e.Date));
-      const percentages = playerEvals.map(e => {
-        const criteria = evaluationCriteria[currentCoach.activity] || [];
-        const total = criteria.reduce((sum, crit) => sum + (parseInt(e[crit]) || 0), 0);
-        return Math.round((total / (criteria.length * 5)) * 100);
-      });
-
-      container.innerHTML = '<canvas id="progressChart"></canvas>';
-      const ctx = canvas.getContext('2d');
-
-      progressChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: dates,
-          datasets: [{
-            label: 'تطور الأداء (%)',
-            data: percentages,
-            borderColor: '#f4e733',
-            backgroundColor: 'rgba(244, 231, 51, 0.2)',
-            borderWidth: 3,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              rtl: true,
-              labels: {
-                color: '#fff',
-                font: {
-                  family: 'NotoKufiArabic',
-                  size: 14
-                }
-              }
-            },
-            tooltip: {
-              rtl: true,
-              bodyFont: {
-                family: 'NotoKufiArabic'
-              },
-              callbacks: {
-                label: (context) => `${context.parsed.y}%`
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: '#fff' },
-              grid: { color: 'rgba(255,255,255,0.1)' }
-            },
-            y: {
-              min: 0,
-              max: 100,
-              ticks: {
-                color: '#fff',
-                callback: (val) => `${val}%`
-              },
-              grid: { color: 'rgba(255,255,255,0.1)' }
-            }
-          }
-        }
-      });
-
-    } catch (error) {
-      console.error('Error in showPlayerProgress:', error);
-      showToast('❌ حدث خطأ في عرض التطور', false);
-    }
-  }
-
+  
   async function fetchEvaluationsFromSheet() {
     try {
       const url = CONFIG.USE_CORS_PROXY 
